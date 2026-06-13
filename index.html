@@ -1432,6 +1432,370 @@ const MODULES = [
     }
   }
 
+  ,{
+    id: "m7", emoji: "📊", tier: "Data & Analysis", build: true,
+    title: "Data and Analysis",
+    desc: "Turn messy data into answers, charts, and a dashboard, with AI doing the heavy lifting",
+    bridge: "You do not need to know statistics to get answers from data. You need to ask well and check the work.",
+    lessons: [
+      {
+        title: "Talk to a dataset", ic: "📂",
+        seed: "Drop a spreadsheet into an AI tool, ask a plain question, and get a chart back. That is the whole loop.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "You have a CSV of 2,000 sales rows. Fastest way to find your best month?",
+          options: ["Open it and scroll through every row", "Upload it and ask the AI to chart sales by month"],
+          a: 1,
+          good: "Right. Tools that run code on your file (ChatGPT data analysis, Claude, Julius) read the whole thing and answer in seconds.",
+          bad: "Upload it and ask. Modern AI tools load the file, run real code on it, and hand you a chart, no scrolling required."
+        },
+        idea: [
+          "Tools like <strong>ChatGPT Advanced Data Analysis</strong>, <strong>Claude</strong>, and <strong>Julius</strong> can take a spreadsheet and actually run code on it. You ask in plain English, it computes, and it shows the result.",
+          "The loop is simple: upload, ask a sharp question, read the answer, ask the next one. You are having a conversation with your data.",
+          "<strong>How it breaks:</strong> asking a vague question like make this better. Ask something specific (which product had the highest revenue in Q2) and you get a specific answer."
+        ],
+        analogy: "A fast analyst sitting next to you. You ask, they pull the numbers and sketch a chart, you ask the follow-up.",
+        goDeeper: { text: ["These tools write and run real Python behind the scenes. You do not see it unless you ask, but you can: requesting the code is how you check its work and learn."], videos: [] }
+      },
+      {
+        title: "Trust, but verify one number", ic: "🔍",
+        seed: "AI gets data answers wrong sometimes, confidently. The fix is one habit: hand-check a single number.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "The AI says total revenue is 4.2 lakh. Before you put that in a report, you should:",
+          options: ["Trust it, the tool ran the math", "Spot-check one number you can verify another way"],
+          a: 1,
+          good: "Right. Pick one figure, check it by hand or with a quick filter. If it matches, your trust in the rest goes up.",
+          bad: "Spot-check one number. AI can misread a column or drop rows silently. One verified figure tells you the pipeline is sound."
+        },
+        idea: [
+          "AI data tools can pick the wrong column, mishandle blank cells, or silently drop rows. The output still looks confident.",
+          "The habit that saves you: <strong>verify one number</strong>. Total a column yourself, or filter to one month and count. If your check matches the AI, trust the rest more.",
+          "<strong>How it breaks:</strong> shipping a number to your boss without ever checking one. When a single wrong assumption flows through, the whole report is wrong and it has your name on it."
+        ],
+        analogy: "A calculator you half-trust. You punch in one sum you already know the answer to. If it is right, you believe the next one.",
+        goDeeper: { text: ["Ask the tool to show its code and the row count it used. If it analyzed 1,950 of your 2,000 rows, you just found 50 rows it quietly skipped."], videos: [] }
+      },
+      {
+        title: "Clean the mess", ic: "🧹",
+        seed: "Real data is dirty: blank cells, Jan vs January, duplicate rows. AI can clean it faster than you can find the menu.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "Your date column mixes 01/02/2026, Feb 1, and 2026-02-01. Best move?",
+          options: ["Fix every cell by hand", "Ask the AI to standardise the whole column to one date format"],
+          a: 1,
+          good: "Right. Describe the target format once and it reformats the entire column, then you spot-check a few.",
+          bad: "Ask it to standardise the column. Describe the format you want once; it fixes all of them, then verify a sample."
+        },
+        idea: [
+          "Messy data is the normal state, not the exception. Common jobs: fill or flag blanks, unify inconsistent labels, remove duplicates, split a full name into two columns, fix mixed date formats.",
+          "Describe the end state you want in plain words. The tool does the bulk edit; you sample-check the result.",
+          "<strong>How it breaks:</strong> cleaning without keeping the original. Always work on a copy, because a bad bulk edit can quietly corrupt data you cannot get back."
+        ],
+        analogy: "Tidying a room by describing how you want it to look, instead of moving every object yourself.",
+        goDeeper: { text: ["You can also extract a clean table from a PDF or image. Tools like LlamaParse and Unstract turn a messy invoice or report into a tidy spreadsheet you can then analyze."], videos: [] }
+      },
+      {
+        title: "Spreadsheet superpowers", ic: "🧮",
+        seed: "You do not need to memorise formulas anymore. Describe what you want and the spreadsheet writes it.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "You want a column that flags orders over 5,000 as High. The 2026 way:",
+          options: ["Remember the exact IF formula syntax", "Type the rule in plain English and let Copilot or Gemini write the formula"],
+          a: 1,
+          good: "Right. Excel Copilot and Sheets with Gemini turn a plain-English rule into the correct formula and explain it.",
+          bad: "Describe the rule in plain English. The AI writes the formula, and you can ask it to explain what it wrote."
+        },
+        idea: [
+          "<strong>Excel Copilot</strong> and <strong>Google Sheets with Gemini</strong> write formulas, build pivot tables, and spot outliers from a plain-English description.",
+          "This unlocks the things people avoided: pivots to summarise, conditional columns, finding the weird values that do not fit.",
+          "<strong>How it breaks:</strong> pasting a formula you do not understand into a live sheet. Ask it to explain the formula in one line, so you can catch a wrong assumption before it spreads."
+        ],
+        analogy: "A spreadsheet expert looking over your shoulder. You say what you want; they type the formula and tell you what it does.",
+        goDeeper: { text: ["The durable skill is naming the operation: filter, group, summarise, compare, rank. Once you can name what you want, any tool (or any future tool) can do it for you."], videos: [] }
+      },
+      {
+        title: "One chart, one story", ic: "📈",
+        seed: "A good chart makes one point clearly. Most bad charts try to show everything and say nothing.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "You want to show sales grew every month this year. Best chart?",
+          options: ["A pie chart of all products", "A simple line chart of monthly sales over time"],
+          a: 1,
+          good: "Right. Trend over time is a line chart. The shape makes the growth obvious in a glance.",
+          bad: "A line chart over time. Match the chart to the point: trends are lines, parts of a whole are bars or a single number."
+        },
+        idea: [
+          "Pick the chart by the point you are making. Change over time is a <strong>line</strong>. Comparing categories is a <strong>bar</strong>. One big result is just a <strong>number</strong>. Pies are usually worse than a bar.",
+          "Ask the AI for the chart, then sharpen it: clear title that states the takeaway, labelled axes, no decoration that does not help.",
+          "<strong>How it breaks:</strong> a cluttered chart with five series and no title. If a reader cannot get the point in three seconds, the chart failed."
+        ],
+        analogy: "A headline, not the whole article. One chart should land one idea before the reader looks away.",
+        goDeeper: { text: ["Make the title the conclusion. Sales up 30% this year beats Monthly sales. The reader should know your point before they study the lines."], videos: [] }
+      },
+      {
+        title: "Talk to a database", ic: "🗄️",
+        seed: "Your data is often not a file, it lives in a database. AI can write the query, and you can learn to read it.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "Your customer data is in a database. You want last month's signups but cannot write SQL. Best move?",
+          options: ["Give up and ask an engineer", "Use a text-to-SQL assistant: describe it, get the query, read what it does"],
+          a: 1,
+          good: "Right. Text-to-SQL turns plain English into a query. You run it, and you read it to confirm it asked the right thing.",
+          bad: "Use text-to-SQL. Describe the question, get the SQL, and learn to read it so you trust the result. No handoff needed."
+        },
+        idea: [
+          "A <strong>database</strong> holds data in tables you query with <strong>SQL</strong>. Text-to-SQL tools (the <strong>Supabase AI assistant</strong>, <strong>ChatGPT</strong>, others) write the SQL from your plain-English question.",
+          "The skill is not memorising SQL, it is reading it. SELECT picks columns, WHERE filters rows, GROUP BY summarises. Read those three and you can confirm the query asked your real question.",
+          "<strong>How it breaks:</strong> running generated SQL on live data without reading it. A wrong filter can return the wrong customers, or an unguarded command can change data. Read first, run on a copy when unsure."
+        ],
+        analogy: "Ordering in a language you are learning to read. The waiter writes it down; you can now check the order says what you meant.",
+        goDeeper: { text: ["Learning to read SQL is the no-handoff move for data: you stop waiting on an analyst for every question and start answering them yourself, with the AI as your typist."], videos: [] }
+      },
+      {
+        title: "From numbers to a decision", ic: "🧭",
+        seed: "Analysis is not done at the chart. It is done when someone can act on it. Always end with so what.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "You found that Tuesday emails get double the opens. The analysis is finished when you:",
+          options: ["Have the chart", "State the action: move the weekly email to Tuesday and watch opens"],
+          a: 1,
+          good: "Right. A finding becomes useful only when it names a decision. The chart is the middle, not the end.",
+          bad: "State the action it implies. Data work ends at a decision someone can take, not at a pretty chart."
+        },
+        idea: [
+          "Every analysis should end with a <strong>so what</strong>: the decision or change it points to. A number with no action attached is trivia.",
+          "Ask the AI to help here too: given this result, what are two actions I could take, and what would I watch to know it worked.",
+          "<strong>How it breaks:</strong> stopping at the insight and never naming the move. Interesting is not the goal; a better decision is."
+        ],
+        analogy: "A weather forecast is useful because you bring an umbrella, not because the chart looks nice.",
+        goDeeper: { text: ["Write findings as claim, evidence, action: opens are higher on Tuesday (chart), so we move the send and recheck in two weeks. That structure survives any meeting."], videos: [] }
+      }
+    ],
+    quiz: [
+      { q: "Fastest way to answer a question from a big CSV?", options: ["Scroll every row", "Upload it and ask the AI to compute and chart it", "Print it", "Guess"], a: 1, why: "Code-running AI tools read the whole file and answer in seconds." },
+      { q: "Before you trust an AI's data answer, you should...", options: ["Always trust it", "Spot-check one number you can verify another way", "Re-upload the file", "Make it prettier"], a: 1, why: "One verified figure tells you the whole pipeline is likely sound." },
+      { q: "Your date column has three different formats. Best move?", options: ["Fix each cell by hand", "Ask AI to standardise the whole column, then sample-check", "Delete the column", "Ignore it"], a: 1, why: "Describe the target format once; it bulk-fixes, you verify a sample." },
+      { q: "You want to show growth over the year. Best chart?", options: ["Pie chart", "Line chart over time", "Table of raw numbers", "Word cloud"], a: 1, why: "Trends over time are lines; match the chart to the point." },
+      { q: "Your data is in a database and you cannot write SQL. Best move?", options: ["Wait for an engineer", "Use text-to-SQL, then read the query to confirm it", "Export everything to email", "Skip it"], a: 1, why: "Text-to-SQL writes it; reading SELECT/WHERE/GROUP BY confirms it." },
+      { q: "An analysis is finished when...", options: ["The chart looks good", "It names a decision someone can act on", "It is long", "It has many charts"], a: 1, why: "Data work ends at a better decision, not at a pretty chart." }
+    ],
+    assignment: {
+      title: "Analyze real data and build a dashboard", xp: 160,
+      steps: "Take a real dataset for {{SPINE}} (your sales, signups, expenses, or a public CSV). (1) Upload it and ask three sharp questions. (2) Verify one number by hand. (3) Clean one messy column on a copy. (4) Make two charts that each land one clear point with a conclusion as the title. (5) Assemble them into a one-screen dashboard (ask your AI tool to generate a simple HTML dashboard, or build one in Sheets) and write three sentences: the finding, the evidence, the action. You can now go from a raw file to a decision, solo."
+    }
+  }
+  ,{
+    id: "m8", emoji: "🚀", tier: "Build AI Products", build: true,
+    title: "Build AI Products and Apps",
+    desc: "Ship a real web app yourself, with auth, a database, and a live URL. No developer, no handoff.",
+    bridge: "Vibe coding gets you moving fast. Understanding what you built is what lets you fix it when it breaks.",
+    lessons: [
+      {
+        title: "How an app actually works", ic: "🏗️",
+        seed: "Every app is four parts. Once you can name them, the whole thing stops feeling like magic.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "A user clicks Sign up on your app. Which part stores their account so it is there tomorrow?",
+          options: ["The frontend (what they see)", "The database (where data is saved)"],
+          a: 1,
+          good: "Right. The frontend is the screen, the backend is the logic, the database is the memory, hosting puts it online.",
+          bad: "The database. Frontend is the screen, backend is the logic, database is the memory, hosting makes it reachable. Four parts."
+        },
+        idea: [
+          "Every web app has four parts. <strong>Frontend</strong>: what the user sees and clicks. <strong>Backend</strong>: the logic that runs when they act. <strong>Database</strong>: where data is stored so it survives. <strong>Hosting</strong>: the server that makes it reachable at a URL.",
+          "When you build with AI, it writes all four. But knowing which part is which is how you describe a bug precisely and fix it instead of guessing.",
+          "<strong>How it breaks:</strong> treating the app as one blob. When something fails you will not know if it is the screen, the logic, or the data, so you cannot tell the AI where to look."
+        ],
+        analogy: "A restaurant: the dining room is the frontend, the kitchen is the backend, the pantry is the database, and the building itself is the hosting.",
+        goDeeper: { text: ["This is the spine of the whole track. You will not write this code by hand, but every fix you make later starts with which of the four parts is involved."], videos: [] }
+      },
+      {
+        title: "What an API and a key are", ic: "🔌",
+        seed: "Apps talk to other apps through APIs. An API key is the password that proves it is you. Both matter from day one.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "Your app needs to use an AI model. How does it reach the model?",
+          options: ["It downloads the whole model into your app", "It calls the model's API with your API key"],
+          a: 1,
+          good: "Right. An API is a doorway one app offers another; the key proves who is knocking and tracks usage.",
+          bad: "It calls the API with your key. An API is a service's doorway; the key is your credential. The model stays on their servers."
+        },
+        idea: [
+          "An <strong>API</strong> is a doorway one app offers so other apps can use its features. Your app sends a request, the service sends data back. That is how you add AI, payments, maps, or email without building them.",
+          "An <strong>API key</strong> is a secret string that proves the request is yours and meters your usage. Treat it like a password.",
+          "<strong>How it breaks:</strong> pasting a key into your frontend code or a public repo. Anyone can read it and run up your bill. Keys live in backend secrets only, never in the browser."
+        ],
+        analogy: "An API is a drive-through window: you order through it without entering the kitchen. The key is the membership card that says the order is on your account.",
+        goDeeper: { text: ["Builder tools store keys as environment secrets on the backend. The rule never changes across any tool: a key in the browser is a leaked key."], videos: [] }
+      },
+      {
+        title: "The vibe-coding loop", ic: "🔁",
+        seed: "Building with AI is a loop: describe what you want, look at what it built, ask for the next change. Small steps win.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "You want to build an app in Lovable. Better first prompt?",
+          options: ["Build me a complete marketplace with payments, chat, and reviews", "Build a single page with a title and a sign-up form, then we iterate"],
+          a: 1,
+          good: "Right. Small, reviewable steps. Build one piece, check it works, then ask for the next. Big-bang prompts produce a mess you cannot debug.",
+          bad: "Start small and iterate. One page, check it, then the next change. Asking for everything at once gives you a tangle you cannot fix."
+        },
+        idea: [
+          "Tools like <strong>Lovable</strong>, <strong>Bolt</strong>, <strong>v0</strong>, <strong>Replit Agent</strong>, and <strong>Cursor</strong> turn descriptions into working apps. The skill is the loop: describe one change, review what it built, test it, then ask for the next.",
+          "Work in small steps you can check. Each step that works is a foundation; each step you skip is a bug you will hunt for later.",
+          "<strong>How it breaks:</strong> the everything prompt. Ask for the whole product in one go and you get a pile of half-working features with no way to tell which part is broken."
+        ],
+        analogy: "Building with bricks, not pouring one giant block. You lay a row, check it is level, then lay the next.",
+        goDeeper: { text: ["Describe the change, the why, and what done looks like. Add a sign-up form, so visitors can join the waitlist, and show a thanks message after they submit gives the AI a target it can hit and you can test."], videos: [] }
+      },
+      {
+        title: "Give it great references", ic: "🎯",
+        seed: "AI builds generic by default. Strong references are how you pull the output toward what you actually want.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "Your app looks bland and generic. Most effective fix?",
+          options: ["Tell it make it look better", "Show it two sites you like and name what you want from each"],
+          a: 1,
+          good: "Right. Concrete references beat vague adjectives. Point at examples and say what specifically to borrow.",
+          bad: "Show real references and name what to take. Make it better is too vague; this layout, that colour mood gives it a target."
+        },
+        idea: [
+          "Left alone, AI produces the average of everything, which looks generic. <strong>References fix this.</strong> Show it real examples and say exactly what to borrow: this layout, that spacing, this colour mood.",
+          "Collect references before you build (a tool like <strong>Mobbin</strong> helps). Specific beats adjectives every time.",
+          "<strong>How it breaks:</strong> describing taste with vague words like clean or modern. Everyone means something different; a reference image removes the guesswork."
+        ],
+        analogy: "Briefing a designer. Make it nice gets you anything; here are three sites I love and why gets you what you pictured.",
+        goDeeper: { text: ["This is the same skill as references in the Websites track. Taste is portable: knowing what good looks like and being able to point at it is half of building something that does not look AI-made."], videos: [] }
+      },
+      {
+        title: "Read and fix an error yourself", ic: "🩺",
+        seed: "Things will break. The difference between a builder and a quitter is reading the error instead of fearing it.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "Your app shows a red error message. Best first move?",
+          options: ["Delete everything and start over", "Copy the exact error, paste it to the AI, and ask what it means and how to fix it"],
+          a: 1,
+          good: "Right. The error text is a clue, not a wall. Paste it in full and the AI usually pinpoints the cause.",
+          bad: "Copy the full error to the AI and ask what it means. Errors are clues that name the problem. Starting over just loses your work."
+        },
+        idea: [
+          "Errors are not failure, they are the app telling you exactly where it got stuck. The move: copy the <strong>full</strong> error message, paste it to your AI, and ask what it means and how to fix it.",
+          "Then read the explanation. Over a few rounds you start recognising the common ones (a missing key, a typo in a name, something not connected). That recognition is real fundamentals.",
+          "<strong>How it breaks:</strong> panicking and deleting working code, or pasting half the error. The full message is the clue; the rest is noise you control."
+        ],
+        analogy: "A check-engine light with a code. You do not junk the car; you read the code, and it tells you which part to look at.",
+        goDeeper: { text: ["This is the single skill that makes you independent. A builder who can read an error fixes their own app forever; one who cannot is stuck waiting for help on every snag."], videos: [] }
+      },
+      {
+        title: "Add users and logins", ic: "🔐",
+        seed: "The moment your app has accounts, it feels real. Auth is a solved problem you switch on, not build from scratch.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "You need users to sign up and log in securely. Best approach?",
+          options: ["Store passwords yourself in a plain table", "Use an auth service like Supabase Auth that handles it properly"],
+          a: 1,
+          good: "Right. Never roll your own password storage. Auth services handle hashing, resets, and security correctly.",
+          bad: "Use an auth service. Storing passwords yourself is dangerous and easy to get wrong. Supabase Auth and similar solve it safely."
+        },
+        idea: [
+          "<strong>Authentication</strong> is knowing who a user is. You do not build this yourself, you switch on a service like <strong>Supabase Auth</strong>, which handles sign-up, login, password resets, and secure storage.",
+          "Ask your builder tool to add auth with one of these services. It wires the screens and the backend for you.",
+          "<strong>How it breaks:</strong> storing passwords in plain text in your own table. It is a serious security hole and it leaks the day you get attention. Always use a real auth service."
+        ],
+        analogy: "A hotel keycard system. You do not invent locks; you install a trusted system that issues and checks the cards.",
+        goDeeper: { text: ["Auth and the database usually come from the same service (Supabase), so user accounts and user data connect cleanly. That pairing is most of a real app's backend."], videos: [] }
+      },
+      {
+        title: "Store and read data", ic: "💾",
+        seed: "An app that forgets everything on refresh is a toy. A database is what makes it remember.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "Users add tasks to your app but they vanish on reload. What is missing?",
+          options: ["A nicer design", "A database saving the tasks, tied to each user"],
+          a: 1,
+          good: "Right. Without a database the data lives only in the browser for a moment. Saving it to a database makes it persist.",
+          bad: "A database. Data that is not saved to one disappears on refresh. Store each user's tasks in the database and they persist."
+        },
+        idea: [
+          "A <strong>database</strong> stores your app's data in tables so it survives refreshes and is there next time. Tasks, posts, orders, profiles all live here.",
+          "Two operations cover most apps: <strong>write</strong> (save new data) and <strong>read</strong> (fetch it back, usually filtered to the logged-in user). Ask your tool to connect the database and wire both.",
+          "<strong>How it breaks:</strong> forgetting to tie data to the user, so everyone sees everyone's data. Each row should belong to a user, and reads should filter to that user."
+        ],
+        analogy: "A filing cabinet versus a sticky note. The note is gone when the wind blows; the cabinet still has your files next week.",
+        goDeeper: { text: ["This connects to the data track: the same SELECT and WHERE you learned to read is what fetches the right user's rows here. The skills stack."], videos: [] }
+      },
+      {
+        title: "Git, your safety net", ic: "🪢",
+        seed: "Git lets you save checkpoints and roll back. It is the reason a bad change never has to lose your work.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "An AI change broke your working app. With git set up, you can:",
+          options: ["Nothing, the old version is gone", "Roll back to the last working checkpoint instantly"],
+          a: 1,
+          good: "Right. Each commit is a checkpoint. If a change breaks things, you return to the last good one and keep going.",
+          bad: "Roll back to the last good commit. Git keeps every checkpoint, so a broken change is an undo, not a disaster."
+        },
+        idea: [
+          "<strong>Git</strong> saves snapshots of your project called <strong>commits</strong>. Each one is a checkpoint you can return to. <strong>GitHub</strong> stores them online as backup.",
+          "Commit whenever something works. Then if the next change breaks the app, you roll back to the last good checkpoint instead of losing hours.",
+          "<strong>How it breaks:</strong> building for hours with no commits. One bad edit and there is nothing to go back to. Commit small and often, especially before a risky change."
+        ],
+        analogy: "Save points in a game. You beat a hard section, you save. If the next part kills you, you reload, you do not restart the whole game.",
+        goDeeper: { text: ["Most builder tools have git built in or one-click GitHub sync. You rarely type commands; the habit that matters is committing each time something works."], videos: [] }
+      },
+      {
+        title: "Ship it to a live URL", ic: "🌍",
+        seed: "An app on your screen helps no one. Deploying puts it at a real link anyone can open.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "Your app works locally. To let a customer use it, you:",
+          options: ["Send them your laptop", "Deploy it so it lives at a public URL"],
+          a: 1,
+          good: "Right. Deploying with a host like Vercel or Netlify puts your app online at a link you can share.",
+          bad: "Deploy it to a public URL. Hosts like Vercel and Netlify take your project and serve it online so anyone can open the link."
+        },
+        idea: [
+          "<strong>Deploying</strong> means putting your app on a server so it has a public URL. Hosts like <strong>Vercel</strong> and <strong>Netlify</strong> connect to your GitHub and publish automatically.",
+          "Once deployed, every time you commit an update, the live site refreshes. You can also add your own custom domain.",
+          "<strong>How it breaks:</strong> a key that worked on your machine is not set on the live host, so the deployed app fails. Set your environment secrets on the host too, not just locally."
+        ],
+        analogy: "Moving from a home kitchen to a storefront. The food was always good; now there is a door the public can actually walk through.",
+        goDeeper: { text: ["Builder tools like Lovable and Bolt deploy in one click and hand you the URL. Knowing the GitHub to Vercel path underneath means you are never locked into one tool."], videos: [] }
+      },
+      {
+        title: "Decide what is worth building", ic: "🧠",
+        seed: "Building is now easy, so the bottleneck moved. The hard part is choosing something people actually want.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "You can build almost anything now. What should you build first?",
+          options: ["The most technically impressive thing", "The smallest version that solves one real problem for one real person"],
+          a: 1,
+          good: "Right. Start with a real problem and the smallest app that solves it. Impressive but unwanted is still a failure.",
+          bad: "The smallest thing that solves one real problem. Building is cheap now, so judgment is the edge: a wanted small app beats an unwanted big one."
+        },
+        idea: [
+          "When anyone can build, <strong>what to build</strong> becomes the real skill. Start from a problem you or someone you know actually has, and ship the smallest version that solves it.",
+          "Then get it in front of real users fast. Their reaction, not your taste, tells you what to build next. A small app people use beats a grand one nobody opens.",
+          "<strong>How it breaks:</strong> building for months in private on a guess. You can spend all that effort solving a problem no one had. Ship small, learn, repeat."
+        ],
+        analogy: "Opening a food stall before a full restaurant. Sell to ten people first; their orders tell you what the menu should be.",
+        goDeeper: { text: ["This loops back to distribution: shipping the app is the start. Getting even ten real users and listening to them is what turns a build into a product."], videos: [] }
+      }
+    ],
+    quiz: [
+      { q: "Which part of an app stores data so it survives a refresh?", options: ["Frontend", "Database", "The logo", "The URL"], a: 1, why: "Frontend is the screen; the database is the memory that persists." },
+      { q: "Where should an API key live?", options: ["In the browser/frontend code", "In backend secrets only", "In a public GitHub repo", "In the app's title"], a: 1, why: "A key in the browser or a public repo is a leaked key; keep it backend-only." },
+      { q: "Best way to build with an AI tool?", options: ["One giant prompt for the whole product", "Small steps you can review and test, then iterate", "Never test until the end", "Avoid describing what you want"], a: 1, why: "Small reviewable steps are debuggable; big-bang prompts are a tangle." },
+      { q: "Your app shows a red error. First move?", options: ["Delete everything", "Copy the full error to the AI and ask what it means", "Ignore it", "Refresh and hope"], a: 1, why: "The full error names the problem; pasting it usually pinpoints the fix." },
+      { q: "You need secure user logins. Best approach?", options: ["Store passwords in a plain table yourself", "Use an auth service like Supabase Auth", "Email everyone their password", "Skip logins forever"], a: 1, why: "Never roll your own password storage; auth services do it safely." },
+      { q: "Why commit to git often?", options: ["It makes the app faster", "Each commit is a checkpoint you can roll back to", "It hides your code", "It deploys the app"], a: 1, why: "A broken change becomes an undo instead of lost hours of work." },
+      { q: "When anyone can build, the real skill is...", options: ["Using the fanciest tool", "Deciding what is worth building and shipping small", "Writing the most code", "Working in secret"], a: 1, why: "Building is cheap now; judgment and real users are the edge." }
+    ],
+    assignment: {
+      title: "Ship a full app, entirely yourself", xp: 220,
+      steps: "Build and deploy a real web app for {{SPINE}}, solo. (1) In one sentence, name the one problem it solves for one person. (2) In a builder tool, create it in small steps: a frontend, then add auth so users can sign up, then a database that saves each user's data. (3) Connect any API you need with the key kept in backend secrets, never the browser. (4) When something breaks, read the full error and fix it yourself with the AI. (5) Commit working checkpoints to GitHub. (6) Deploy to a live URL and open it on your phone. You now have a working app you built and can fix end to end, with no developer in the loop."
+    }
+  }
 ];
 
 /* =====================================================================
@@ -2069,12 +2433,14 @@ function renderHome(){
 }
 function tierStyle(t){
   return ({
-    "AI Fluency":["#1a6aff","#0e4fd4"],
-    "How AI Works":["#2bb673","#1f9159"],
-    "Build From Scratch":["#6b4fd4","#4f39ad"],
-    "Build Real Things":["#e8852b","#c26a13"],
-    "Agents & Production":["#0a1633","#060e22"],
-    "The Frontier":["#d23f8c","#a82d6f"]
+    "Foundations":["#2bb673","#1f9159"],
+    "Prompting & Context":["#1a6aff","#0e4fd4"],
+    "Automations & Agents":["#0a1633","#060e22"],
+    "Everyday AI":["#0fa3a3","#0a7d7d"],
+    "Websites & Landing Pages":["#6b4fd4","#4f39ad"],
+    "Marketing & Content":["#e8852b","#c26a13"],
+    "Data & Analysis":["#c0392b","#992d22"],
+    "Build AI Products":["#d23f8c","#a82d6f"]
   })[t] || ["#1a6aff","#0e4fd4"];
 }
 function openChest(mi){
