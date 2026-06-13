@@ -1688,19 +1688,55 @@ const OB_QUESTIONS = [
 ];
 let obStep = 0, obAnswers = {};
 
+// Personalized affirmations shown after a choice, Duolingo style.
+const AFFIRM = {
+  role: {
+    founder:  { e:"🚀", t:"A founder. You will turn AI from a buzzword into hours back in your week." },
+    marketer: { e:"📣", t:"A marketer. AI is about to become your fastest teammate." },
+    student:  { e:"🎓", t:"A student, learning this at exactly the right moment." },
+    engineer: { e:"💻", t:"An engineer. You will go from using AI to building with it." },
+    other:    { e:"✨", t:"Love it. AI rewards the curious more than the credentialed." }
+  },
+  level: {
+    never:   { e:"🌱", t:"Perfect starting point. Everyone here began exactly where you are." },
+    chat:    { e:"💬", t:"You already chat with AI. Now you will see what happens under the hood." },
+    tried:   { e:"🧪", t:"You have built a little. Time to make it solid and repeatable." },
+    regular: { e:"⚙️", t:"You build regularly, so we will sharpen the parts most people skip, like evals and cost." }
+  },
+  goal: {
+    work:    { e:"💼", t:"Smart. The people who use AI well at work are quietly pulling ahead." },
+    build:   { e:"🛠️", t:"Builder energy. By the end you will have shipped something real." },
+    automate:{ e:"⚡", t:"Yes. The busywork you hate is exactly what AI is best at removing." },
+    curious: { e:"🔭", t:"Curiosity is the whole game here. Let us make it click." }
+  },
+  minutes: {
+    habit:    { e:"🌿", t:"A daily habit. Small reps every day is how this truly sticks." },
+    weekend:  { e:"🧱", t:"Nibble on weekdays, build on weekends. A realistic rhythm for a busy life." },
+    serious:  { e:"🔥", t:"Serious pace. Real progress every day, without the burnout." },
+    immersive:{ e:"🚀", t:"Immersive. With time on your hands, you will adapt to AI faster than almost anyone." }
+  },
+  spineType: {
+    business: { e:"🏢", t:"Great. By the end, your business will have an assistant, an automation, and a plan." },
+    job:      { e:"💼", t:"Great. You will become the person at work who actually ships with AI." },
+    hobby:    { e:"🎨", t:"Love it. The best way to learn is on something you genuinely care about." }
+  }
+};
+
 function renderOnboarding(){
   const q = OB_QUESTIONS[obStep];
   const prog = OB_QUESTIONS.map((_,i)=>`<span class="${i<=obStep?"on":""}"></span>`).join("");
   let body;
   if (q.type === "text"){
-    body = `<input type="text" id="ob-name" placeholder="${q.ph || "Type here"}" maxlength="60" autocomplete="off">
+    const val = obAnswers[q.key] ? esc(obAnswers[q.key]) : "";
+    body = `<input type="text" id="ob-name" placeholder="${q.ph || "Type here"}" maxlength="60" autocomplete="off" value="${val}">
       <div style="height:16px"></div>
-      <button class="btn btn-primary" id="ob-next" disabled>Continue</button>`;
+      <button class="btn btn-primary" id="ob-next" ${val?"":"disabled"}>Continue</button>`;
   } else {
-    body = q.options.map(o=>`<button class="choice pop" data-val="${o[0]}">${o[1]}</button>`).join("");
+    body = q.options.map(o=>`<button class="choice pop ${obAnswers[q.key]===o[0]?"selected":""}" data-val="${o[0]}">${o[1]}</button>`).join("");
   }
   app.innerHTML = `<div class="ob-wrap">
     <div class="logo-line"><span class="mark">A</span>AIcademy</div>
+    <button class="back-link" id="ob-back" style="margin-bottom:4px;">← Back</button>
     <div class="ob-progress">${prog}</div>
     <div class="screen no-tabs" style="padding:0;flex:none;">
       <div class="ob-q">${q.q}</div>
@@ -1708,6 +1744,7 @@ function renderOnboarding(){
       ${body}
     </div>
   </div>`;
+  document.getElementById("ob-back").onclick = obBack;
   if (q.type === "text"){
     const inp = document.getElementById("ob-name"), btn = document.getElementById("ob-next");
     inp.focus();
@@ -1717,19 +1754,38 @@ function renderOnboarding(){
   } else {
     document.querySelectorAll(".choice").forEach((b,i) => {
       b.style.animationDelay = (i*0.05)+"s";
-      b.onclick = () => { b.classList.add("selected"); setTimeout(()=>advance(b.dataset.val), 180); };
+      b.onclick = () => {
+        document.querySelectorAll(".choice").forEach(x=>x.classList.remove("selected"));
+        b.classList.add("selected");
+        setTimeout(()=>advance(b.dataset.val), 160);
+      };
     });
   }
-  function advance(val){
-    obAnswers[q.key] = val;
-    obStep++;
-    if (obStep < OB_QUESTIONS.length) renderOnboarding();
-    else {
-      profile = obAnswers;
-      save();
-      renderWelcome();
-    }
-  }
+}
+function obBack(){
+  if (obStep === 0){ renderIntro(); return; }
+  obStep--;
+  renderOnboarding();
+}
+function advance(val){
+  const q = OB_QUESTIONS[obStep];
+  obAnswers[q.key] = val;
+  const a = AFFIRM[q.key] && AFFIRM[q.key][val];
+  if (a) renderAffirm(a, obProceed); else obProceed();
+}
+function obProceed(){
+  obStep++;
+  if (obStep < OB_QUESTIONS.length) renderOnboarding();
+  else { profile = obAnswers; save(); renderWelcome(); }
+}
+function renderAffirm(a, onContinue){
+  app.innerHTML = `<div class="ob-wrap"><div class="celebrate" style="padding:48px 10px;">
+    <div class="big">${a.e}</div>
+    <h2 style="margin-top:14px;line-height:1.3;">${a.t}</h2>
+    <div style="height:8px"></div>
+    <button class="btn btn-primary" id="aff-go">Continue</button>
+  </div></div>`;
+  document.getElementById("aff-go").onclick = onContinue;
 }
 
 function renderWelcome(){
