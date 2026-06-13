@@ -1796,6 +1796,274 @@ const MODULES = [
       steps: "Build and deploy a real web app for {{SPINE}}, solo. (1) In one sentence, name the one problem it solves for one person. (2) In a builder tool, create it in small steps: a frontend, then add auth so users can sign up, then a database that saves each user's data. (3) Connect any API you need with the key kept in backend secrets, never the browser. (4) When something breaks, read the full error and fix it yourself with the AI. (5) Commit working checkpoints to GitHub. (6) Deploy to a live URL and open it on your phone. You now have a working app you built and can fix end to end, with no developer in the loop."
     }
   }
+  ,{
+    id: "m9", emoji: "🧭", tier: "Leading AI",
+    title: "Leading AI and Strategy",
+    desc: "Decide where AI is worth it, run it responsibly, and write a 90-day plan your team can follow",
+    bridge: "The hard part of AI at work is not the tools. It is choosing the right problems and owning the results.",
+    lessons: [
+      {
+        title: "Pick the right use case", ic: "🎯",
+        seed: "Most AI projects fail because someone picked a flashy problem instead of a valuable, doable one.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "You have ten AI ideas. How do you choose the first to fund?",
+          options: ["The most impressive or futuristic one", "The one highest on both value and feasibility"],
+          a: 1,
+          good: "Right. Score each idea on value to the business and how doable it is. Start where both are high.",
+          bad: "Score value times feasibility and start where both are high. Impressive but hard or low-value is how pilots die quietly."
+        },
+        idea: [
+          "Rank every idea on two axes: <strong>value</strong> (does it save money or make money) and <strong>feasibility</strong> (do we have the data, tools, and access to do it now). Start in the high-value, high-feasibility corner.",
+          "A boring win that ships beats a visionary project that stalls. Early wins buy you the credibility to attempt the hard ones.",
+          "<strong>How it breaks:</strong> chasing the most exciting idea regardless of feasibility. It burns budget and goodwill, and the next AI proposal gets a colder room."
+        ],
+        analogy: "Picking fruit: you take what is ripe and within reach first, not the one shiny apple at the top of the tree.",
+        goDeeper: { text: ["Ask of any use case: how often does this task happen, how long does it take, and what does an error cost. High-frequency, time-heavy, low-error-cost tasks are the safest first wins."], videos: [] }
+      },
+      {
+        title: "Build or buy", ic: "⚖️",
+        seed: "For most needs, someone already sells a tool. Building from scratch only pays off when the need is truly yours.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "You want AI to summarise support tickets, a common need. Default move?",
+          options: ["Build a custom system from scratch", "Buy or adopt an existing tool, build only if nothing fits"],
+          a: 1,
+          good: "Right. Buy for common needs, build for what is unique to you. Custom-building a solved problem wastes months.",
+          bad: "Buy first for common needs. Build only when your need is genuinely unique or core to your edge. Reinventing a solved tool is wasted effort."
+        },
+        idea: [
+          "<strong>Buy</strong> when the need is common and tools exist (most cases): faster, cheaper, maintained for you. <strong>Build</strong> when the capability is unique to your business or is your actual competitive edge.",
+          "A middle path is configuring a flexible tool (a no-code automation, a custom assistant) rather than coding from zero.",
+          "<strong>How it breaks:</strong> building a custom version of something you could have subscribed to. You pay in months of work and ongoing maintenance for no advantage."
+        ],
+        analogy: "You buy flour, you do not grow wheat. You mill your own only if the flour is the thing that makes your bread special.",
+        goDeeper: { text: ["Total cost is not just the licence. Building adds maintenance, security, and the person who has to keep it alive. Factor the whole life of the thing, not the first month."], videos: [] }
+      },
+      {
+        title: "Is your data ready", ic: "🗂️",
+        seed: "AI is only as good as what you feed it. Messy, scattered, or private-by-law data quietly sinks projects.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "Before an AI project that uses company data, the first question is:",
+          options: ["Which model is the smartest", "Is the data we need available, clean enough, and allowed to be used"],
+          a: 1,
+          good: "Right. Data readiness comes before model choice. The best model cannot fix data you do not have or cannot use.",
+          bad: "Whether the data is available, clean, and allowed. Readiness beats model choice; great models still fail on missing or off-limits data."
+        },
+        idea: [
+          "Three checks before you start: is the data <strong>available</strong> (do you have access), is it <strong>clean enough</strong> (or will it mislead the AI), and is it <strong>allowed</strong> (privacy, contracts, consent).",
+          "If a project depends on data you cannot get or cannot legally use, change the project now, not after you have spent the budget.",
+          "<strong>How it breaks:</strong> picking the model first and discovering late that the data is locked, dirty, or off-limits. The project stalls at the worst possible time."
+        ],
+        analogy: "A great chef still needs ingredients in the kitchen. No amount of skill cooks a meal from an empty, locked pantry.",
+        goDeeper: { text: ["Customer and employee data carries legal duties (in India, the DPDP Act; elsewhere, GDPR and similar). Looping in whoever owns privacy early is faster than unwinding a project later."], videos: [] }
+      },
+      {
+        title: "A human owns every output", ic: "🛡️",
+        seed: "AI can draft, suggest, and act, but accountability cannot be automated. Name the human for each use.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "An AI tool sends a customer the wrong refund. Who is accountable?",
+          options: ["The AI, it made the call", "A named human who owns that AI's outputs"],
+          a: 1,
+          good: "Right. Governance means a specific person owns each AI use and its results. You cannot delegate accountability to software.",
+          bad: "A named human owns it. AI can act, but accountability stays with a person. Every AI use needs a named owner and a check."
+        },
+        idea: [
+          "<strong>Governance</strong> in plain terms: every AI use has a named human owner, clear limits on what it may do alone, and a check for high-stakes actions. Decide where AI decides versus where it only suggests.",
+          "Write down the simple rules: what is allowed, what needs human approval, and who to call when it goes wrong.",
+          "<strong>How it breaks:</strong> letting an AI take consequential actions with no owner and no approval step. When it errs, no one is responsible and trust collapses."
+        ],
+        analogy: "Autopilot still has a captain. The system flies, but a named person is responsible and can take the controls.",
+        goDeeper: { text: ["Match the control to the stakes: low-risk tasks can run automatically, medium-risk needs a human to approve, high-risk needs a human to decide. One page of these rules prevents most disasters."], videos: [] }
+      },
+      {
+        title: "Does the math work", ic: "💰",
+        seed: "Excitement is not a business case. A use case earns its place when the value clearly beats the full cost.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "To judge if an AI project is worth it, you compare its value against:",
+          options: ["Only the monthly subscription", "The full cost: tools, setup, training, and upkeep"],
+          a: 1,
+          good: "Right. Count every cost, not just the licence: setup time, training people, and ongoing maintenance.",
+          bad: "The full cost, including setup, training, and upkeep. Comparing value to the licence alone hides the real bill and oversells the project."
+        },
+        idea: [
+          "Estimate <strong>value</strong> (time saved times what that time is worth, plus revenue gained or errors avoided) against <strong>full cost</strong> (tools, build or setup, training people, and ongoing upkeep).",
+          "You do not need precision, you need honesty. A rough model that counts every cost beats an optimistic one that counts only the subscription.",
+          "<strong>How it breaks:</strong> measuring only the licence fee and ignoring the human time to set it up and run it. The project looks cheap on paper and disappoints in reality."
+        ],
+        analogy: "Buying a cheap printer with costly ink. The sticker price was never the real cost; the cartridges were.",
+        goDeeper: { text: ["Track one or two before-and-after numbers (hours per task, cost per ticket). Real saved time is the proof that wins the next round of budget."], videos: [] }
+      },
+      {
+        title: "Bring people with you", ic: "🤝",
+        seed: "Tools do not transform an organisation. People adopting them does, and people resist what feels like a threat.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "You rolled out a great AI tool but no one uses it. Most likely cause?",
+          options: ["The tool is not advanced enough", "People were not trained, trusted, or shown what is in it for them"],
+          a: 1,
+          good: "Right. Adoption is a people problem. Training, trust, and a clear personal benefit drive use, not raw capability.",
+          bad: "People were not brought along. Change management, training, trust, and a clear benefit, is what turns a tool into actual use."
+        },
+        idea: [
+          "Adoption depends on <strong>change management</strong>: explain why, train people properly, address the fear of being replaced, and show each person what they personally gain.",
+          "Start with willing volunteers, let their wins spread, and make it safe to learn. Mandates without support breed quiet resistance.",
+          "<strong>How it breaks:</strong> dropping a tool on people and assuming they will use it. Without trust and training it gathers dust, and you wrongly blame the technology."
+        ],
+        analogy: "A gym membership changes nothing on its own. Showing up, a plan, and encouragement are what actually change anything.",
+        goDeeper: { text: ["Name an internal champion per team, someone respected who uses it daily. Peer proof moves people far more than a leadership email ever will."], videos: [] }
+      }
+    ],
+    quiz: [
+      { q: "How should you choose your first AI use case?", options: ["Most futuristic idea", "Highest on both value and feasibility", "Cheapest tool", "Whatever a vendor pitches"], a: 1, why: "Value times feasibility; early ripe wins buy credibility for harder ones." },
+      { q: "Default for a common need like ticket summaries?", options: ["Build from scratch", "Buy or adopt an existing tool first", "Hire a big team", "Do nothing"], a: 1, why: "Buy for common needs; build only for what is unique or your edge." },
+      { q: "First question before an AI project that uses your data?", options: ["Which model is smartest", "Is the data available, clean, and allowed", "What colour is the dashboard", "Who is the vendor"], a: 1, why: "Data readiness beats model choice; bad or off-limits data sinks projects." },
+      { q: "An AI tool causes a costly error. Who is accountable?", options: ["The AI", "A named human owner of that output", "Nobody", "The customer"], a: 1, why: "Accountability cannot be automated; every use needs a named owner." },
+      { q: "To judge ROI, compare value against...", options: ["Only the subscription", "Full cost: tools, setup, training, upkeep", "Nothing", "The competitor's price"], a: 1, why: "Counting only the licence hides the real bill and oversells it." },
+      { q: "Great tool, nobody uses it. Likely cause?", options: ["Not advanced enough", "No training, trust, or clear personal benefit", "Too cheap", "Too fast"], a: 1, why: "Adoption is a people problem solved by change management, not features." }
+    ],
+    assignment: {
+      title: "Write your 90-day AI roadmap", xp: 150,
+      steps: "Draft a 90-day AI plan for {{SPINE}}. (1) List five candidate use cases and score each on value and feasibility. (2) Pick the top one or two and note build-vs-buy for each. (3) For your top pick, check data readiness (available, clean, allowed) and name the human who owns its outputs. (4) Sketch the rough ROI: value versus full cost. (5) Write the 90-day sequence: a quick win in month one, a measured rollout in month two, and a decision point in month three, plus how you will bring people along. You now have a roadmap you could put in front of a team or a board."
+    }
+  }
+  ,{
+    id: "m10", emoji: "🛰️", tier: "The Frontier",
+    title: "The Frontier",
+    desc: "Stay current without drowning: read a model release, run your own test, and keep your skills fresh",
+    bridge: "Tools change weekly. The skill that does not go stale is knowing how to judge what is new for yourself.",
+    lessons: [
+      {
+        title: "Signal versus noise", ic: "📡",
+        seed: "You cannot follow everything in AI, and trying will burn you out. Pick a few good sources and ignore the rest.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "A new model drops every week and the hype is constant. Healthiest way to keep up?",
+          options: ["Read every post and try every tool the day it launches", "Follow a few trusted sources and ask does this change my actual work"],
+          a: 1,
+          good: "Right. Curate a short list of signal, and filter each release through whether it changes what you do.",
+          bad: "Follow a few trusted sources and filter by relevance to your work. Chasing every release is noise that exhausts you and teaches little."
+        },
+        idea: [
+          "The field moves too fast to follow all of it. Pick a small set of <strong>trusted sources</strong> and let everything else pass. The question for any news is simple: does this change what I can do, today.",
+          "Most announcements are noise for your purposes. A few are real shifts. The skill is telling them apart quickly.",
+          "<strong>How it breaks:</strong> trying to consume everything. You end up anxious and shallow, knowing every headline and having shipped nothing."
+        ],
+        analogy: "You do not read every newspaper on earth. You pick a couple you trust and get on with your day.",
+        goDeeper: { text: ["A working setup: one newsletter or daily brief, one or two practitioners you trust, and a monthly hour to try whatever actually reached you. That beats hours of daily scrolling."], videos: [] }
+      },
+      {
+        title: "Read a model release", ic: "📰",
+        seed: "Launch posts are written to impress. The useful read is filtering past the hype to what changed for you.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "A new model claims state-of-the-art benchmark scores. What matters most to you?",
+          options: ["The benchmark numbers themselves", "Whether it is better at the specific tasks you actually do"],
+          a: 1,
+          good: "Right. Benchmarks are marketing-adjacent. What counts is performance on your real tasks, your cost, and your speed.",
+          bad: "Whether it helps your real tasks. Benchmark wins rarely map to your work; test it on what you actually do before believing the claim."
+        },
+        idea: [
+          "When you read a release, skip past the leaderboard and ask three things: is it better at <strong>my</strong> tasks, what does it <strong>cost</strong>, and is it <strong>faster or slower</strong>. Benchmarks rarely match your reality.",
+          "Also note what is genuinely new (longer context, a new ability, a price drop) versus a small bump dressed as a revolution.",
+          "<strong>How it breaks:</strong> switching tools on benchmark hype. A model that tops a chart can still be worse, slower, or pricier for your particular work."
+        ],
+        analogy: "Car ads quote top speed you will never use. What matters is how it drives on your commute, in your traffic.",
+        goDeeper: { text: ["Watch for the quiet wins that matter more than raw smarts: a big price cut, a longer context window, or a new input type often changes what is practical more than a few benchmark points."], videos: [] }
+      },
+      {
+        title: "Run your own eval", ic: "🧪",
+        seed: "The only honest way to compare two models is to test them on your real tasks. This is a five-minute habit.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "Everyone argues whether model X beats model Y. How do you actually decide for your work?",
+          options: ["Trust the loudest opinion online", "Keep a set of your real tasks and run both through them"],
+          a: 1,
+          good: "Right. A small personal test set, your real prompts with known good answers, settles it for your work in minutes.",
+          bad: "Run both on your own task set. A handful of real prompts with answers you trust tells you more than any online debate."
+        },
+        idea: [
+          "An <strong>eval</strong> is just a saved set of your real tasks with answers you trust. To compare any two models, run both through it and read the results. This is the same skill the Agents track used, applied to staying current.",
+          "Five to ten prompts that reflect your actual work is enough. Keep them; reuse them on every new model.",
+          "<strong>How it breaks:</strong> deciding by vibes or online tribes. Your work is specific; a quick personal test beats a thousand opinions about averages."
+        ],
+        analogy: "A test drive on your own roads. You do not buy the car because a stranger online loved theirs.",
+        goDeeper: { text: ["Save your eval prompts in a note. Each new release, paste them into the new model and compare. Over a year this becomes the most valuable AI asset you own: ground truth for your own needs."], videos: [] }
+      },
+      {
+        title: "Open versus closed models", ic: "🔓",
+        seed: "Two camps shape the landscape: closed models you rent through an API, and open ones you can run yourself.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "A startup needs the strongest model fast with no infrastructure. Likely best fit?",
+          options: ["Host an open-weights model on their own servers", "Use a closed model through an API"],
+          a: 1,
+          good: "Right. Closed APIs give top capability with zero infrastructure. Open models win on control, privacy, and cost at scale.",
+          bad: "A closed API: top capability, nothing to host. Open models trade some convenience for control, privacy, and lower cost at scale."
+        },
+        idea: [
+          "<strong>Closed models</strong> (used through an API, like the GPT, Claude, and Gemini families) give frontier capability with nothing to maintain, billed per use. <strong>Open-weights models</strong> (like the Llama and others) you can run yourself for control, privacy, and lower cost at scale.",
+          "The trade is convenience and peak capability versus control and data privacy. Neither is right for everyone; it depends on your needs.",
+          "<strong>How it breaks:</strong> assuming one camp is simply best. A privacy-bound business may need open models; a small team shipping fast almost always wants a closed API."
+        ],
+        analogy: "Renting a fully serviced flat versus owning a house. One is effortless and flexible; the other is yours to control and cheaper over time, with more responsibility.",
+        goDeeper: { text: ["The capability gap between open and closed has narrowed a lot. For many tasks an open model is now good enough, which changes the privacy-versus-power maths in open models' favour."], videos: [] }
+      },
+      {
+        title: "The cost curve", ic: "📉",
+        seed: "What is expensive or impossible today often gets cheap fast. That changes what is worth building and when.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "A capability you want exists but is too costly to use at scale today. Smart stance?",
+          options: ["Assume the price will stay high forever", "Design for it, knowing prices have fallen fast and likely will again"],
+          a: 1,
+          good: "Right. AI capability per dollar has improved sharply. Plan for prices to drop and you stay ahead of the curve.",
+          bad: "Plan for it to get cheaper. AI prices have dropped steeply and repeatedly; what is costly now is often affordable within a year."
+        },
+        idea: [
+          "The price of a given AI capability has fallen sharply and repeatedly. Something uneconomic at scale this quarter may be cheap within a year.",
+          "Use this when planning: prototype with the capability now even if it is pricey, knowing the economics likely move your way by launch.",
+          "<strong>How it breaks:</strong> permanently shelving an idea because today's price is high. You may be killing something that becomes obviously affordable very soon."
+        ],
+        analogy: "Early flat-screen TVs cost a fortune and then did not. Betting on the price staying high would have aged badly.",
+        goDeeper: { text: ["The flip side: do not over-build for cost today. A simpler, pricier approach now is often fine, because the cost problem tends to solve itself faster than you expect."], videos: [] }
+      },
+      {
+        title: "Keep the skill fresh", ic: "🔁",
+        seed: "Knowledge fades if you never revisit it. A light review habit keeps what you learned here actually usable.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "You learned a lot here but use only part of it daily. How do you keep the rest?",
+          options: ["Hope you remember when you need it", "Briefly revisit and re-apply the ideas on a light schedule"],
+          a: 1,
+          good: "Right. Spaced review, coming back to ideas now and then and using them once, is how learning sticks for the long run.",
+          bad: "Revisit and re-apply on a light schedule. Skills you do not touch fade; a short, spaced review keeps them ready to use."
+        },
+        idea: [
+          "Memory fades without use. A little <strong>spaced review</strong>, returning to a concept days then weeks later and applying it once, locks it in far better than one intense session.",
+          "Pair it with doing: re-run your eval on a new model, redo one capstone with a fresh tool. Using a skill is the strongest review there is.",
+          "<strong>How it breaks:</strong> treating learning as one-and-done. Without revisiting, most of it quietly evaporates and you are back where you started."
+        ],
+        analogy: "A language you do not speak slips away. A little practice now and then keeps it alive and ready.",
+        goDeeper: { text: ["A monthly ritual works well: read your trusted sources for an hour, run your eval on anything new, and redo one small project with a current tool. That keeps both your knowledge and your toolset fresh."], videos: [] }
+      }
+    ],
+    quiz: [
+      { q: "Healthiest way to keep up with AI news?", options: ["Read and try everything", "A few trusted sources, filtered by relevance to your work", "Ignore it all", "Only follow hype accounts"], a: 1, why: "Curate signal and ask whether each release changes your actual work." },
+      { q: "A model touts top benchmark scores. What matters to you?", options: ["The benchmark numbers", "Whether it is better at your real tasks, and its cost and speed", "Its name", "The launch video"], a: 1, why: "Benchmarks rarely map to your work; test on your real tasks." },
+      { q: "How do you actually decide if model X beats Y for you?", options: ["Trust loudest opinion", "Run both through your own saved task set", "Flip a coin", "Pick the newest"], a: 1, why: "A small personal eval settles it for your work in minutes." },
+      { q: "A startup needs top capability fast, no infrastructure. Best fit?", options: ["Self-host an open model", "Use a closed model via API", "Build a model from scratch", "Avoid AI"], a: 1, why: "Closed APIs give frontier capability with nothing to maintain." },
+      { q: "A capability is too costly at scale today. Smart stance?", options: ["Assume it stays expensive", "Design for it; prices have fallen fast and likely will again", "Abandon it forever", "Ignore cost entirely"], a: 1, why: "AI capability per dollar has dropped steeply and repeatedly." },
+      { q: "How do you keep skills you do not use daily?", options: ["Hope to remember", "Spaced review: revisit and re-apply on a light schedule", "Relearn from zero each time", "Write them once and forget"], a: 1, why: "Spaced review plus re-applying the skill is what makes it stick." }
+    ],
+    assignment: {
+      title: "Build your field-readiness routine", xp: 140,
+      steps: "Set up a system to stay current for {{SPINE}}, so you never fall behind again. (1) Choose three trusted sources and one daily or weekly brief. (2) Write your personal eval: five to ten real tasks with answers you trust, saved in a note. (3) Run your eval on two current models and write which wins for your work and why. (4) Note one capability that feels too costly today but worth designing for. (5) Put a recurring monthly hour on your calendar to read, re-run your eval, and redo one small project with a fresh tool. You now have a routine that keeps your AI skills from going stale."
+    }
+  }
 ];
 
 /* =====================================================================
@@ -2440,7 +2708,9 @@ function tierStyle(t){
     "Websites & Landing Pages":["#6b4fd4","#4f39ad"],
     "Marketing & Content":["#e8852b","#c26a13"],
     "Data & Analysis":["#c0392b","#992d22"],
-    "Build AI Products":["#d23f8c","#a82d6f"]
+    "Build AI Products":["#d23f8c","#a82d6f"],
+    "Leading AI":["#8a6d3b","#6b5329"],
+    "The Frontier":["#0f766e","#0b574f"]
   })[t] || ["#1a6aff","#0e4fd4"];
 }
 function openChest(mi){
