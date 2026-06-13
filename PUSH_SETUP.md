@@ -10,6 +10,7 @@ create table public.push_subscriptions (
   user_id uuid references auth.users on delete cascade,
   endpoint text unique,
   subscription jsonb not null,
+  last_notified date,
   created_at timestamptz default now()
 );
 alter table public.push_subscriptions enable row level security;
@@ -44,8 +45,8 @@ Enable the `pg_cron` and `pg_net` extensions (Database → Extensions), then run
 
 ```sql
 select cron.schedule(
-  'aicademy-daily-reminders',
-  '0 13 * * *',  -- 13:00 UTC ≈ 6:30pm IST, adjust as you like
+  'aicademy-reminders',
+  '0 * * * *',  -- hourly; the function self-limits to one nudge per person per day, inside a 9:30am–9:30pm IST window
   $$ select net.http_post(
        url := 'https://hhsucudtvnndsfeibaxk.supabase.co/functions/v1/send-reminders',
        headers := jsonb_build_object('Authorization','Bearer YOUR_SERVICE_ROLE_KEY','Content-Type','application/json')
