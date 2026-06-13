@@ -1699,6 +1699,42 @@ function renderCheckEmail(email){
   </div></div>`;
   document.getElementById("sb-again").onclick = renderSignIn;
 }
+
+/* =====================================================================
+   PUSH NOTIFICATIONS (native web push)
+   ===================================================================== */
+const VAPID_PUBLIC = "BGKA25cewrr3GlXGPjCY7FfTIgE9Ug2OTtxOjvbSmCY-wnU-eWdQD9VP0CEdqNHEXC0U9nG2FUpzW0B40Dy2qlw";
+let swReg = null;
+if ("serviceWorker" in navigator){ navigator.serviceWorker.register("sw.js").then(r => swReg = r).catch(()=>{}); }
+function pushSupported(){ return !!(SB && authUser && "serviceWorker" in navigator && "PushManager" in window && "Notification" in window); }
+function pushOn(){ return localStorage.getItem("aicademy_push") === "on"; }
+function urlB64ToUint8Array(b64){
+  const pad = "=".repeat((4 - b64.length % 4) % 4);
+  const base = (b64 + pad).replace(/-/g,"+").replace(/_/g,"/");
+  const raw = atob(base); const arr = new Uint8Array(raw.length);
+  for (let i=0;i<raw.length;i++) arr[i] = raw.charCodeAt(i);
+  return arr;
+}
+async function enablePush(){
+  try{
+    const perm = await Notification.requestPermission();
+    if (perm !== "granted"){ toast("Reminders stay off"); return; }
+    const reg = swReg || await navigator.serviceWorker.ready;
+    const sub = await reg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey: urlB64ToUint8Array(VAPID_PUBLIC) });
+    await SB.from("push_subscriptions").upsert({ user_id: authUser.id, endpoint: sub.endpoint, subscription: sub.toJSON() }, { onConflict:"endpoint" });
+    localStorage.setItem("aicademy_push","on");
+    burstConfetti(); toast("Reminders on 🔔"); renderHome();
+  } catch(e){ toast("Could not turn on reminders"); }
+}
+function pushCardHTML(){
+  if (!pushSupported() || pushOn() || localStorage.getItem("aicademy_push_dismiss") === "1") return "";
+  return `<div class="card" style="display:flex;align-items:center;gap:12px;margin-bottom:18px;border-color:var(--blue);">
+    <div style="font-size:24px;">🔔</div>
+    <div style="flex:1;"><div style="font-weight:800;font-size:14px;">Turn on daily reminders</div><div style="font-size:12.5px;color:var(--muted);font-weight:600;margin-top:1px;">A nudge to keep your streak alive.</div></div>
+    <button class="btn btn-primary" id="push-on" style="width:auto;padding:9px 15px;font-size:14px;">On</button>
+    <button class="back-link" id="push-no" style="font-size:13px;">Later</button>
+  </div>`;
+}
 function todayStr(){ const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
 function dateNAgo(n){ const d=new Date(); d.setDate(d.getDate()-n); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
 function touchStreak(){
@@ -2081,6 +2117,7 @@ function renderHome(){
         <div class="pbar"><div style="width:${Math.min(100,(S.xp % 200)/2)}%"></div></div>
       </div>
     </div>
+    ${pushCardHTML()}
     <div class="trail">
       ${nodes}
     </div>
@@ -2088,6 +2125,8 @@ function renderHome(){
   `);
   const _so = document.getElementById("sign-out");
   if (_so) _so.onclick = () => SB.auth.signOut();
+  const _pOn = document.getElementById("push-on"); if (_pOn) _pOn.onclick = enablePush;
+  const _pNo = document.getElementById("push-no"); if (_pNo) _pNo.onclick = () => { localStorage.setItem("aicademy_push_dismiss","1"); renderHome(); };
   document.querySelectorAll(".lvl-btn[data-act]").forEach(c => {
     c.onclick = () => {
       const mi = +c.dataset.mi, act = c.dataset.act;
