@@ -352,6 +352,47 @@
     .module-node.left .mcard:active{transform:translateX(-12px) translateY(4px);}
     .module-node.right .mcard:active{transform:translateX(12px) translateY(4px);}
   }
+
+  /* ===== in-stone session player ===== */
+  @keyframes shakeX{10%,90%{transform:translateX(-2px);}20%,80%{transform:translateX(4px);}30%,50%,70%{transform:translateX(-7px);}40%,60%{transform:translateX(7px);}}
+  @keyframes popBig{0%{transform:scale(.7);opacity:0;}60%{transform:scale(1.12);}100%{transform:scale(1);opacity:1;}}
+  .sp-top{display:flex;align-items:center;gap:10px;margin:10px 0 18px;}
+  .sp-x{background:none;border:none;font-size:22px;color:var(--muted);cursor:pointer;flex:none;line-height:1;padding:0 2px;}
+  .sp-combo{flex:none;font-weight:800;font-size:14px;color:var(--gold-dark);min-width:30px;text-align:right;opacity:0;transition:opacity .2s;}
+  .sp-combo.on{opacity:1;}
+  .sp-q{font-weight:800;font-size:19px;line-height:1.35;margin:4px 0 16px;}
+  .sp-wrap.shake{animation:shakeX .4s;}
+  .sp-foot{margin-top:18px;}
+  .sp-mute{position:absolute;top:14px;right:16px;background:none;border:none;font-size:18px;cursor:pointer;opacity:.6;}
+  /* fill-the-blank chips */
+  .chips{display:flex;flex-wrap:wrap;gap:9px;margin-top:6px;}
+  .chip-opt{padding:11px 15px;border:2px solid var(--border);border-bottom-width:4px;border-radius:13px;background:#fff;font-weight:600;font-size:15px;cursor:pointer;transition:transform .08s;}
+  .chip-opt:active{transform:translateY(2px);}
+  .chip-opt.correct{background:#e6f8ef;border-color:var(--green);color:var(--green-dark);}
+  .chip-opt.wrong{background:#fdecec;border-color:var(--red);color:var(--red);}
+  .blank-slot{display:inline-block;min-width:90px;border-bottom:3px solid var(--blue);margin:0 4px;text-align:center;font-weight:800;color:var(--blue);}
+  /* match pairs */
+  .match-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .match-col{display:flex;flex-direction:column;gap:10px;}
+  .match-it{padding:12px 13px;border:2px solid var(--border);border-bottom-width:4px;border-radius:13px;background:#fff;font-weight:600;font-size:14.5px;cursor:pointer;text-align:left;transition:transform .08s;}
+  .match-it.sel{border-color:var(--blue);background:#eef4ff;}
+  .match-it.done{background:#e6f8ef;border-color:var(--green);color:var(--green-dark);pointer-events:none;opacity:.7;}
+  .match-it.miss{animation:shakeX .4s;border-color:var(--red);}
+  /* order steps */
+  .order-pool,.order-ans{display:flex;flex-direction:column;gap:9px;margin:6px 0;}
+  .order-ans{min-height:8px;}
+  .order-it{padding:12px 14px;border:2px solid var(--border);border-bottom-width:4px;border-radius:13px;background:#fff;font-weight:600;font-size:15px;cursor:pointer;display:flex;align-items:center;gap:10px;}
+  .order-it .num{width:22px;height:22px;border-radius:50%;background:var(--blue);color:#fff;font-size:13px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;flex:none;}
+  .order-ans .order-it{background:#eef4ff;border-color:var(--blue);}
+  .order-it.correct{background:#e6f8ef;border-color:var(--green);}
+  .order-it.wrong{background:#fdecec;border-color:var(--red);}
+  /* teach + reward cards */
+  .sp-teach{animation:riseIn .35s both;}
+  .sp-reward{text-align:center;padding:36px 12px;animation:popBig .5s both;}
+  .sp-reward .big{font-size:64px;}
+  .sp-reward h2{font-size:26px;font-weight:800;margin:10px 0 6px;}
+  .sp-reward .stat{display:inline-block;background:var(--surface);border:2px solid var(--border);border-radius:14px;padding:10px 18px;margin:6px;font-weight:800;}
+  .sp-reward .perfect{color:var(--gold-dark);font-weight:800;font-size:18px;margin-top:8px;}
 </style>
 </head>
 <body>
@@ -430,6 +471,15 @@ const MODULES = [
             bad: "Close, but it usually splits into un / believ / able, about 3 tokens. Models read word pieces, not whole words."
           }
         },
+        practice: [
+          { type:"pick", q:"Each step, what is the model literally doing?", options:["Looking the answer up in a stored list","Predicting the next token from the text so far","Searching the live web for the reply"], a:1, good:"Right. It predicts the next token, over and over.", bad:"It predicts the next token from the text so far. No stored list, no live lookup." },
+          { type:"blank", q:"Your words are first split into small chunks called ___ that the model reads.", options:["tokens","files","pixels"], a:0, good:"Yes. Tokens are the chunks a model reads and predicts.", bad:"They are called tokens, the small chunks a model reads and predicts." },
+          { type:"order", q:"Put the prediction loop in the right order.", items:["Read the text so far","Predict the most likely next token","Add that token to the text","Repeat until the answer is done"], good:"That is the loop: read, predict, add, repeat.", bad:"The loop is read, predict, add, repeat. Check the numbers." },
+          { type:"match", q:"Match each term to what it means.", pairs:[["token","a small chunk of text"],["sampling","the bit of randomness in each answer"],["training","the one-time phase where it learned"]] },
+          { type:"pick", q:"Why can the same prompt give a slightly different answer each time?", options:["It quietly edits its training data","It samples from likely options instead of reading one fixed reply","Your connection changed the text"], a:1, good:"Right. A little controlled randomness, called sampling.", bad:"It samples from the likely options, so answers vary a little. That is sampling." },
+          { type:"blank", q:"Because it predicts likely text, a confident tone is ___ a guarantee that the answer is true.", options:["not","always","legally"], a:0, good:"Exactly. Confidence is not truth.", bad:"It is not a guarantee. A wrong answer sounds just as confident as a right one." },
+          { type:"pick", q:"You ask for an obscure citation and get a tidy-looking one. Best assumption?", options:["It is real, the model found it","It may be predicted to look right and needs checking before you trust it"], a:1, good:"Right. Verify anything specific or rare before relying on it.", bad:"Treat it as a guess until you check. Rare, specific facts are where it makes things up." }
+        ],
         idea: [
           "A <strong>large language model</strong> (the engine inside ChatGPT, Claude, and Gemini) does one core thing: it predicts the next <strong>token</strong>, a small chunk of text usually a few characters long. Your words get split into tokens, the model reads them, and it writes its answer one token at a time, always asking what most likely comes next.",
           "Here is the part that surprises people: there is no stored list of answers inside it. During training it adjusted billions of internal numbers until its next-token guesses got very good. Good guessing, at a large enough scale, ends up looking exactly like understanding.",
@@ -5903,8 +5953,210 @@ function renderModule(mi){ renderHome(); return; /* module page retired; trail i
    ===================================================================== */
 function renderLesson(mi, li){
   const l = MODULES[mi].lessons[li];
+  if (l.practice && l.practice.length) return renderStone(mi, li);
   if (l.exercise) return renderLessonDoing(mi, li);
   return renderLessonClassic(mi, li);
+}
+
+/* =====================================================================
+   SOUND (synthesized, no audio files; respects a mute toggle)
+   ===================================================================== */
+let _AC = null, _muted = localStorage.getItem("aica_mute") === "1";
+function _ac(){ try{ if(!_AC) _AC = new (window.AudioContext||window.webkitAudioContext)(); if(_AC.state==="suspended") _AC.resume(); }catch(e){} return _AC; }
+function _tone(freq, start, dur, type, gain){
+  const a=_ac(); if(!a) return;
+  const o=a.createOscillator(), g=a.createGain(), t0=a.currentTime+start;
+  o.type=type||"sine"; o.frequency.value=freq;
+  g.gain.setValueAtTime(0.0001,t0); g.gain.exponentialRampToValueAtTime(gain||0.2,t0+0.012);
+  g.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
+  o.connect(g); g.connect(a.destination); o.start(t0); o.stop(t0+dur+0.03);
+}
+function sCorrect(){ if(_muted) return; _tone(660,0,0.12,"triangle",0.22); _tone(990,0.08,0.16,"triangle",0.2); }
+function sWrong(){ if(_muted) return; _tone(196,0,0.24,"sawtooth",0.14); _tone(146,0.09,0.24,"sawtooth",0.12); }
+function sTick(){ if(_muted) return; _tone(540,0,0.05,"square",0.08); }
+function sComplete(){ if(_muted) return; [523,659,784,1047].forEach((f,i)=>_tone(f,i*0.11,0.26,"triangle",0.22)); }
+function vibrate(p){ try{ if(navigator.vibrate) navigator.vibrate(p); }catch(e){} }
+function toggleMute(){ _muted=!_muted; localStorage.setItem("aica_mute", _muted?"1":"0"); return _muted; }
+function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+
+/* =====================================================================
+   IN-STONE SESSION PLAYER  (a sequence of ~8 mixed exercises per stone)
+   ===================================================================== */
+let SP = null;
+function renderStone(mi, li){
+  const m = MODULES[mi], l = m.lessons[li];
+  markScreen("lesson", mi, li);
+  const qs = [];
+  if (l.exercise) qs.push(l.exercise);
+  (l.practice||[]).forEach(p=>qs.push(p));
+  const steps = [{k:"q", ex:qs[0]}, {k:"teach"}];
+  const mid = Math.ceil(qs.length/2);
+  for (let i=1;i<qs.length;i++){
+    steps.push({k:"q", ex:qs[i]});
+    if (i===mid && l.mistakes && l.mistakes.length) steps.push({k:"mistakes"});
+  }
+  if (l.tryit) steps.push({k:"apply"});
+  steps.push({k:"recap"});
+  SP = { mi, li, steps, idx:0, totalQ:qs.length, doneQ:0, combo:0, best:0, wrong:0, xp:0, already:lessonRead(mi,li) };
+  spRender();
+}
+function spTeachHTML(l){
+  const w=l.worked;
+  return `<div class="sp-teach">
+    <div class="section-title" style="margin-top:0;">Here's the idea</div>
+    <div class="lesson-body">${(l.idea||[]).slice(0,2).map(p=>`<p>${p}</p>`).join("")}</div>
+    ${w?`<div class="worked"><span class="wtag">▶ ${w.label?esc(w.label):"Watch it work"}</span><div class="io in">${(w.steps||[]).map(s=>`<div>${s}</div>`).join("")}</div>${w.out?`<div class="io out"><span class="iolab">Result</span>${w.out}</div>`:""}</div>`:""}
+  </div>`;
+}
+function spRecapHTML(l){
+  const gd=l.goDeeper;
+  return `<div class="sp-teach">
+    <div class="section-title" style="margin-top:0;">Lock it in</div>
+    <div class="lesson-body"><div class="analogy"><span class="tag">💡 Picture it</span>${l.analogy}</div></div>
+    ${gd&&gd.videos&&gd.videos.length?`<div class="gd open"><div class="gd-body">${gd.videos.map(v=>`<a class="vid" href="${v[2]}" target="_blank" rel="noopener"><span class="pl">▶</span><span class="vid-meta">${esc(v[1])}<small>YouTube · ${esc(v[0])}${v[3]?" · "+esc(v[3]):""}</small></span><span class="vid-go">Watch ↗</span></a>`).join("")}</div></div>`:""}
+  </div>`;
+}
+function spRender(){
+  const m=MODULES[SP.mi], l=m.lessons[SP.li], step=SP.steps[SP.idx];
+  if (!step) return spReward();
+  const frac = SP.totalQ ? SP.doneQ/SP.totalQ : 0;
+  const top = `<div class="sp-top">
+      <button class="sp-x" id="sp-x" aria-label="Exit">✕</button>
+      <div class="pbar"><div style="width:${Math.round(frac*100)}%"></div></div>
+      <span class="sp-combo ${SP.combo>=2?'on':''}">${SP.combo>=2?'🔥'+SP.combo:''}</span>
+    </div>
+    <button class="sp-mute" id="sp-mute" aria-label="Sound">${_muted?'🔇':'🔊'}</button>`;
+  const isQ = step.k==="q";
+  let body;
+  if (step.k==="teach") body = spTeachHTML(l);
+  else if (step.k==="mistakes") body = `<div class="sp-teach"><div class="mistakes"><span class="mtag">⚠ Watch out for</span><ul>${l.mistakes.map(x=>`<li>${x}</li>`).join("")}</ul></div></div>`;
+  else if (step.k==="apply") body = `<div class="sp-teach"><div class="tryit"><span class="ttag">✋ Try it yourself</span><p>${l.tryit.do}</p>${l.tryit.check?`<p class="check">✅ ${l.tryit.check}</p>`:""}</div></div>`;
+  else if (step.k==="recap") body = spRecapHTML(l);
+  else body = `<div class="sp-wrap" id="sp-wrap">${exHTML(step.ex)}</div><div id="sp-fb"></div>`;
+  setScreen(top + body + `<div class="sp-foot"><button class="btn btn-primary" id="sp-next" ${isQ?'disabled':''}>Continue</button></div>`, {noTabs:true});
+  document.getElementById("sp-x").onclick = ()=>{ SP=null; renderHome(); };
+  document.getElementById("sp-mute").onclick = (e)=>{ e.target.textContent = toggleMute()?'🔇':'🔊'; };
+  const nextBtn = document.getElementById("sp-next");
+  nextBtn.onclick = ()=>{ SP.idx++; spRender(); };
+  if (!isQ){ if(step.k==="teach") sTick(); return; }
+  exBind(step.ex, (correct)=>{
+    nextBtn.disabled=false;
+    if (correct){ SP.combo++; SP.best=Math.max(SP.best,SP.combo); SP.xp+=5; SP.doneQ++; sCorrect(); vibrate(12); }
+    else { SP.combo=0; SP.wrong++; sWrong(); vibrate([25,40,25]);
+      SP.steps.splice(SP.steps.length-1, 0, {k:"q", ex:step.ex}); // requeue for mastery
+      const w=document.getElementById("sp-wrap"); if(w){ w.classList.remove("shake"); void w.offsetWidth; w.classList.add("shake"); } }
+    const cp=document.querySelector(".sp-combo"); if(cp){ cp.className="sp-combo "+(SP.combo>=2?"on":""); cp.textContent=SP.combo>=2?"🔥"+SP.combo:""; }
+    const pb=document.querySelector(".pbar>div"); if(pb) pb.style.width=Math.round((SP.totalQ?SP.doneQ/SP.totalQ:0)*100)+"%";
+  });
+}
+function spReward(){
+  const m=MODULES[SP.mi], l=m.lessons[SP.li];
+  const perfect = SP.wrong===0;
+  let gained = SP.already ? 0 : 10 + (perfect?5:0);
+  if (!SP.already){ S.lessons[m.id+"_"+SP.li]=true; addXP(gained); }
+  sComplete(); vibrate([15,30,15,30,40]); burstConfetti();
+  setScreen(`<div class="sp-reward">
+      <div class="big">${perfect?'🏆':'⭐'}</div>
+      <h2>${perfect?'Perfect stone!':'Stone cleared!'}</h2>
+      <p class="muted" style="font-weight:600;">${esc(l.title)}</p>
+      <div style="margin-top:14px;">
+        <span class="stat">🔥 best streak ${SP.best}</span>
+        <span class="stat">⭐ +${SP.already?0:gained} XP</span>
+      </div>
+      ${perfect?`<div class="perfect">No mistakes, +5 bonus</div>`:""}
+      <div style="height:22px"></div>
+      <button class="btn btn-primary" id="sp-done">Back to the path</button>
+    </div>`, {noTabs:true});
+  document.getElementById("sp-done").onclick = ()=>{ SP=null; renderHome(); };
+}
+/* ---- exercise type renderers + binders ---- */
+function exHTML(ex){
+  if (ex.type==="tokenize"){
+    const t=tokTiles(ex.start);
+    return `<div class="sp-q">${ex.intro}</div>
+      <input type="text" id="tok-in" value="${esc(ex.start)}" autocomplete="off">
+      <div class="tok-out" id="tok-out">${t.html}</div><div class="tok-count" id="tok-count">${t.count} tokens</div>
+      <div style="height:14px"></div><div class="sp-q">${ex.predict.q}</div>
+      <div id="sp-choices">${ex.predict.options.map((o,i)=>`<button class="choice" data-i="${i}">${o}</button>`).join("")}</div>`;
+  }
+  if (ex.type==="blank"){
+    return `<div class="sp-q">${ex.q.replace("___",'<span class="blank-slot" id="blank">____</span>')}</div>
+      <div class="chips" id="sp-chips">${ex.options.map((o,i)=>`<button class="chip-opt" data-i="${i}">${o}</button>`).join("")}</div>`;
+  }
+  if (ex.type==="match"){
+    const lefts = ex.pairs.map((p,i)=>({t:p[0], i})); const rights = shuffle(ex.pairs.map((p,i)=>({t:p[1], i})));
+    return `<div class="sp-q">${ex.q||"Match each pair"}</div>
+      <div class="match-grid">
+        <div class="match-col" id="m-left">${lefts.map(x=>`<button class="match-it" data-side="L" data-i="${x.i}">${x.t}</button>`).join("")}</div>
+        <div class="match-col" id="m-right">${rights.map(x=>`<button class="match-it" data-side="R" data-i="${x.i}">${x.t}</button>`).join("")}</div>
+      </div>`;
+  }
+  if (ex.type==="order"){
+    const pool = shuffle(ex.items.map((t,i)=>({t,i})));
+    return `<div class="sp-q">${ex.q||"Put these in the right order"}</div>
+      <div class="order-ans" id="o-ans"></div>
+      <div style="font-size:12.5px;color:var(--muted);font-weight:600;margin:4px 0;">tap in order</div>
+      <div class="order-pool" id="o-pool">${pool.map(x=>`<button class="order-it" data-i="${x.i}">${x.t}</button>`).join("")}</div>`;
+  }
+  // default: pick
+  return `<div class="sp-q">${ex.q}</div>
+    <div id="sp-choices">${ex.options.map((o,i)=>`<button class="choice" data-i="${i}">${o}</button>`).join("")}</div>`;
+}
+function _fb(html, good){ const f=document.getElementById("sp-fb"); if(f) f.innerHTML=`<div class="feedback ${good?"good":"bad"}">${html}</div>`; }
+function exBind(ex, cb){
+  if (ex.type==="tokenize"){
+    const inp=document.getElementById("tok-in");
+    if(inp) inp.oninput=()=>{ const t=tokTiles(inp.value||""); document.getElementById("tok-out").innerHTML=t.html; document.getElementById("tok-count").textContent=t.count+" tokens"; };
+    return _bindPick(ex.predict, cb);
+  }
+  if (ex.type==="blank") return _bindBlank(ex, cb);
+  if (ex.type==="match") return _bindMatch(ex, cb);
+  if (ex.type==="order") return _bindOrder(ex, cb);
+  return _bindPick(ex, cb);
+}
+function _bindPick(q, cb){
+  const wrap=document.getElementById("sp-choices");
+  wrap.querySelectorAll(".choice").forEach(b=> b.onclick=()=>{
+    const pick=+b.dataset.i, right=pick===q.a;
+    wrap.querySelectorAll(".choice").forEach((c,i)=>{ c.disabled=true; if(i===q.a)c.classList.add("correct"); else if(i===pick)c.classList.add("wrong"); });
+    _fb(right? (q.good||"Correct.") : (q.bad||"Not quite."), right); cb(right);
+  });
+}
+function _bindBlank(ex, cb){
+  const chips=document.getElementById("sp-chips");
+  chips.querySelectorAll(".chip-opt").forEach(b=> b.onclick=()=>{
+    const pick=+b.dataset.i, right=pick===ex.a;
+    const slot=document.getElementById("blank"); if(slot){ slot.textContent=ex.options[pick]; slot.style.color = right?"var(--green-dark)":"var(--red)"; slot.style.borderColor = right?"var(--green)":"var(--red)"; }
+    chips.querySelectorAll(".chip-opt").forEach((c,i)=>{ c.disabled=true; if(i===ex.a)c.classList.add("correct"); else if(i===pick)c.classList.add("wrong"); });
+    _fb(right? (ex.good||"Correct.") : (ex.bad||"Not quite."), right); cb(right);
+  });
+}
+function _bindMatch(ex, cb){
+  let sel=null, missed=false, matched=0;
+  const all=document.querySelectorAll("#m-left .match-it, #m-right .match-it");
+  all.forEach(b=> b.onclick=()=>{
+    if (b.classList.contains("done")) return;
+    if (!sel){ sel=b; b.classList.add("sel"); return; }
+    if (sel===b){ b.classList.remove("sel"); sel=null; return; }
+    if (sel.dataset.side===b.dataset.side){ sel.classList.remove("sel"); sel=b; b.classList.add("sel"); return; }
+    // one L one R selected
+    if (sel.dataset.i===b.dataset.i){ sel.classList.remove("sel"); sel.classList.add("done"); b.classList.add("done"); sel=null; matched++; sTick();
+      if (matched===ex.pairs.length){ _fb(missed?"Matched. Watch the tricky ones next time.":"All matched, nice.", !missed); cb(!missed); } }
+    else { missed=true; const a=sel,c=b; a.classList.add("miss"); c.classList.add("miss"); sWrong(); setTimeout(()=>{ a.classList.remove("miss","sel"); c.classList.remove("miss"); },420); sel=null; }
+  });
+}
+function _bindOrder(ex, cb){
+  const pool=document.getElementById("o-pool"), ans=document.getElementById("o-ans"); const placed=[];
+  function refresh(){
+    ans.innerHTML=placed.map((p,n)=>`<button class="order-it" data-pos="${n}"><span class="num">${n+1}</span>${ex.items[p]}</button>`).join("");
+    ans.querySelectorAll(".order-it").forEach(b=> b.onclick=()=>{ if(ans.querySelector(".correct"))return; const pos=+b.dataset.pos; placed.splice(pos,1); refresh(); });
+    if (placed.length===ex.items.length){
+      const right = placed.every((p,n)=>p===n);
+      ans.querySelectorAll(".order-it").forEach((b,n)=> b.classList.add(placed[n]===n?"correct":"wrong"));
+      _fb(right? (ex.good||"Correct order.") : (ex.bad||"Not the right order, see the numbers."), right); cb(right);
+    }
+  }
+  pool.querySelectorAll(".order-it").forEach(b=> b.onclick=()=>{ if(placed.length===ex.items.length)return; placed.push(+b.dataset.i); b.disabled=true; b.style.opacity=.4; refresh(); });
 }
 
 /* ---- learn by doing helpers ---- */
