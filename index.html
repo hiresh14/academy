@@ -171,6 +171,11 @@
   .lvl-start:after{content:"";position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:var(--blue);}
   @keyframes bob{0%,100%{transform:translateX(-50%) translateY(0);}50%{transform:translateX(-50%) translateY(-5px);}}
   .lvl-check{position:absolute;top:-3px;right:-3px;width:25px;height:25px;border-radius:50%;background:#fff;border:2px solid var(--gold-dark);color:var(--gold-dark);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;}
+  .lvl-lock{position:absolute;bottom:-3px;right:-3px;width:22px;height:22px;border-radius:50%;background:#fff;border:2px solid #cfd6e6;display:flex;align-items:center;justify-content:center;font-size:11px;}
+  .lvl-ic{line-height:1;}
+  .lvl-ic.dim{opacity:.4;}
+  .fadein{animation:fade .4s ease both;}
+  @keyframes fade{from{opacity:0;}to{opacity:1;}}
 
   /* ---------- module detail ---------- */
   .item-row{
@@ -1940,6 +1945,23 @@ const GOAL_LINE = {
   automate: "Let's learn to hand off the busywork.",
   curious: "Let's make AI make sense."
 };
+const LESSON_ICONS = {
+  "A very good guesser":"🎲","Training vs inference":"🎓","The context window":"🪟",
+  "Why prompts matter":"💬","Give it the context":"📎","Work like an editor":"✏️",
+  "Why it makes things up":"🌀","The jagged frontier":"🧗","You own the output":"🪪",
+  "Neurons and parameters":"🔩","How it learns":"📉","Meaning as numbers":"📍",
+  "Attention, the big idea":"👁️","From raw model to assistant":"🪄","Why tokenizing causes quirks":"✂️",
+  "What the code is doing":"💻","A neuron in a few lines":"➕","From characters to a tiny model":"🔤",
+  "The system prompt":"📋","Make it answer in a fixed shape":"🧱","Ask it to think first":"💭",
+  "Grounding beats guessing":"📚","RAG in plain language":"🔎","When retrieval fails":"🚧",
+  "Tools: letting AI act":"🦾","Automations vs agents":"⚙️","Design one on paper":"📐",
+  "Vibes do not scale":"📊","Build a tiny test set":"🧪","Close the loop":"🔁",
+  "What an AI app is made of":"🧩","APIs and keys":"🔑","Shipping beats perfect":"📦",
+  "Anatomy of an agent":"🤖","Guardrails and a human in the loop":"🛡️","Many agents working together":"🐝",
+  "Tokens are money":"💸","Spend less: caching and routing":"🪙","Make it feel fast":"⚡",
+  "Pick the right use case":"🎯","People, trust, and governance":"🤝","Your 90 day plan":"🗺️",
+  "Signal vs noise":"📡","Test it on your own work":"🧭","Make it a habit":"📅"
+};
 function renderHome(){
   currentTab = "home";
   const order = moduleOrder();
@@ -1969,9 +1991,9 @@ function renderHome(){
       const claimed = !!((S.chests || {})[m.id]);
       const avail = assignComplete(s.mi) && !claimed;
       const col = (claimed || avail) ? ["#f5b800","#cf9a00"] : ["#e6e9f2","#cfd6e6"];
-      nodes += `<div class="lvl rise" style="transform:translateX(${off}px);">
+      nodes += `<div class="lvl fadein" style="transform:translateX(${off}px);">
         <div style="position:relative;display:flex;justify-content:center;">
-          <button class="lvl-btn ${avail?"":"locked"}" style="--bbg:${col[0]};--bsh:${col[1]};" ${avail?`data-act="chest" data-mi="${s.mi}"`:""}>${(avail||claimed)?"🎁":"🔒"}</button>
+          <button class="lvl-btn ${avail?"":"locked"}" style="--bbg:${col[0]};--bsh:${col[1]};" ${avail?`data-act="chest" data-mi="${s.mi}"`:""}>${(avail||claimed)?`<span class="lvl-ic">🎁</span>`:`<span class="lvl-lock">🔒</span><span class="lvl-ic dim">🎁</span>`}</button>
         </div>
         <div class="lvl-label ${(avail||claimed)?"":"muted"}">${claimed?"Reward claimed":"Treasure"}</div>
       </div>`;
@@ -1981,16 +2003,16 @@ function renderHome(){
     const unlocked = prevDone;
     const isCurrent = unlocked && !done && !currentSet; if (isCurrent) currentSet = true;
     prevDone = done;
-    const glyph = s.t==="lesson" ? "⭐" : s.t==="quiz" ? "🎯" : (m.build ? "🚀" : "🏆");
+    const glyph = s.t==="lesson" ? (LESSON_ICONS[MODULES[s.mi].lessons[s.li].title] || "⭐") : s.t==="quiz" ? "🏁" : (m.build ? "🚀" : "🏆");
     const label = s.t==="lesson" ? MODULES[s.mi].lessons[s.li].title : s.t==="quiz" ? "Quick check" : MODULES[s.mi].assignment.title;
     const col = done ? ["#f5b800","#cf9a00"] : (unlocked ? tc : ["#e6e9f2","#cfd6e6"]);
     const dataAttr = unlocked ? `data-act="${s.t}" data-mi="${s.mi}"${s.t==="lesson"?` data-li="${s.li}"`:""}` : "";
-    nodes += `<div class="lvl rise" style="transform:translateX(${off}px);">
+    nodes += `<div class="lvl fadein" style="transform:translateX(${off}px);">
       <div style="position:relative;display:flex;justify-content:center;">
         ${isCurrent ? `<span class="lvl-start">${started?"Continue":"Start"}</span>` : ""}
         <button class="lvl-btn ${unlocked?"":"locked"}" style="--bbg:${col[0]};--bsh:${col[1]};" ${dataAttr}>
-          ${done ? `<span class="lvl-check">✓</span>` : ""}
-          ${unlocked ? glyph : "🔒"}
+          ${done ? `<span class="lvl-check">✓</span>` : (!unlocked ? `<span class="lvl-lock">🔒</span>` : "")}
+          <span class="lvl-ic ${unlocked?"":"dim"}">${glyph}</span>
         </button>
       </div>
       <div class="lvl-label ${unlocked?"":"muted"}">${label}</div>
