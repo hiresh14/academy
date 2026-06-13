@@ -155,12 +155,15 @@
   .tier-head span{background:var(--navy);color:#fff;border-radius:999px;padding:7px 18px;font-size:12px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;box-shadow:0 4px 0 rgba(10,22,51,.25);}
   .lvl{display:flex;flex-direction:column;align-items:center;margin-bottom:22px;}
   .lvl-btn{position:relative;width:74px;height:74px;border-radius:50%;border:none;cursor:pointer;font-family:inherit;font-size:31px;
-    display:flex;align-items:center;justify-content:center;background:var(--blue);box-shadow:0 6px 0 var(--blue-dark);
+    display:flex;align-items:center;justify-content:center;background:var(--bbg,#1a6aff);box-shadow:0 6px 0 var(--bsh,#0e4fd4);
     transition:transform .08s ease,box-shadow .08s ease;}
-  .lvl-btn:active{transform:translateY(4px);box-shadow:0 2px 0 var(--blue-dark);}
-  .lvl-btn.done{background:var(--gold);box-shadow:0 6px 0 var(--gold-dark);}
-  .lvl-btn.locked{background:#e6e9f2;box-shadow:0 6px 0 #cfd6e6;cursor:default;}
-  .lvl-btn.locked:active{transform:none;box-shadow:0 6px 0 #cfd6e6;}
+  .lvl-btn:active{transform:translateY(4px);box-shadow:0 2px 0 var(--bsh,#0e4fd4);}
+  .lvl-btn.locked{cursor:default;}
+  .lvl-btn.locked:active{transform:none;}
+  .unit-banner{display:flex;align-items:center;gap:12px;width:94%;max-width:420px;border-radius:18px;padding:14px 18px;margin:18px 0 22px;color:#fff;}
+  .unit-banner .ub-sub{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;opacity:.82;}
+  .unit-banner .ub-title{font-size:18px;font-weight:800;line-height:1.2;margin-top:2px;}
+  .unit-banner .ub-emoji{margin-left:auto;font-size:30px;}
   .lvl-ring{position:absolute;inset:-7px;pointer-events:none;}
   .lvl-label{margin-top:11px;font-size:13px;font-weight:800;color:var(--navy);background:#fff;border:2px solid var(--border);border-bottom-width:3px;border-radius:12px;padding:5px 13px;max-width:240px;text-align:center;line-height:1.25;}
   .lvl-label.muted{color:#9aa6c0;background:var(--surface);}
@@ -1581,7 +1584,8 @@ let S = JSON.parse(localStorage.getItem(LS_STATE) || "null") || {
   lessons: {},     // "m1_0": true
   quizDone: {},    // "m1": score
   quizAwarded: {}, // "m1_2": true (XP given for this question)
-  assignDone: {}   // "m1": true
+  assignDone: {},  // "m1": true
+  chests: {}       // "m1": true (unit reward claimed)
 };
 
 function save(){ localStorage.setItem(LS_STATE, JSON.stringify(S)); if(profile) localStorage.setItem(LS_PROFILE, JSON.stringify(profile)); syncRemote(); }
@@ -1939,33 +1943,57 @@ const GOAL_LINE = {
 function renderHome(){
   currentTab = "home";
   const order = moduleOrder();
-  let startBadgeGiven = false;
-  let prevSection = null;
-  let nodes = "";
-  order.forEach((mi, idx) => {
-    const m = MODULES[mi];
-    const unlocked = moduleUnlocked(mi);
-    const done = moduleComplete(mi);
-    const prog = moduleProgress(mi);
-    const skip = isSkipReview(mi);
-    const section = m.tier || "Foundations";
-    if (section !== prevSection){
-      nodes += `<div class="tier-head"><span>${section}</span></div>`;
-      prevSection = section;
+  const started = Object.keys(S.lessons || {}).length > 0;
+  const stones = [];
+  let unit = 0;
+  order.forEach(mi => {
+    unit++;
+    stones.push({ t:"banner", mi, unit });
+    MODULES[mi].lessons.forEach((_, li) => stones.push({ t:"lesson", mi, li }));
+    stones.push({ t:"quiz", mi });
+    stones.push({ t:"assign", mi });
+    stones.push({ t:"chest", mi });
+  });
+  let prevDone = true, currentSet = false, b = 0, nodes = "";
+  stones.forEach(s => {
+    const m = MODULES[s.mi];
+    const tc = tierStyle(m.tier);
+    if (s.t === "banner"){
+      nodes += `<div class="unit-banner rise" style="background:${tc[0]};box-shadow:0 5px 0 ${tc[1]};">
+        <div><div class="ub-sub">${m.tier} · Unit ${s.unit}</div><div class="ub-title">${m.title}</div></div>
+        <div class="ub-emoji">${m.emoji}</div></div>`;
+      return;
     }
-    const off = Math.round(Math.sin(idx * 0.85) * 62);
-    const isStart = unlocked && !done && !startBadgeGiven; if (isStart) startBadgeGiven = true;
-    const state = !unlocked ? "locked" : (done ? "done" : "");
-    nodes += `<div class="lvl rise" style="transform:translateX(${off}px);animation-delay:${Math.min(idx,8)*0.05}s">
+    const off = Math.round(Math.sin(b * 0.8) * 60); b++;
+    if (s.t === "chest"){
+      const claimed = !!((S.chests || {})[m.id]);
+      const avail = assignComplete(s.mi) && !claimed;
+      const col = (claimed || avail) ? ["#f5b800","#cf9a00"] : ["#e6e9f2","#cfd6e6"];
+      nodes += `<div class="lvl rise" style="transform:translateX(${off}px);">
+        <div style="position:relative;display:flex;justify-content:center;">
+          <button class="lvl-btn ${avail?"":"locked"}" style="--bbg:${col[0]};--bsh:${col[1]};" ${avail?`data-act="chest" data-mi="${s.mi}"`:""}>${(avail||claimed)?"🎁":"🔒"}</button>
+        </div>
+        <div class="lvl-label ${(avail||claimed)?"":"muted"}">${claimed?"Reward claimed":"Treasure"}</div>
+      </div>`;
+      return;
+    }
+    const done = s.t==="lesson" ? lessonRead(s.mi,s.li) : s.t==="quiz" ? quizComplete(s.mi) : assignComplete(s.mi);
+    const unlocked = prevDone;
+    const isCurrent = unlocked && !done && !currentSet; if (isCurrent) currentSet = true;
+    prevDone = done;
+    const glyph = s.t==="lesson" ? "⭐" : s.t==="quiz" ? "🎯" : (m.build ? "🚀" : "🏆");
+    const label = s.t==="lesson" ? MODULES[s.mi].lessons[s.li].title : s.t==="quiz" ? "Quick check" : MODULES[s.mi].assignment.title;
+    const col = done ? ["#f5b800","#cf9a00"] : (unlocked ? tc : ["#e6e9f2","#cfd6e6"]);
+    const dataAttr = unlocked ? `data-act="${s.t}" data-mi="${s.mi}"${s.t==="lesson"?` data-li="${s.li}"`:""}` : "";
+    nodes += `<div class="lvl rise" style="transform:translateX(${off}px);">
       <div style="position:relative;display:flex;justify-content:center;">
-        ${isStart ? `<span class="lvl-start">Start</span>` : ""}
-        ${(unlocked && !done && prog > 0) ? trailRing(prog) : ""}
-        <button class="lvl-btn ${state}" ${unlocked ? `data-mi="${mi}"` : ""}>
+        ${isCurrent ? `<span class="lvl-start">${started?"Continue":"Start"}</span>` : ""}
+        <button class="lvl-btn ${unlocked?"":"locked"}" style="--bbg:${col[0]};--bsh:${col[1]};" ${dataAttr}>
           ${done ? `<span class="lvl-check">✓</span>` : ""}
-          ${unlocked ? m.emoji : "🔒"}
+          ${unlocked ? glyph : "🔒"}
         </button>
       </div>
-      <div class="lvl-label ${unlocked ? "" : "muted"}">${m.title}</div>
+      <div class="lvl-label ${unlocked?"":"muted"}">${label}</div>
     </div>`;
   });
 
@@ -1989,12 +2017,33 @@ function renderHome(){
   `);
   const _so = document.getElementById("sign-out");
   if (_so) _so.onclick = () => SB.auth.signOut();
-  document.querySelectorAll(".lvl-btn[data-mi]").forEach(c => {
+  document.querySelectorAll(".lvl-btn[data-act]").forEach(c => {
     c.onclick = () => {
-      const mi = +c.dataset.mi;
-      if (moduleUnlocked(mi)) renderModule(mi);
+      const mi = +c.dataset.mi, act = c.dataset.act;
+      if (act === "lesson") renderLesson(mi, +c.dataset.li);
+      else if (act === "quiz") startQuiz(mi);
+      else if (act === "assign") renderAssignment(mi);
+      else if (act === "chest") openChest(mi);
     };
   });
+}
+function tierStyle(t){
+  return ({
+    "AI Fluency":["#1a6aff","#0e4fd4"],
+    "How AI Works":["#2bb673","#1f9159"],
+    "Build From Scratch":["#6b4fd4","#4f39ad"],
+    "Build Real Things":["#e8852b","#c26a13"],
+    "Agents & Production":["#0a1633","#060e22"],
+    "The Frontier":["#d23f8c","#a82d6f"]
+  })[t] || ["#1a6aff","#0e4fd4"];
+}
+function openChest(mi){
+  const id = MODULES[mi].id;
+  if (!S.chests) S.chests = {};
+  if (S.chests[id]){ renderHome(); return; }
+  S.chests[id] = true; addXP(25);
+  setScreen(`<div class="celebrate"><div class="big">🎁</div><h2>Treasure unlocked!</h2><p>You finished <b>${esc(MODULES[mi].title)}</b>. Here's <b class="xp-float">+25 XP</b> to keep the streak fed.</p><button class="btn btn-primary" id="chest-go">Back to the path</button></div>`, {});
+  document.getElementById("chest-go").onclick = renderHome;
 }
 function trailRing(frac){
   const size = 88, r = size/2 - 4, c = 2*Math.PI*r;
@@ -2007,7 +2056,7 @@ function trailRing(frac){
 /* =====================================================================
    MODULE DETAIL
    ===================================================================== */
-function renderModule(mi){
+function renderModule(mi){ renderHome(); return; /* module page retired; trail is the home */
   const m = MODULES[mi];
   const rows = m.lessons.map((l, li) => {
     const read = lessonRead(mi, li);
@@ -2145,7 +2194,7 @@ function renderLessonDoing(mi, li){
       </div>
     </div>` : "";
   setScreen(`
-    <button class="back-link" id="back">← ${m.title}</button>
+    <button class="back-link" id="back">← Back to path</button>
     <div class="dots" style="margin-top:10px;">${dots}</div>
     <div class="lesson-head"><h2>${l.title}</h2><p>${m.emoji} ${m.title} · Lesson ${li+1} of ${m.lessons.length}</p></div>
     <div class="seed rise"><span class="tag">The gist</span>${l.seed}</div>
@@ -2160,10 +2209,10 @@ function renderLessonDoing(mi, li){
     </div>
     <div style="height:10px"></div>
     <button class="btn btn-primary" id="done-btn" ${already?"":"disabled"}>
-      ${already ? (isLast ? "Back to module" : "Next lesson →") : (isLast ? "Finish · +10 XP" : "Continue · +10 XP")}
+      ${already ? "Back to path" : "Got it · +10 XP"}
     </button>
   `);
-  document.getElementById("back").onclick = () => renderModule(mi);
+  document.getElementById("back").onclick = () => renderHome();
   bindExercise(l.exercise, () => {
     const rev = document.getElementById("reveal");
     rev.style.display = "block"; rev.classList.add("rise");
@@ -2174,7 +2223,7 @@ function renderLessonDoing(mi, li){
   if (gdHead) gdHead.onclick = () => document.getElementById("gd").classList.toggle("open");
   document.getElementById("done-btn").onclick = () => {
     if (!already){ S.lessons[m.id + "_" + li] = true; addXP(10); }
-    if (isLast) renderModule(mi); else renderLesson(mi, li+1);
+    renderHome();
   };
 }
 
@@ -2184,7 +2233,7 @@ function renderLessonClassic(mi, li){
   const already = lessonRead(mi, li);
   const isLast = li === m.lessons.length - 1;
   setScreen(`
-    <button class="back-link" id="back">← ${m.title}</button>
+    <button class="back-link" id="back">← Back to path</button>
     <div class="dots" style="margin-top:10px;">${dots}</div>
     <div class="lesson-head">
       <h2>${l.title}</h2>
@@ -2197,16 +2246,16 @@ function renderLessonClassic(mi, li){
     </div>
     <div style="height:10px"></div>
     <button class="btn btn-primary" id="done-btn">
-      ${already ? (isLast ? "Back to module" : "Next lesson →") : (isLast ? "Finish · +10 XP" : "Continue · +10 XP")}
+      ${already ? "Back to path" : "Got it · +10 XP"}
     </button>
   `);
-  document.getElementById("back").onclick = () => renderModule(mi);
+  document.getElementById("back").onclick = () => renderHome();
   document.getElementById("done-btn").onclick = () => {
     if (!already){
       S.lessons[m.id + "_" + li] = true;
       addXP(10);
     }
-    if (isLast) renderModule(mi); else renderLesson(mi, li+1);
+    renderHome();
   };
 }
 
@@ -2249,7 +2298,7 @@ function renderQuizQ(){
     </div>
     <div id="fb"></div>
   `, {});
-  document.getElementById("back").onclick = () => renderModule(mi);
+  document.getElementById("back").onclick = () => renderHome();
   document.querySelectorAll(".choice").forEach(b => b.onclick = () => answerQuiz(+b.dataset.i));
 }
 function answerQuiz(pick){
@@ -2306,7 +2355,7 @@ function finishQuiz(){
       <button class="btn btn-ghost" id="retake">Retake quiz</button>
     </div>
   `);
-  document.getElementById("cont").onclick = () => renderModule(mi);
+  document.getElementById("cont").onclick = () => renderHome();
   document.getElementById("retake").onclick = () => startQuiz(mi);
 }
 
@@ -2318,7 +2367,7 @@ function renderAssignment(mi){
   const done = assignComplete(mi);
   const xp = m.assignment.xp || 50;
   setScreen(`
-    <button class="back-link" id="back">← ${m.title}</button>
+    <button class="back-link" id="back">← Back to path</button>
     <div class="lesson-head" style="margin-top:10px;">
       <h2>🎯 ${m.assignment.title}</h2>
       <p>${m.build ? "Build project · plan 2-3 focused hours · real tools, real output" : "Practical assignment · do this in your own ChatGPT or Claude account"}</p>
@@ -2331,7 +2380,7 @@ function renderAssignment(mi){
       : `<button class="btn btn-primary" id="mark">I did it, mark done · +${xp} XP</button>
          <p class="muted" style="text-align:center;font-size:13px;margin-top:10px;font-weight:500;">Honor system. The XP only means something if you actually did it 😉</p>`}
   `);
-  document.getElementById("back").onclick = () => renderModule(mi);
+  document.getElementById("back").onclick = () => renderHome();
   if (done){
     document.getElementById("undo").onclick = () => { delete S.assignDone[m.id]; save(); renderAssignment(mi); };
   } else {
