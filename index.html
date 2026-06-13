@@ -741,7 +741,314 @@ const MODULES = [
       title: "Build a reusable prompt and a custom assistant", xp: 120,
       steps: "Make AI a reliable teammate for {{SPINE}}. (1) Pick a recurring task. Write a prompt using all four levers, one example, and an exact output shape. Run it on three real inputs until the shape holds every time. (2) Turn it into a custom assistant: a Custom GPT, a Claude Project, or a Gemini Gem. Put the standing rules in the system prompt and add a reference file or two. (3) Test it on three fresh cases and fix what drifts. You can now hand a repeating task to an assistant that does it your way."
     }
+  },
+  {
+    id: "m3", emoji: "🤖", tier: "Automations & Agents", build: true,
+    title: "Automations and Agents",
+    desc: "Go from a single AI answer to an agent that does real work",
+    bridge: "Answering is useful. Acting is where the value jumps.",
+    lessons: [
+      {
+        title: "From answer to action", ic: "🦾",
+        seed: "On its own, a model only writes text. Tools are what let it actually do things in the world.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "A model can only output text. So how does it actually send an email or check a calendar?",
+          options: ["It connects to the mail server itself", "It outputs a structured request, and your software runs it"],
+          a: 1,
+          good: "Right. The model asks, your code does the action and hands back the result. That handoff is tool use.",
+          bad: "It emits a structured request and your software performs the action, then returns the result. That is tool use."
+        },
+        idea: [
+          "<strong>Tool use</strong> (also called function calling) lets a model request a real action: search, send, look up, calculate. It writes a structured request, ordinary software runs it, and the result comes back.",
+          "This is the whole bridge from a chatbot that talks to a system that acts. Everything later in this track stands on it.",
+          "<strong>How it breaks:</strong> people expect the model itself to reach the internet or a database. It cannot. It can only ask; your code (or a no-code tool) does the doing, which is also where you put the safety checks."
+        ],
+        analogy: "A sharp dispatcher who cannot drive. They radio precise instructions, and the drivers carry them out and report back.",
+        goDeeper: { text: ["A 2026 standard called MCP is making tools plug into any assistant the way any browser opens any site. Describe the job well, and scope what the tool is allowed to touch."], videos: [] }
+      },
+      {
+        title: "The call and respond loop", ic: "🔁",
+        seed: "Tool use is a loop: the model asks for a tool, the tool runs, the result goes back, the model decides what is next.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "Your AI looks up an order, the tool returns the order data. What has to happen next for a good reply?",
+          options: ["Show the raw data to the user", "Feed the result back to the model so it can answer in plain language"],
+          a: 1,
+          good: "Right. The result returns to the model, which turns it into a useful answer or decides the next tool to call.",
+          bad: "The result goes back to the model, which writes the human answer or picks the next step. Raw data alone is not the job."
+        },
+        idea: [
+          "The pattern is: model requests a tool, software runs it, the result is fed back into the model, and it continues. Simple tasks need one pass. Real ones chain several.",
+          "Getting this loop right (and handling a tool that errors or returns junk) is most of what makes a reliable assistant.",
+          "<strong>How it breaks:</strong> forgetting to feed the result back, or not handling failures, so the assistant answers from nothing when a tool call fails."
+        ],
+        analogy: "A chef calling out an order, the line cook making it, and the plate coming back to the chef to check before it leaves.",
+        goDeeper: { text: ["When you have several tools, the model also has to pick the right one. Clear tool names and descriptions are what make routing reliable."], videos: [] }
+      },
+      {
+        title: "Workflow, automation, or agent?", ic: "🪜",
+        seed: "Three ways to put AI to work, and picking the simplest one that fits is a real skill.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "\"When a form arrives, summarise it and draft a reply.\" Best built as:",
+          options: ["An agent that figures out what to do", "A fixed automation, the steps never change"],
+          a: 1,
+          good: "Right. Fixed steps means a simple, reliable automation. Save agents for when the path is not known in advance.",
+          bad: "A fixed automation. The steps are always the same, so you do not need an agent deciding the path. Start simple."
+        },
+        idea: [
+          "A <strong>workflow</strong> is steps you map out. An <strong>automation</strong> runs those fixed steps on a trigger, often with an AI step inside. An <strong>agent</strong> is a model in a loop that chooses its own next action toward a goal.",
+          "Most real value is plain automations. Reach for an agent only when the steps genuinely cannot be fixed ahead of time.",
+          "<strong>How it breaks:</strong> building a clever agent where a five-step automation would do. Simpler is cheaper, faster, and far easier to trust."
+        ],
+        analogy: "An automation is a recipe. An agent is a cook improvising toward a dish. Recipes are predictable; cooks handle the unknown, with more risk.",
+        goDeeper: { text: ["The expensive 2026 mistake is agent-washing: wrapping a simple automation in an agent for the buzzword. Pick the simplest tool that solves it."], videos: [] }
+      },
+      {
+        title: "Memory and the agent loop", ic: "♻️",
+        seed: "An agent is a model in a loop with a goal, tools, and memory: it acts, sees the result, and decides the next step.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "What actually makes an agent different from a single AI answer?",
+          options: ["It uses a bigger model", "It loops: act, observe the result, decide the next action, until done"],
+          a: 1,
+          good: "Right. The loop is the whole idea: take a step, see what happened, choose the next one toward the goal.",
+          bad: "The loop. It acts, observes, and chooses the next step, carrying state forward, instead of answering once."
+        },
+        idea: [
+          "Each turn the agent decides an action, runs a tool, reads the result, and decides again, carrying <strong>state</strong> (what it has done and learned) forward. That loop is what lets it handle a multi-step job.",
+          "It is powerful and riskier than a single answer, because a small error early can compound across steps.",
+          "<strong>How it breaks:</strong> no stopping condition (it loops forever or wanders), or losing track of state so it repeats or contradicts earlier steps."
+        ],
+        analogy: "A new intern with a to-do list and a phone: make a call, see what comes back, decide the next call, instead of answering everything in one breath.",
+        goDeeper: { text: ["Useful agent patterns: reflection (check its own work), planning (draft steps before acting), and tool use. Good agents are usually a few of these combined simply, with a hard cap on steps."], videos: [] }
+      },
+      {
+        title: "Guardrails and a human in the loop", ic: "🛡️",
+        seed: "An agent that can act can also act wrongly at speed. Limits and approval points keep it safe.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "You give an agent the ability to email customers. The safest setup is:",
+          options: ["Let it send freely so it is fast", "Let it draft, and require a human to approve sends"],
+          a: 1,
+          good: "Right. Draft freely, approve the consequential step. Speed where it is safe, a human gate where it matters.",
+          bad: "Let it draft but require approval to send. Speed where it is safe, a human gate before anything irreversible."
+        },
+        idea: [
+          "<strong>Guardrails</strong> are the limits around an agent: which tools it may use, spending caps, a sandbox, and approval steps before anything irreversible (sending, paying, publishing).",
+          "Keep permissions minimal and treat anything the agent reads from the outside as untrusted.",
+          "<strong>How it breaks:</strong> <strong>prompt injection</strong>, where text hidden in a webpage or email tells your agent to do something else. Minimal permissions and a human gate limit the blast radius."
+        ],
+        analogy: "A trainee with a company card that has a low limit and needs a manager's nod for big purchases. Freedom to work, brakes where it counts.",
+        goDeeper: { text: ["The common antipatterns: one giant do-everything agent, over-engineered planning, and no logging. You cannot trust what you cannot see, so log every step."], videos: [] }
+      },
+      {
+        title: "Give it your knowledge (RAG)", ic: "📚",
+        seed: "To make an assistant answer from your own documents, you do not retrain it. You fetch the right pieces and hand them over.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "You want a support bot that answers from your help docs. How?",
+          options: ["Retrain the model on your docs", "Fetch the most relevant chunks and put them in the prompt (RAG)"],
+          a: 1,
+          good: "Right. Retrieve the relevant chunks, drop them in the window, answer from them, with a quote. No retraining.",
+          bad: "It retrieves the relevant chunks and answers from them (RAG). Retraining is slow, costly, and unnecessary here."
+        },
+        idea: [
+          "<strong>RAG</strong> (retrieval-augmented generation) is the standard pattern for AI over your documents: split them into chunks, find the chunks closest in meaning to the question, and feed those to the model to answer from.",
+          "It keeps answers grounded and current (change the docs, not the model) and lets the bot cite which chunk each claim came from.",
+          "<strong>How it breaks:</strong> most RAG failures are retrieval failures. If the wrong chunks come back, the model answers confidently from bad context. Clean docs and good chunking set the ceiling."
+        ],
+        analogy: "A librarian who does not memorise every book. They fetch the three relevant pages, then answer with those open in front of them.",
+        goDeeper: { text: ["No-code tools (Dify, and the file-upload features in Custom GPTs or Claude Projects) let you build a working RAG bot without code. The deeper Knowledge Systems track covers chunking, reranking, and retrieval evals."], videos: [] }
+      },
+      {
+        title: "Build it no-code first", ic: "🔗",
+        seed: "You can ship a real automation today without writing code. Connect triggers, steps, and an AI action visually.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "You want your first working automation live this week. Where do you start?",
+          options: ["Write it from scratch in Python", "Build it visually in a no-code tool like n8n, Make, or Zapier"],
+          a: 1,
+          good: "Right. No-code gets a real automation running fast. You learn the shape, then go deeper only if you need to.",
+          bad: "Start no-code (n8n, Make, Zapier). You ship something real fast and learn the moving parts before touching code."
+        },
+        idea: [
+          "Tools like <strong>n8n, Make, and Zapier</strong> let you wire a trigger (a form, an email, a schedule) to steps, with an AI step in the middle, all by dragging boxes. Newer ones (Lindy, Relevance AI) add agent behavior.",
+          "The skill is the same one you mapped on paper: trigger, steps, the AI part, and the human approval gate. The tool just runs it.",
+          "<strong>How it breaks:</strong> over-reaching on version one. Automate the narrowest useful slice first, watch it run, then expand."
+        ],
+        analogy: "Building with connected Lego blocks instead of moulding plastic yourself. Same structure, far faster to a working thing.",
+        goDeeper: { text: ["A shared standard, MCP, increasingly lets these tools and assistants plug into the same apps. When you outgrow no-code, the same concepts move to the OpenAI Agents SDK, Claude Agent SDK, or LangGraph."], videos: [] }
+      },
+      {
+        title: "Prove it works", ic: "✅",
+        seed: "Before you trust an automation with real work, you measure it. Trying it twice and feeling good is not proof.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "Your support agent looked great in two test chats. Can you turn it loose on customers?",
+          options: ["Yes, it clearly works", "Not yet, two cases can hide failures; test a real set first"],
+          a: 1,
+          good: "Right. Build a small test set of real cases and score it before you trust it. Vibes do not scale.",
+          bad: "Not yet. Two happy demos can hide cases that fail. Score it on a real test set first, then trust it."
+        },
+        idea: [
+          "An <strong>eval</strong> is a repeatable test: real cases plus a way to score them, run on every change. For an agent, the question is simple: does it actually complete the task, safely, across realistic inputs?",
+          "Start with 10 to 20 real cases, including the tricky and ambiguous ones, and score each run.",
+          "<strong>How it breaks:</strong> shipping on a good demo. A change that fixes one case can silently break three others, and you only catch that with a test set."
+        ],
+        analogy: "A pilot's pre-flight checklist, run before every flight and updated whenever something new goes wrong.",
+        goDeeper: { text: ["Log real production failures and fold each one back in as a new test case. Your eval set gets stronger every time something breaks."], videos: [] }
+      }
+    ],
+    quiz: [
+      { q: "Tool use (function calling) lets a model...", options: ["Train itself", "Request real actions that your software then runs", "Write faster", "Skip the prompt"], a: 1, why: "The model emits a structured request; your code performs the action and returns the result." },
+      { q: "An automation is...", options: ["A model improvising freely", "A fixed pipeline of steps on a trigger, often with AI inside", "A type of GPU", "A pricing plan"], a: 1, why: "Same steps every time; reach for an agent only when the path cannot be fixed." },
+      { q: "What makes something an agent?", options: ["A bigger model", "A loop: act, observe, decide the next step, with memory", "A nicer prompt", "A database"], a: 1, why: "The act-observe-decide loop carrying state forward is the defining feature." },
+      { q: "Safest way to let an agent send customer emails?", options: ["Send freely for speed", "Draft freely, require human approval before sending", "Never use email", "Email only the owner"], a: 1, why: "Speed where it is safe, a human gate before anything irreversible." },
+      { q: "To make a bot answer from your own docs you...", options: ["Retrain the model", "Use RAG: fetch relevant chunks into the prompt", "Paste everything every time", "Hope it knows"], a: 1, why: "Retrieve the relevant pieces and answer from them; change docs, not the model." },
+      { q: "Before trusting an agent in production you should...", options: ["Ship on a good demo", "Build a test set of real cases and score it", "Ask it if it is sure", "Use the biggest model"], a: 1, why: "Evals catch the failures and regressions a demo hides." }
+    ],
+    assignment: {
+      title: "Ship your first automation, then an agent", xp: 150,
+      steps: "Take the most repetitive task in {{SPINE}}. (1) On one page map it: trigger, steps, the AI step, and the single human approval gate. (2) Build it no-code in n8n, Make, or Zapier with one AI step. (3) Add the approval gate before anything irreversible. (4) Stretch: turn it into an agent that loops over a real job (for example, triage incoming emails and draft replies for your approval). You can now hand real work to AI, safely."
+    }
+  },
+  {
+    id: "m4", emoji: "⚡", tier: "Everyday AI",
+    title: "Everyday AI at work",
+    desc: "Make AI do your daily work: writing, research, meetings",
+    bridge: "Small daily wins are where the habit forms.",
+    lessons: [
+      {
+        title: "Drafts in your voice", ic: "✍️",
+        seed: "The fastest everyday win is turning a blank page into a solid draft you only need to polish.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "You want an email that sounds like you, not like a robot. Best move?",
+          options: ["Ask for \"a professional email\"", "Give the audience, the goal, and a sample of your past writing, then edit"],
+          a: 1,
+          good: "Right. Audience, goal, and a voice sample get you 80 percent there. You finish the last 20 percent by editing.",
+          bad: "Give audience, goal, and a writing sample, then edit. \"Professional email\" gets you the generic average."
+        },
+        idea: [
+          "Brief the model like a teammate: who it is for, what it should achieve, and one or two samples of your voice. Then treat the output as a first draft, not a final.",
+          "Claude, ChatGPT, and Gemini all do this well. The skill is the brief and the edit, not finding a magic tool.",
+          "<strong>How it breaks:</strong> shipping raw output. It reads generic, and small factual claims may be wrong. The human edit is the job, not an afterthought."
+        ],
+        analogy: "A talented ghostwriter on day one: brilliant, fast, and entirely dependent on the brief and your final polish.",
+        goDeeper: { text: ["Keep a short voice note (three lines on tone plus two sample paragraphs) and paste it whenever you draft. It is a tiny investment that fixes the generic problem for good."], videos: [] }
+      },
+      {
+        title: "Research you can trust", ic: "🔎",
+        seed: "AI research is fast, but a confident summary is not the same as a correct one. Verify before you rely.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "An AI gives you a tidy research summary with stats. Before you use it, you should:",
+          options: ["Quote it as is, it sounds solid", "Check the key claims against the cited sources"],
+          a: 1,
+          good: "Right. Use a tool that cites sources, then click through and verify the claims that matter.",
+          bad: "Verify against the citations. Confident and correct are not the same; check the claims that carry weight."
+        },
+        idea: [
+          "For cited web research use <strong>Perplexity</strong> (fast, with inline sources). For deeper synthesis use a Deep Research mode. To stay strictly inside your own documents, use <strong>NotebookLM</strong>, which only answers from what you upload.",
+          "Match the tool to the job: fast cited facts, deep synthesis, or grounded-in-my-docs.",
+          "<strong>How it breaks:</strong> trusting a fluent summary without opening a single source. The citation might not say what the summary claims."
+        ],
+        analogy: "A research assistant who hands you a great brief. You still skim the sources before you put your name on it.",
+        goDeeper: { text: ["NotebookLM can also turn your sources into an audio overview, which is a fast way to absorb a dense report on a commute."], videos: [] }
+      },
+      {
+        title: "Ask your documents", ic: "📓",
+        seed: "Instead of reading a 50 page report, you can load it and ask it questions, with answers grounded only in that file.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "You have a long report and three specific questions. Fastest reliable way to answers?",
+          options: ["Read all 50 pages", "Load it into a grounded tool (like NotebookLM) and ask, checking the cited section"],
+          a: 1,
+          good: "Right. Grounded Q&A answers from the document and points you to the exact section, so you can trust and verify.",
+          bad: "Load it and ask. Grounded tools answer from the file and cite the section, so you skim only what matters."
+        },
+        idea: [
+          "Grounded document tools answer only from what you give them and show you where the answer came from. That makes them trustworthy in a way open chat is not.",
+          "This is the everyday version of grounding: the model is not guessing from memory, it is reading your file.",
+          "<strong>How it breaks:</strong> using a normal chat for this and getting confident answers that are not actually in your document. Use a tool that cites the source passage."
+        ],
+        analogy: "A reader who highlights the exact paragraph that answers your question, instead of telling you what they vaguely recall.",
+        goDeeper: { text: ["The same idea scales to a whole library of documents through RAG, which the Automations and Agents track turns into a real assistant."], videos: [] }
+      },
+      {
+        title: "Capture every meeting", ic: "🎙️",
+        seed: "AI note-takers transcribe and summarise meetings. The real value is not the transcript, it is what happens after.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "Where does most of the value of an AI meeting tool actually come from?",
+          options: ["A perfect word-for-word transcript", "The action items actually moving into your tasks afterward"],
+          a: 1,
+          good: "Right. Transcription is solved everywhere. The win is decisions and action items that land in your workflow.",
+          bad: "It is the action items moving. Every tool transcribes; the value is the follow-up actually getting done."
+        },
+        idea: [
+          "Tools like <strong>Granola</strong> (captures audio without a bot), <strong>Fireflies</strong>, and <strong>Otter</strong> give you clean notes, summaries, and a list of action items from any meeting.",
+          "Set one up on your next real meeting and you will never go back to scrambling notes.",
+          "<strong>How it breaks:</strong> stopping at the summary. A summary nobody acts on is just a tidier version of forgetting."
+        ],
+        analogy: "A diligent assistant in the corner who writes everything down and hands you a clean action list as you leave the room.",
+        goDeeper: { text: ["The next lesson closes the loop: pushing those action items into your task tool automatically, so the meeting actually changes what happens next."], videos: [] }
+      },
+      {
+        title: "Make action items move", ic: "🔁",
+        seed: "Notes are nice. Notes that turn themselves into tasks in the right place are a system.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "Your meeting tool produces great action items. To make them actually happen, you should:",
+          options: ["Re-type them into your task app later", "Connect the tool so items auto-flow into Notion, Slack, or your task list"],
+          a: 1,
+          good: "Right. Wire the notes tool to your task system so action items land where you work, no re-typing.",
+          bad: "Connect it so items flow into your tools automatically. Re-typing is exactly the step that quietly never happens."
+        },
+        idea: [
+          "Most meeting tools integrate with Notion, Slack, task managers, and CRMs. Set the connection once and every meeting's actions land where you actually work.",
+          "This is your first taste of automation in daily life: a trigger (meeting ends) leading to an action (tasks created).",
+          "<strong>How it breaks:</strong> leaving it as a manual copy-paste. The friction is small, but small friction is exactly what gets skipped."
+        ],
+        analogy: "A conveyor belt from the meeting room to your to-do list, instead of carrying notes by hand and dropping half.",
+        goDeeper: { text: ["If your tool does not integrate directly, a no-code automation (the Agents track) can bridge it. Same trigger-to-action idea."], videos: [] }
+      },
+      {
+        title: "A weekly assistant", ic: "🤖",
+        seed: "Any task you do the same way every week can become a saved assistant that does it your way.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "You write the same kind of weekly client update every Friday. The best long-term move?",
+          options: ["Prompt it fresh each week", "Build a custom assistant once with your format and rules, then reuse it"],
+          a: 1,
+          good: "Right. Bake your format, tone, and rules into a Custom GPT, Claude Project, or Gemini Gem once, then reuse it.",
+          bad: "Build it once as a saved assistant with your format and rules, then reuse it. Re-prompting from scratch wastes the pattern."
+        },
+        idea: [
+          "A <strong>custom assistant</strong> (Custom GPT, Claude Project, or Gemini Gem) is a saved setup with standing instructions and a few reference files. It is the difference between re-explaining yourself every time and pressing go.",
+          "Pick one recurring chore, encode how you like it done, and reuse it weekly.",
+          "<strong>How it breaks:</strong> instructions that are vague, so it drifts. Write them tight, test on a few real cases, and fix what slips."
+        ],
+        analogy: "Training an assistant once on how you like the weekly report, instead of briefing a new temp every Friday.",
+        goDeeper: { text: ["Pick the tool by need: Gemini Gems for speed inside Google Workspace, Claude Projects for deep instructions and big reference files, Custom GPTs for sharing with others."], videos: [] }
+      }
+    ],
+    quiz: [
+      { q: "Best way to get AI writing in your voice?", options: ["Ask for a professional tone", "Give audience, goal, and a writing sample, then edit", "Use all caps", "Write longer prompts"], a: 1, why: "A voice sample plus a clear brief, finished with your edit, beats generic instructions." },
+      { q: "Before using an AI research summary you should...", options: ["Quote it directly", "Check the key claims against the cited sources", "Make it longer", "Trust the confident ones"], a: 1, why: "Confident is not correct; verify the claims that matter against sources." },
+      { q: "For trustworthy answers from one long document, use...", options: ["A normal chat from memory", "A grounded tool that answers from the file and cites the section", "A web search", "A bigger model"], a: 1, why: "Grounded tools answer from your file and show the source passage." },
+      { q: "The real value of an AI meeting tool is...", options: ["A perfect transcript", "Action items that actually move into your workflow", "A recording to store", "Fewer meetings"], a: 1, why: "Transcription is solved; the win is follow-up that gets done." },
+      { q: "To make meeting action items happen, you...", options: ["Re-type them later", "Connect the tool so they auto-flow into your task system", "Email yourself", "Memorise them"], a: 1, why: "Automate the trigger-to-task step so the small friction never gets skipped." },
+      { q: "A custom assistant is best for...", options: ["One-off questions", "A task you do the same way repeatedly", "Replacing your judgment", "Storing files"], a: 1, why: "Encode a recurring task once with your rules, then reuse it." }
+    ],
+    assignment: {
+      title: "Set up your AI work routine", xp: 100,
+      steps: "Build a daily-work system for {{SPINE}}. (1) Put an AI note-taker on your next real meeting and get the action items. (2) Connect it so those items land in your task tool automatically. (3) Pick one weekly chore and build a custom assistant (Custom GPT, Claude Project, or Gemini Gem) that does it your way, tested on three real cases. You can now run your week with AI handling the busywork."
+    }
   }
+
 ];
 
 /* =====================================================================
