@@ -79,12 +79,12 @@
   .choice:disabled{cursor:default;}
   .choice:disabled:active{transform:none;border-bottom-width:5px;}
 
-  input[type=text]{
+  input[type=text],input[type=email]{
     width:100%;font-family:inherit;font-size:18px;font-weight:500;color:var(--navy);
     border:2px solid var(--border);border-bottom-width:5px;border-radius:16px;
     padding:15px 18px;outline:none;background:#fff;
   }
-  input[type=text]:focus{border-color:var(--blue);}
+  input[type=text]:focus,input[type=email]:focus{border-color:var(--blue);}
 
   /* ---------- top bar ---------- */
   .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;gap:10px;}
