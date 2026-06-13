@@ -392,19 +392,18 @@ const NEWS = [
    CURRICULUM
    ===================================================================== */
 const MODULES = [
-  /* ============ TIER: AI FLUENCY ============ */
   {
-    id: "m1", emoji: "🧠", tier: "AI Fluency",
-    title: "How AI actually works",
-    desc: "Tokens, prediction, training, the context window",
-    bridge: "So how do you talk to a very good guesser?",
+    id: "m1", emoji: "🧠", tier: "Foundations",
+    title: "Foundations",
+    desc: "What AI is really doing, so you use it well and spot when it bluffs",
+    bridge: "Now, how do you get great answers out of it?",
     lessons: [
       {
-        title: "A very good guesser",
+        title: "A very good guesser", ic: "🎲",
         seed: "An AI model has one job: look at the text so far and guess the next small chunk. Do that again and again, and out comes a whole answer.",
         exercise: {
           type: "tokenize",
-          intro: "Type any sentence. Watch the app break it into the chunks a model actually reads, called tokens.",
+          intro: "Type any sentence. Watch the app split it into the chunks a model actually reads, called tokens.",
           start: "AI is a very good guesser",
           predict: {
             q: "Guess first: how many tokens in the word \"unbelievable\"?",
@@ -415,12 +414,13 @@ const MODULES = [
           }
         },
         idea: [
-          "A model never sees whole words the way you do. It sees <strong>tokens</strong>, small chunks of text, and predicts the next one from everything before it. Then it repeats, thousands of times, until the answer is done.",
-          "There is no stored list of replies inside. During <strong>training</strong> it tuned billions of internal dials, called <strong>parameters</strong>, until its guesses got very good. Guessing well needs real skill: to finish a maths line correctly, you have to actually do the maths."
+          "A <strong>large language model</strong> (ChatGPT, Claude, Gemini) does one core thing: it predicts the next <strong>token</strong>, a small chunk of text. Your words get split into tokens, and it writes its answer one token at a time, always asking what most likely comes next.",
+          "There is no stored list of answers inside. It learned patterns from huge amounts of writing, so good guessing ends up looking like understanding. That is also why the same prompt can give slightly different answers each time: it samples from likely options, it does not look up a fixed reply.",
+          "<strong>How it breaks:</strong> when the truth is rare or specific (a phone number, a citation, your order history), the most likely-sounding token and the correct one drift apart, and it will guess wrong with full confidence. Treat output as a fluent draft, not a lookup."
         ],
-        analogy: "Think of phone autocomplete, but it learned from a huge slice of everything ever written, and instead of one word it keeps going until the whole reply is finished.",
+        analogy: "Phone autocomplete that read most of the internet and never stops to think, only to guess the next piece.",
         goDeeper: {
-          text: ["Each step, the model scores every possible next token, then picks one. A setting called <strong>temperature</strong> decides how adventurous the pick is: low stays safe and repetitive, higher gets more creative and more error prone. That is also why the same prompt can give different answers each time."],
+          text: ["Each step it scores every possible next token and picks one. A setting called temperature controls how adventurous the pick is: low is safe and repetitive, higher is creative and more error prone."],
           videos: [
             ["Andrej Karpathy", "Deep Dive into LLMs like ChatGPT", "https://www.youtube.com/watch?v=7xTGNNLPyMI", "~3h 30m"],
             ["3Blue1Brown", "But what is a neural network?", "https://www.youtube.com/watch?v=aircAruvnKk", "~19 min"]
@@ -428,1078 +428,318 @@ const MODULES = [
         }
       },
       {
-        title: "Training vs inference",
-        seed: "AI has two phases people mix up: learning once (training), and answering you (inference). Telling them apart clears up half the confusion about AI.",
+        title: "Learns once, answers forever", ic: "🎓",
+        seed: "AI has two phases people mix up: a slow one-time phase where it learns (training), and a fast phase where it answers you (inference).",
         exercise: {
-          type: "pick",
-          intro: "Have a go before the explanation.",
-          q: "You correct an AI on a fact mid chat. Tomorrow you open a fresh chat and ask the same thing. What happens?",
-          options: ["It remembers your correction and answers right", "It makes the same mistake again"],
+          type: "pick", intro: "Predict first.",
+          q: "You correct an AI on a fact mid chat. Tomorrow, in a brand new chat, you ask the same thing. What happens?",
+          options: ["It remembers your correction", "It makes the same mistake again"],
           a: 1,
           good: "Right. Your chat does not retrain the model. The fix lived only in that one conversation.",
-          bad: "Actually it usually repeats the mistake. Your chat does not retrain the model, so the fix lived only in that one conversation."
+          bad: "Actually it usually repeats the mistake. Chatting never retrains the model, so the fix lived only in that conversation."
         },
         idea: [
-          "<strong>Training</strong> is the slow, costly, one time phase where the model learns from huge amounts of text. It happens long before you meet it. <strong>Inference</strong> is what runs when you chat: the model is frozen and simply uses what it already learned.",
-          "Two things follow. There is a <strong>knowledge cutoff</strong>, a date after which it knows nothing new. And your conversation does not permanently teach it anything. Memory features just re-feed notes into the chat; they do not retrain the model."
+          "<strong>Training</strong> is the slow, costly, one-time phase where the model learns from mountains of text. It happens long before you meet it. <strong>Inference</strong> is what runs when you chat: the model is frozen and just uses what it already learned.",
+          "Two things follow. There is a <strong>knowledge cutoff</strong>, a date after which it knows nothing new on its own. And your conversation does not permanently teach it anything. Memory features just re-feed notes into the chat, they do not retrain the model.",
+          "<strong>How it breaks:</strong> people assume corrections stick. Tell it the right fact and it agrees inside that chat, then repeats the error in a fresh one. For current info, give it the facts in your message or a tool that fetches them."
         ],
-        analogy: "A chef trains for years (slow, once). Then they cook your dinner in twenty minutes (fast, every order). Ordering dinner does not send the chef back to school.",
+        analogy: "A chef trains for years (slow, once), then cooks your dinner in twenty minutes (fast, every order). Ordering dinner does not send them back to school.",
         goDeeper: {
-          text: ["Training nudges billions of numbers a tiny bit at a time so the next guess is a little less wrong. Do that trillions of times and you get a model. A second, smaller step then teaches the blunt text predictor to behave like a helpful assistant."],
+          text: ["Training nudges billions of internal numbers a hair at a time so the next guess is a little less wrong, trillions of times. A smaller later step teaches the raw text-predictor to behave like a helpful assistant."],
           videos: [["Andrej Karpathy", "Deep Dive into LLMs like ChatGPT", "https://www.youtube.com/watch?v=7xTGNNLPyMI", "~3h 30m"]]
         }
       },
       {
-        title: "The context window",
+        title: "The context window", ic: "🪟",
         seed: "A model can only see a limited amount of text at once. That window is its entire working memory for your conversation.",
         exercise: {
-          type: "pick",
-          intro: "Predict first.",
-          q: "You are 60 messages into a chat. You ask about something from message one and the model gets it wrong. Most likely reason?",
+          type: "pick", intro: "Predict first.",
+          q: "You are 60 messages into a chat. You ask about something from message one and it gets it wrong. Most likely reason?",
           options: ["The model got tired", "Your early message slid out of the window it can see"],
           a: 1,
           good: "Right. The window has edges. The oldest text falls out to make room, and the model only sees what is left.",
-          bad: "It does not get tired. The window has edges, so the oldest text falls out to make room and the model only sees what is left."
+          bad: "It does not get tired. The window has edges, so the oldest text falls out and the model only sees what remains."
         },
         idea: [
           "The <strong>context window</strong> is everything the model can see right now: your messages, its replies, any document you pasted, and hidden instructions. Everything inside shapes the next guess. Everything outside may as well not exist.",
-          "This explains a lot at once: pasting the relevant document beats hoping it knows, very long chats get worse, and starting fresh often fixes a confused one."
+          "This explains a lot at once: pasting the relevant document beats hoping it knows, very long chats get worse, and starting fresh often fixes a confused one.",
+          "<strong>How it breaks:</strong> two traps. Assuming it still remembers something from far earlier in a long chat (it scrolled off the board), and dumping in everything you have, which dilutes attention and can make answers worse, not better."
         ],
-        analogy: "Picture a whiteboard in a meeting. Anything on it gets used well. But it has edges, so writing too much means the oldest notes get wiped to make space.",
+        analogy: "A whiteboard in a meeting. Anything on it gets used well, but it has edges, so writing too much wipes the oldest notes.",
         goDeeper: {
-          text: ["The model re-reads the whole window for every token it writes. So a huge context is not just a memory limit, it is a cost and speed cost too. Putting in only what matters is a real skill, not just tidiness."],
+          text: ["The model re-reads the whole window for every token it writes, so a huge context is also a cost and speed cost, not just a memory limit. Putting in only what matters is a real skill."],
           videos: [["3Blue1Brown", "Attention in transformers, visually explained", "https://www.youtube.com/watch?v=eMlx5fFNoYc", "~26 min"]]
+        }
+      },
+      {
+        title: "Why it makes things up", ic: "🌀",
+        seed: "A model is built to produce plausible text, not to verify truth. Usually those line up. Sometimes they do not.",
+        exercise: {
+          type: "pick", intro: "Spot the risk.",
+          q: "You ask for three sources on a niche topic and get three tidy citations. What should you assume?",
+          options: ["They are real, it found them", "Some may be invented and need checking"],
+          a: 1,
+          good: "Right. A confident citation can be a confident guess. Verify anything that matters before you rely on it.",
+          bad: "Be careful. A confident citation can be a confident guess. Verify anything that matters before relying on it."
+        },
+        idea: [
+          "A <strong>hallucination</strong> is a confident answer that is false: invented facts, citations, or numbers. It is a side effect of predicting likely text instead of looking up truth.",
+          "The fix is not to scold the model. It is to give it real sources, ask it to say when it is unsure, and check the claims that carry weight.",
+          "<strong>How it breaks:</strong> the more obscure or specific your question, the higher the made-up risk, and the answer will sound just as confident as a correct one. Confidence is not a truth signal."
+        ],
+        analogy: "A brilliant improviser. Ask for a fact it does not have and, rather than freeze, it fills the gap with something that sounds right.",
+        goDeeper: {
+          text: ["Grounding the model in real documents (you will build this later) is the main cure, along with asking for a quote per claim. No quotable source is your signal to doubt it."],
+          videos: []
+        }
+      },
+      {
+        title: "The model landscape", ic: "🏷️",
+        seed: "There is not one AI. There are families and sizes, and picking the right one for the task is its own skill.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "You need to classify 5,000 short product reviews as positive or negative, cheaply. Best pick?",
+          options: ["The biggest, most powerful model for every review", "A small, cheap model, since the task is simple and repetitive"],
+          a: 1,
+          good: "Right. Match the model to the task. A small model nails easy, high-volume work at a fraction of the cost.",
+          bad: "A small cheap model is the move. Match the model to the task; the biggest model on easy work just burns money."
+        },
+        idea: [
+          "The big families are ChatGPT (OpenAI), Claude (Anthropic), and Gemini (Google), plus open models you can run yourself. Within each there are <strong>big</strong> models (smarter, slower, pricier) and <strong>small</strong> ones (fast, cheap, great for simple jobs), and <strong>reasoning</strong> models tuned to think step by step for hard problems.",
+          "There is also <strong>closed</strong> (use it through an app or API) versus <strong>open-weight</strong> (download and run it yourself for control and privacy). For most people, the practical skill is right-sizing: small model for the easy 80 percent, a top model for the hard 20.",
+          "<strong>How it breaks:</strong> defaulting to the biggest model for everything. It feels safe and quietly costs 10x more than the task needs."
+        ],
+        analogy: "You do not rent a moving truck to pick up a coffee. Match the vehicle to the trip.",
+        goDeeper: {
+          text: ["Leaderboards churn monthly, so do not memorize rankings. The durable question is always for which task, and the honest test is running two models on your own real example."],
+          videos: [["Andrej Karpathy", "Intro to Large Language Models", "https://www.youtube.com/watch?v=zjkBMFhNj_g", "~1 hr"]]
+        }
+      },
+      {
+        title: "What it costs", ic: "💰",
+        seed: "Every token in and out is billed. Cost per task is the number that decides whether an AI idea is worth doing.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "A long chat re-sends the whole conversation each turn. As it gets longer, the cost per message:",
+          options: ["Stays the same", "Climbs, because the input grows every turn"],
+          a: 1,
+          good: "Right. The model re-reads the whole history each turn, so input tokens, and cost, pile up as the chat grows.",
+          bad: "It climbs. The whole history is re-read each turn, so input tokens and cost grow as the chat lengthens."
+        },
+        idea: [
+          "Pricing is per token, and output usually costs several times more than input. One answer is a fraction of a paisa, but multiply by many users and many turns and it becomes a real bill.",
+          "Two doors: a <strong>subscription</strong> is a flat fee with speed limits (a buffet), an <strong>API key</strong> is pay-per-token with no cap (a meter running). Products run on the metered door so cost scales with use.",
+          "<strong>How it breaks:</strong> not knowing your cost per completed task. Long rambling context is the quiet cost driver, since the whole window is re-read for every token."
+        ],
+        analogy: "A taxi meter that runs on every word. One ride is cheap; a fleet running all day is a budget.",
+        goDeeper: {
+          text: ["This is why short, sharp context is a cost discipline, not just tidiness, and why cheaper models for easy tasks (model routing) often cut bills many times over at equal quality."],
+          videos: []
         }
       }
     ],
     quiz: [
-      { q: "What does a language model fundamentally do?", options: ["Searches a database of stored answers", "Predicts the next token from everything so far", "Copies text from websites live", "Runs rules written by programmers"], a: 1, why: "It predicts the next token over and over. No stored answers, no live web copying." },
-      { q: "What is a token?", options: ["A payment for AI services", "A small chunk of text, like a word or piece of one", "A login key", "A type of chip"], a: 1, why: "A token is a chunk of text, often a word or a piece of one. Models read and price by tokens." },
+      { q: "What does a language model fundamentally do?", options: ["Looks answers up in a database", "Predicts the next token from everything so far", "Copies text from the web live", "Runs rules written by engineers"], a: 1, why: "It predicts the next token over and over. No stored answers, no live lookup." },
       { q: "Which phase happens while you chat?", options: ["Training", "Inference", "Fine-tuning", "Data collection"], a: 1, why: "Chatting is inference: the trained model is frozen and just predicting for you." },
-      { q: "Why does a model have a knowledge cutoff?", options: ["The company blocks recent news", "Its training data ended on a date and chatting adds no new knowledge", "It forgets old facts to save space", "Recent events are too controversial"], a: 1, why: "Its training data stops on a date, and chatting adds no new knowledge." },
-      { q: "Your assistant forgot an instruction from early in a long chat. Most likely why?", options: ["It retrained itself mid chat", "The instruction fell outside the context window", "Moderators deleted it", "Models ignore old instructions"], a: 1, why: "The window has edges, so the oldest text scrolls out and the model stops seeing it." }
+      { q: "Why is there a knowledge cutoff?", options: ["The company hides recent news", "Training data ended on a date, and chatting adds no new knowledge", "It forgets old facts", "Recent events are blocked"], a: 1, why: "It learned up to a date; nothing after that unless you give it the info." },
+      { q: "Your assistant forgot an instruction from early in a long chat. Why?", options: ["It retrained itself", "The instruction fell outside the context window", "A filter removed it", "It ignores old text on purpose"], a: 1, why: "The window has edges; the oldest text scrolls out and it can no longer see it." },
+      { q: "A hallucination is...", options: ["A rare bug", "A confident answer that is false, from predicting plausible text", "A type of prompt", "An app crash"], a: 1, why: "Plausible-sounding is not the same as true; verify what matters." },
+      { q: "Why do long chats cost more per message?", options: ["Prices rise hourly", "The growing history is re-sent as input each turn", "Longer answers are free", "The model gets greedy"], a: 1, why: "The whole conversation is re-read every turn, so input tokens add up." }
     ],
     assignment: {
-      title: "Watch prediction happen", xp: 50,
-      steps: "Open ChatGPT or Claude. (1) Ask it to split the word \"extraordinarily\" into tokens. (2) Ask the same one line creative prompt in two separate chats, \"give me a one line slogan for {{SPINE}}\", and compare. (3) Ask \"what is your knowledge cutoff, and what would you not know about {{SPINE}}?\" Notice how all three answers trace back to prediction, training, and the context window."
+      title: "Read AI like a builder", xp: 60,
+      steps: "In ChatGPT or Claude, prove you can see through it for {{SPINE}}. (1) Ask it to split a long word into tokens. (2) Ask \"what is your knowledge cutoff, and what would you not know about {{SPINE}}?\" (3) Ask a niche factual question about {{SPINE}} you already know the answer to, and catch any confident error. Write three sentences: how prediction, the knowledge cutoff, and hallucination each showed up. You can now explain to a skeptic what AI is actually doing."
     }
   },
   {
-    id: "m2", emoji: "💬", tier: "AI Fluency",
-    title: "Talking to AI well",
-    desc: "Prompts, context, and working like an editor",
-    bridge: "You can prompt it. But can you trust what comes back?",
+    id: "m2", emoji: "💬", tier: "Prompting & Context",
+    title: "Prompting and Context",
+    desc: "Get reliably great output, then build a reusable assistant",
+    bridge: "You can talk to it well. Next, can you trust what comes back?",
     lessons: [
       {
-        title: "Why prompts matter",
+        title: "Why prompts matter", ic: "💬",
         seed: "A prompt is everything you hand the model before it answers. Vague in, generic out.",
         exercise: {
           type: "pick", intro: "Pick the one likely to give the best result.",
           q: "Which prompt gets the strongest output?",
           options: ["Write something about marketing", "Write a post", "Write a 100 word LinkedIn post for first time founders, practical tone, one concrete tip, no buzzwords"],
           a: 2,
-          good: "Right. It says who it is for, how long, the tone, and what to avoid. Each constraint points the guess at what you actually want.",
-          bad: "The detailed one wins. It says who it is for, how long, the tone, and what to avoid. Each constraint points the guess at what you actually want."
+          good: "Right. It says who it is for, how long, the tone, and what to avoid. Each constraint steers the guess toward what you want.",
+          bad: "The detailed one wins. Who it is for, length, tone, what to avoid: each constraint points the prediction at what you actually want."
         },
         idea: [
           "Because the model continues the most likely text, a vague request gets the average of the internet. Specifics change the prediction.",
-          "Tell it <strong>who it is</strong>, <strong>who it is for</strong>, <strong>what you want</strong>, and <strong>what to avoid</strong>. It cannot read your mind, but it is very good at following the mind you put on the page."
+          "It cannot read your mind, but it is excellent at following the mind you put on the page. The more clearly you frame the job, the better the answer.",
+          "<strong>How it breaks:</strong> people blame the model for a weak answer when the real problem was a one-line, context-free ask."
         ],
-        analogy: "A prompt is a brief for a sharp new hire on day one. World class skills, zero knowledge of you. A one paragraph brief gets you something you would actually ship.",
-        goDeeper: { text: ["A reusable trick: keep a short note of your best brief for a recurring task, and paste it each time. That is the first step from chatting toward building."], videos: [["Andrej Karpathy", "Intro to Large Language Models (1 hour)", "https://www.youtube.com/watch?v=zjkBMFhNj_g", "~1 hr"]] }
+        analogy: "A prompt is a brief for a sharp new hire on day one: world-class skills, zero knowledge of you.",
+        goDeeper: { text: ["A quick test before sending: could a smart stranger do this task with only what you wrote? If not, the model cannot either."], videos: [["Andrej Karpathy", "Intro to Large Language Models", "https://www.youtube.com/watch?v=zjkBMFhNj_g", "~1 hr"]] }
       },
       {
-        title: "Give it the context",
-        seed: "The biggest upgrade is not clever wording. It is handing the model the material it needs.",
+        title: "The four levers", ic: "🎚️",
+        seed: "Four things turn a vague prompt into a sharp one: who it is, who it is for, what you want, what to avoid.",
         exercise: {
-          type: "pick", intro: "Predict the better move.",
-          q: "You want a reply in your own writing style. What works best?",
-          options: ["Describe your style in adjectives", "Paste two or three samples of your past writing and ask it to match them"],
+          type: "pick", intro: "Predict.",
+          q: "Your prompt keeps giving generic, off-tone results. The fastest fix is to add:",
+          options: ["More exclamation marks", "A role, an audience, the exact output you want, and what to avoid"],
           a: 1,
-          good: "Right. Examples beat description. The model matches a pattern it can see far better than a vibe you name.",
-          bad: "Examples win. The model matches a pattern it can see far better than a style you only describe in words."
+          good: "Right. Those four levers narrow the space of likely answers toward exactly what you need.",
+          bad: "The four levers do it: role, audience, the exact output, and what to avoid. Each one steers the prediction."
         },
         idea: [
-          "Paste the email thread, the past post, the product page. The model can only use what is in the window, so put the good stuff in it.",
-          "Two habits do most of the work: show <strong>examples</strong> of the output you want, and state the <strong>format</strong> exactly, like a three column table or five short bullets."
+          "Tell it <strong>who it is</strong> (\"you are a no-nonsense fitness coach\"), <strong>who it is for</strong> (\"busy parents\"), <strong>what you want</strong> (\"a 120 word post with one tip\"), and <strong>what to avoid</strong> (\"no 5am-routine cliches\").",
+          "Each lever removes a whole category of wrong answers. Together they move you from \"the average of the internet\" to \"the thing in my head.\"",
+          "<strong>How it breaks:</strong> leaving the levers implicit and hoping the model infers them. It will fill the gaps with the most generic option."
         ],
-        analogy: "Briefing a designer, you would not say make it pop. You would send brand colors, three designs you like, and the size you need. Same with the model.",
-        goDeeper: { text: ["A quick test before you send: could a smart stranger do this task with only what you wrote? If not, the model cannot either."], videos: [] }
+        analogy: "Briefing a freelancer: role, audience, deliverable, and the no-go list. Same brief works on the model.",
+        goDeeper: { text: ["Keep a short note of your best brief for a recurring task and paste it each time. That is the first step from chatting toward building systems."], videos: [] }
       },
       {
-        title: "Work like an editor",
+        title: "Show, don't tell", ic: "🖼️",
+        seed: "The most reliable way to get a specific style is not to describe it. It is to show examples.",
+        exercise: {
+          type: "pick", intro: "Predict the better move.",
+          q: "You want replies in your exact writing voice. What works best?",
+          options: ["Describe your voice in adjectives", "Paste two or three samples of your past writing and ask it to match them"],
+          a: 1,
+          good: "Right. Examples beat description. The model matches a pattern it can see far better than a vibe you name.",
+          bad: "Examples win. The model copies a pattern it can see much more reliably than a style you only describe."
+        },
+        idea: [
+          "Including a few samples of the output you want is called <strong>few-shot prompting</strong>. The model is a pattern matcher, so two or three good examples teach it your format and tone instantly.",
+          "This works for voice, structure, and formatting alike: paste two great cold emails, then ask for a third in the same shape.",
+          "<strong>How it breaks:</strong> describing style in adjectives (\"make it punchy and human\") gives mush. Show, do not tell."
+        ],
+        analogy: "Teaching someone your handwriting by showing three samples, not by describing the loops.",
+        goDeeper: { text: ["Two or three examples is usually the sweet spot. One is too thin to set a pattern; ten wastes context and rarely beats three good ones."], videos: [] }
+      },
+      {
+        title: "Context is most of the work", ic: "📎",
+        seed: "The biggest upgrade is not clever wording. It is handing the model the material it needs.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "You want a sharp reply to a tricky client email. Best approach?",
+          options: ["Describe the email situation in a sentence", "Paste the full email thread, then ask for the reply"],
+          a: 1,
+          good: "Right. Give it the real material. It can only use what is in the window, so put the good stuff in.",
+          bad: "Paste the thread. The model can only use what is in front of it, so the real material beats a summary."
+        },
+        idea: [
+          "The model can only use what is in the context window. Paste the email thread, the past post, the product page, the brief. Most weak answers come from a context-starved prompt, not a weak model.",
+          "A reliable habit: before sending, gather the source material the task depends on and drop it in.",
+          "<strong>How it breaks:</strong> hoping it already knows your specifics. It does not. It guesses, and guesses generically."
+        ],
+        analogy: "You would not ask a new assistant to reply to a client without showing them the thread.",
+        goDeeper: { text: ["When the material is too big to paste (a whole library of docs), you graduate to grounding and retrieval, which you will meet later. Same principle, automated."], videos: [] }
+      },
+      {
+        title: "Iterate like an editor", ic: "✏️",
         seed: "The first answer is a first draft, not a verdict. Power users iterate.",
         exercise: {
           type: "pick", intro: "The structure is right but the tone is off. Best next move?",
           q: "What gets you there fastest?",
-          options: ["Give up and write it yourself", "Repeat the exact same prompt", "Say what is right, what is wrong, and ask for one revision"],
+          options: ["Give up and write it yourself", "Repeat the same prompt", "Say what is right, what is wrong, and ask for one revision"],
           a: 2,
-          good: "Right. Tell it what to keep and what to change. Each round takes seconds and builds on everything already there.",
-          bad: "Steering wins: say what to keep and what to change, and ask for a revision. Each round builds on what is already there."
+          good: "Right. Tell it what to keep and what to change. Each round takes seconds and builds on what is there.",
+          bad: "Steering wins: keep what works, change what does not, in one follow up. Each round builds on the last."
         },
         idea: [
-          "The conversation is the tool. Useful moves: tighten (\"cut by half, keep the strongest point\"), redirect (\"good structure, warmer tone\"), branch (\"five versions of the opening line\"), and self critique (\"what is weak here?\").",
-          "Know when to restart, though. If a chat is going in circles, a fresh one with a better opening prompt usually beats one more correction."
+          "The conversation is the tool. Useful moves: tighten (\"cut by half, keep the strongest point\"), redirect (\"warmer tone\"), branch (\"five versions of the opening line\"), and self-critique (\"what is weak here?\").",
+          "Know when to restart, though. If a chat is going in circles, a fresh one with a better opening prompt beats one more correction.",
+          "<strong>How it breaks:</strong> re-sending the same prompt expecting a different result, or piling corrections onto a polluted chat instead of starting clean."
         ],
-        analogy: "Working with AI is like clay on a wheel. Nobody throws a perfect vase in one motion. You shape, look, reshape, and sometimes start with fresh clay.",
-        goDeeper: { text: ["Restarting is not failure. A polluted context full of failed attempts drags every new answer down. Carry the lesson, drop the mess."], videos: [] }
-      }
-    ],
-    quiz: [
-      { q: "Why do vague prompts give generic answers?", options: ["The model is lazy", "It predicts the most likely continuation, and vague text continues generically", "A filter blocks them", "Short prompts use a weaker model"], a: 1, why: "Vague text has a generic most likely continuation, so that is what you get." },
-      { q: "Most reliable way to get a specific writing style?", options: ["Name the style in adjectives", "Paste two or three examples and ask it to match", "Use all caps", "Ask it to try harder"], a: 1, why: "Showing two or three real samples beats describing a style in words." },
-      { q: "Structure is right, tone is wrong. Best move?", options: ["Start over from scratch", "Repeat the same prompt", "Say what is right and wrong, ask for a revision", "Switch AI brands"], a: 2, why: "Steer it: keep what works, change what does not, in one follow up." },
-      { q: "When is starting a fresh chat the smart move?", options: ["Never", "When a chat is stuck in circles and the context is full of failed tries", "After every single message", "Only when the app crashes"], a: 1, why: "A clean restart beats fighting a context full of failed attempts." }
-    ],
-    assignment: {
-      title: "The one brief upgrade", xp: 50,
-      steps: "Take a real task from {{SPINE}}. (1) Write your normal quick prompt and save the output. (2) Rewrite it with role, audience, length, tone, one example, and one thing to avoid. (3) Run both and compare. Keep the better brief as a template you reuse."
-    }
-  },
-  {
-    id: "m3", emoji: "⚠️", tier: "AI Fluency",
-    title: "When AI gets it wrong",
-    desc: "Hallucination, the jagged edge, and owning the output",
-    bridge: "If it can be confidently wrong, how do you build trust?",
-    lessons: [
-      {
-        title: "Why it makes things up",
-        seed: "A model is built to produce plausible text, not to know the truth. Usually those line up. Sometimes they do not.",
-        exercise: {
-          type: "pick", intro: "Spot the risk.",
-          q: "You ask for three sources on a niche topic and get three neat citations. What should you assume?",
-          options: ["They are real, it found them", "Some may be invented and need checking"],
-          a: 1,
-          good: "Right. A confident citation can be a confident guess. Verify anything that matters before you rely on it.",
-          bad: "Be careful. A confident citation can be a confident guess. Verify anything that matters before you rely on it."
-        },
-        idea: [
-          "A <strong>hallucination</strong> is a confident answer that is false: invented facts, citations, or numbers. It is a side effect of predicting likely text rather than looking up truth.",
-          "The fix is not to scold the model. It is to give it real sources, ask for uncertainty, and check the claims that carry weight."
-        ],
-        analogy: "It is a brilliant improviser. Ask for a fact it does not have, and rather than freeze, it fills the gap with something that sounds right.",
-        goDeeper: { text: ["Grounding the model in real documents, which you will meet later, is the main cure. So is asking it to say when it is unsure instead of guessing."], videos: [] }
+        analogy: "Clay on a wheel. Nobody throws a perfect vase in one motion: shape, look, reshape, sometimes start with fresh clay.",
+        goDeeper: { text: ["A polluted context full of failed attempts drags every new answer down. Carry the lesson into a fresh chat, drop the mess."], videos: [] }
       },
       {
-        title: "The jagged frontier",
-        seed: "AI is superhuman at some tasks and clumsy at others, and the line between them is not obvious.",
-        exercise: {
-          type: "pick", intro: "Predict.",
-          q: "Which task is an AI more likely to get quietly wrong?",
-          options: ["Draft a polished cover letter", "Count how many times the letter r appears in a long paragraph"],
-          a: 1,
-          good: "Right. Tasks that look trivial to us, like exact counting, can trip it up, while hard looking writing is easy for it.",
-          bad: "The counting one. Tasks that look trivial to us can trip it up, while hard looking writing is often easy for it."
-        },
-        idea: [
-          "Capability is <strong>jagged</strong>: strong and weak spots sit right next to each other. Easy looking and hard looking do not predict where it fails.",
-          "The move is to learn the edges by testing, not to assume. Try it on your real tasks and note where it shines and where it slips."
-        ],
-        analogy: "It is like a colleague who is a genius at strategy but cannot reliably add up a bill. You learn to hand them the right jobs.",
-        goDeeper: { text: ["Many failures trace back to tokenization, which you will meet later. The model sees chunks, not letters, so letter level tasks are oddly hard."], videos: [] }
-      },
-      {
-        title: "You own the output",
-        seed: "The AI drafts. You decide. Accountability does not transfer to a tool.",
-        exercise: {
-          type: "pick", intro: "Pick the right habit.",
-          q: "An AI writes a client email with a number in it. Before sending, you should:",
-          options: ["Send it, the AI is usually right", "Check the number and the claims, then send"],
-          a: 1,
-          good: "Right. A person owns every output that goes out. The AI is a fast drafter, not the signatory.",
-          bad: "Check first. A person owns every output that goes out. The AI is a fast drafter, not the signatory."
-        },
-        idea: [
-          "Being the <strong>human in the loop</strong> means the AI does the work and you approve the step that has consequences: sending, paying, publishing.",
-          "This is not a lack of trust in the tool. It is how serious teams use it: speed from the AI, judgement from you."
-        ],
-        analogy: "A junior writes the first draft of the contract. The partner still reads it before it goes to the client. The draft saved hours; the review kept the standard.",
-        goDeeper: { text: ["A simple rule for any workflow you build: name the one step a human must approve, and make the AI stop there until they do."], videos: [] }
-      }
-    ],
-    quiz: [
-      { q: "A hallucination is...", options: ["A rare bug in old models", "A confident answer that is false, a side effect of predicting plausible text", "A type of prompt", "When the app crashes"], a: 1, why: "A confident but false answer, a side effect of predicting plausible text." },
-      { q: "The jagged frontier means...", options: ["AI is bad at everything", "Strong and weak spots sit side by side and are hard to predict", "AI only works on weekdays", "Bigger models have no weaknesses"], a: 1, why: "Skill is uneven and hard to predict, so test rather than assume." },
-      { q: "Best defence against made up facts?", options: ["Ask more politely", "Give it real sources and verify what matters", "Use a longer prompt", "Trust longer answers more"], a: 1, why: "Ground it in real sources and verify what matters." },
-      { q: "Human in the loop means...", options: ["A person approves the consequential step", "The AI is fully responsible", "You watch it work all day", "No automation is allowed"], a: 0, why: "The AI drafts; a person approves anything with real consequences." }
-    ],
-    assignment: {
-      title: "Catch it, then ground it", xp: 50,
-      steps: "Pick a factual question about {{SPINE}} you already know the answer to. (1) Ask an AI cold and note any errors. (2) Now paste a real source and ask it to answer only from that, with a quote. (3) Compare. Write one line on where the ungrounded answer went wrong."
-    }
-  },
-
-  /* ============ TIER: HOW AI WORKS ============ */
-  {
-    id: "m4", emoji: "🔩", tier: "How AI Works",
-    title: "Inside the machine",
-    desc: "Neurons, parameters, learning, and embeddings",
-    bridge: "If it is just numbers, how does meaning get in there?",
-    lessons: [
-      {
-        title: "Neurons and parameters",
-        seed: "A neural network is a big pile of simple math units, wired together, with dials on every wire.",
-        exercise: {
-          type: "pick", intro: "Predict.",
-          q: "When people say a model has 70 billion parameters, those are:",
-          options: ["70 billion facts it memorised", "70 billion adjustable numbers set during training"],
-          a: 1,
-          good: "Right. Parameters are tunable numbers, not stored facts. Learning means finding good values for them.",
-          bad: "They are adjustable numbers, not stored facts. Learning means finding good values for the dials."
-        },
-        idea: [
-          "Each <strong>neuron</strong> takes some numbers in, mixes them with its <strong>weights</strong>, and passes a number on. Stack millions of these in layers and you get a network.",
-          "The weights are the <strong>parameters</strong>: the dials. A bigger model has more dials, which lets it capture more patterns, at the cost of more compute to run."
-        ],
-        analogy: "Think of a giant mixing board with billions of sliders. Training is the long process of finding the slider positions that make good output.",
-        goDeeper: { text: ["No single neuron knows anything. Meaning lives in the pattern across millions of them, which is why you cannot point to where a fact is stored."], videos: [["3Blue1Brown", "But what is a neural network?", "https://www.youtube.com/watch?v=aircAruvnKk", "~19 min"]] }
-      },
-      {
-        title: "How it learns",
-        seed: "Learning is just this: guess, measure how wrong, nudge the dials to be a little less wrong, repeat.",
-        exercise: {
-          type: "pick", intro: "Predict.",
-          q: "What is the model trying to make smaller during training?",
-          options: ["Its file size", "Its error, the gap between its guess and the right answer"],
-          a: 1,
-          good: "Right. That gap is the loss. Training is a long walk downhill, lowering loss step by step.",
-          bad: "It is shrinking its error, called loss. Training is a long walk downhill, lowering that gap step by step."
-        },
-        idea: [
-          "Show the model real text with the next token hidden. It guesses. The <strong>loss</strong> measures how wrong it was. Then every dial moves a hair in the direction that would have helped.",
-          "That nudging is <strong>gradient descent</strong>. One step barely matters. Trillions of steps turn noise into a model."
-        ],
-        analogy: "Picture finding the bottom of a valley in fog by always stepping downhill. Slow, blind, but it gets there.",
-        goDeeper: { text: ["The trick that makes this efficient across billions of dials is backpropagation: it works out how each dial contributed to the error and corrects all of them at once."], videos: [["3Blue1Brown", "Gradient descent, how networks learn", "https://www.youtube.com/watch?v=IHZwWFHWa-w", "~21 min"], ["3Blue1Brown", "Backpropagation, intuitively", "https://www.youtube.com/watch?v=Ilg3gGewQ5U", "~14 min"]] }
-      },
-      {
-        title: "Meaning as numbers",
-        seed: "To do math on words, a model first turns each piece of text into a list of numbers that captures its meaning.",
-        exercise: {
-          type: "pick", intro: "Predict.",
-          q: "In this number space, which pair sits closest together?",
-          options: ["\"king\" and \"queen\"", "\"king\" and \"bicycle\""],
-          a: 0,
-          good: "Right. Similar meaning lands close together, so king and queen are near, and bicycle is far.",
-          bad: "King and queen. Similar meaning lands close together in the space, while bicycle sits far away."
-        },
-        idea: [
-          "An <strong>embedding</strong> is a list of numbers that represents the meaning of a chunk of text. Similar meanings get similar numbers, so closeness in the space means closeness in meaning.",
-          "This is the backbone of search by meaning and of feeding your own data to AI later. It turns the fuzzy idea of similar into plain distance."
-        ],
-        analogy: "Like placing every word on a giant map where related words sit in the same neighborhood. Paris and London are close; banana is across town.",
-        goDeeper: { text: ["Embeddings can even capture relationships: the direction from king to queen is roughly the same as from man to woman. Meaning becomes geometry."], videos: [["3Blue1Brown", "Transformers, the tech behind LLMs", "https://www.youtube.com/watch?v=wjZofJX0v4M", "~27 min"]] }
-      }
-    ],
-    quiz: [
-      { q: "A model's parameters are...", options: ["Stored facts", "Adjustable numbers set during training", "User settings", "Safety rules"], a: 1, why: "Tunable numbers set during training, not stored facts." },
-      { q: "Loss measures...", options: ["File size", "How wrong the model's guess was", "Speed", "Token price"], a: 1, why: "The gap between the guess and the right answer, which training shrinks." },
-      { q: "Gradient descent is...", options: ["Nudging the dials downhill to reduce error, over and over", "A type of prompt", "A cooling system for GPUs", "A pricing model"], a: 0, why: "Nudging every dial a little to lower the error, repeated many times." },
-      { q: "An embedding is...", options: ["A picture of a word", "A list of numbers capturing meaning, so similar text sits close", "A login token", "A database table"], a: 1, why: "Meaning turned into numbers, so similar text sits close together." }
-    ],
-    assignment: {
-      title: "See similarity in action", xp: 50,
-      steps: "In any AI chat, ask: \"Group these into clusters by meaning and explain the groups\" and paste 12 mixed words from {{SPINE}}, like product names, customer types, and tasks. Notice it groups by meaning, not spelling. Write one line on a grouping that surprised you."
-    }
-  },
-  {
-    id: "m5", emoji: "🪞", tier: "How AI Works",
-    title: "Why it behaves that way",
-    desc: "Attention, the assistant recipe, and tokenizer quirks",
-    bridge: "You know the parts. Now, why the strange behavior?",
-    lessons: [
-      {
-        title: "Attention, the big idea",
-        seed: "To predict the next word well, a model has to decide which earlier words matter most right now.",
-        exercise: {
-          type: "pick", intro: "Predict.",
-          q: "In \"The trophy did not fit in the suitcase because it was too big\", what does \"it\" refer to?",
-          options: ["The trophy", "The suitcase"],
-          a: 0,
-          good: "Right, the trophy. Doing this means weighing earlier words by relevance, which is what attention does.",
-          bad: "It is the trophy. Working that out means weighing earlier words by relevance, which is exactly what attention does."
-        },
-        idea: [
-          "<strong>Attention</strong> lets the model, at each step, look back and weigh every earlier token by how relevant it is to the next guess. Important words get more pull.",
-          "Stacking many attention layers is what made modern models work so well. It is how they track who did what to whom across long passages."
-        ],
-        analogy: "Like reading a contract and, for each new clause, instantly highlighting the few earlier lines that change its meaning.",
-        goDeeper: { text: ["A model runs many attention heads at once, each watching for a different kind of relationship, like grammar, subject, or tone, then combines them."], videos: [["3Blue1Brown", "Attention in transformers, visually explained", "https://www.youtube.com/watch?v=eMlx5fFNoYc", "~26 min"]] }
-      },
-      {
-        title: "From raw model to assistant",
-        seed: "Straight out of training, a model is a blunt text predictor with no manners. A second step makes it helpful.",
-        exercise: {
-          type: "pick", intro: "Predict.",
-          q: "A raw, freshly trained model is asked a question. It is most likely to:",
-          options: ["Answer politely like ChatGPT", "Continue the text in some plausible way, maybe with more questions"],
-          a: 1,
-          good: "Right. Raw models just continue text. Being a helpful assistant is taught afterward.",
-          bad: "It just continues text in a plausible way. The polite assistant behavior is taught in a later step."
-        },
-        idea: [
-          "Pretraining gives a <strong>base model</strong> that completes text. A smaller step then shows it many examples of helpful answers and tunes it to behave like an assistant.",
-          "A further step uses human preference to push it toward answers people rate as better. That is why today's assistants feel cooperative rather than like raw autocomplete."
-        ],
-        analogy: "Pretraining is reading the whole library. The assistant step is a finishing school that teaches it how to actually be useful to a person.",
-        goDeeper: { text: ["The same finishing step is where a lot of safety behavior and tone come from. It is also why two models trained on similar data can feel very different to talk to."], videos: [["Andrej Karpathy", "Deep Dive into LLMs like ChatGPT", "https://www.youtube.com/watch?v=7xTGNNLPyMI", "~3h 30m"]] }
-      },
-      {
-        title: "Why tokenizing causes quirks",
-        seed: "Remember tokens? Because the model sees chunks, not letters, some easy looking tasks are oddly hard.",
-        exercise: {
-          type: "pick", intro: "Predict.",
-          q: "Why do models sometimes miscount the letters in a word?",
-          options: ["They are careless", "They see word chunks, not individual letters"],
-          a: 1,
-          good: "Right. A token might be a whole chunk like \"straw\", so the letters inside are not obvious to the model.",
-          bad: "They see chunks, not letters. A token might be \"straw\" as one piece, so the letters inside are not obvious."
-        },
-        idea: [
-          "Text is split into tokens before the model sees it. A token can be a word or a fragment, and the letters inside a token are not directly visible.",
-          "So letter level tasks, exact counting, and some math get shaky. Knowing this, you can hand those jobs to a tool or spell things out."
-        ],
-        analogy: "Imagine reading where common words are single stamps. You read fast, but if asked to count the letters on a stamp, you have to stop and squint.",
-        goDeeper: { text: ["This also explains odd behavior with numbers and rare words: they get chopped into unusual chunks the model saw less often during training."], videos: [["Andrej Karpathy", "Let's build the GPT Tokenizer", "https://www.youtube.com/watch?v=zduSFxRajkE", "~2h 13m"]] }
-      }
-    ],
-    quiz: [
-      { q: "Attention lets a model...", options: ["Run faster", "Weigh which earlier tokens matter most for the next guess", "Store more facts", "Skip training"], a: 1, why: "Weigh which earlier words matter most for the next guess." },
-      { q: "A base model, before the assistant step, mostly...", options: ["Answers like a polite chatbot", "Continues text in a plausible way", "Refuses everything", "Searches the web"], a: 1, why: "Just continues text, with no manners yet." },
-      { q: "Why do models miscount letters?", options: ["They rush", "They see tokens, not individual letters", "Bad training data", "It is a myth"], a: 1, why: "They see chunks, not individual letters, so letter tasks are hard." },
-      { q: "The assistant behavior comes from...", options: ["Pretraining alone", "A later step that tunes the base model on helpful examples and preferences", "The user's prompt only", "The context window"], a: 1, why: "A smaller tuning step after pretraining teaches it to be helpful." }
-    ],
-    assignment: {
-      title: "Probe the quirks", xp: 50,
-      steps: "In any AI chat: (1) Ask it to count the letter s in a long sentence about {{SPINE}}, then count yourself. (2) Ask a tricky pronoun question like the trophy example. (3) Ask it to reverse a long word. Note which it nails and which it fumbles, and link each back to tokens or attention."
-    }
-  },
-
-  /* ============ TIER: BUILD FROM SCRATCH ============ */
-  {
-    id: "m6", emoji: "💻", tier: "Build From Scratch",
-    title: "Peek under the hood",
-    desc: "Read real code and see a model built from nothing",
-    bridge: "Now you have seen the ideas. Want to see them in code?",
-    lessons: [
-      {
-        title: "What the code is doing",
-        seed: "You do not need to be a programmer to read a few lines and see the ideas you already know, written out.",
-        exercise: {
-          type: "pick", intro: "Read this loop, then predict.",
-          q: "This runs: for each step, score the next token, pick one, add it to the text, repeat. What is it doing?",
-          options: ["Training a model", "Generating an answer one token at a time"],
-          a: 1,
-          good: "Right. That is the generation loop from lesson one, written as code. Score, pick, append, repeat.",
-          bad: "It is generating text, one token at a time. Score, pick, append, repeat, the loop you met in lesson one."
-        },
-        idea: [
-          "The whole magic of answering is a short loop: predict the next token, add it, and feed the longer text back in. Real chatbots wrap this loop in a lot of polish, but the core is tiny.",
-          "Seeing it as code removes the mystery. There is no hidden brain, just a function called over and over."
-        ],
-        analogy: "Like watching a master chef and realising the signature dish is five steps repeated with care, not sorcery.",
-        goDeeper: { text: ["Andrej Karpathy builds a working version of this from scratch. Even watching without coding makes the mechanism click."], videos: [["Andrej Karpathy", "Let's build GPT from scratch, in code", "https://www.youtube.com/watch?v=kCc8FmEb1nY", "~1h 56m"]] }
-      },
-      {
-        title: "A neuron in a few lines",
-        seed: "A single neuron is just: multiply inputs by weights, add them, and pass the result through a simple function.",
-        exercise: {
-          type: "pick", intro: "Predict.",
-          q: "If a neuron multiplies inputs by its weights and sums them, the weights mostly control:",
-          options: ["The color of the output", "How much each input matters to the result"],
-          a: 1,
-          good: "Right. Weights set how much each input counts. Training is just finding good weights.",
-          bad: "Weights set how much each input matters. Training is the search for good weight values."
-        },
-        idea: [
-          "In code, a neuron is a few lines: a weighted sum plus an activation. Wire many together and add the learning step, and you have the engine behind everything in this app.",
-          "The point of building it small is that nothing stays a black box. You can see exactly where the numbers come from."
-        ],
-        analogy: "Like learning one Lego brick and one way to connect them. Everything elaborate is just those two ideas at scale.",
-        goDeeper: { text: ["Karpathy's micrograd builds the learning engine itself in pure Python, in about a hundred lines. It is the clearest way to truly get backpropagation."], videos: [["Andrej Karpathy", "Building micrograd, spelled out", "https://www.youtube.com/watch?v=VMj-3S1tku0", "~2h 25m"]] }
-      },
-      {
-        title: "From characters to a tiny model",
-        seed: "Train a small model on a list of names and it will invent new ones that sound right. Same idea, tiny scale.",
-        exercise: {
-          type: "pick", intro: "Predict.",
-          q: "You train a tiny model only on real names, then sample from it. You get:",
-          options: ["Exact copies of the training names", "New name like strings that follow the same patterns"],
-          a: 1,
-          good: "Right. It learned the patterns, not a copy list, so it produces fresh name shaped text.",
-          bad: "You get new, name like strings. It learned the patterns rather than memorising a list to copy."
-        },
-        idea: [
-          "A tiny character level model predicts the next letter instead of the next word. Train it on names and it generates believable new ones, the same prediction game at small scale.",
-          "This is the honest version of how big models work. Bigger data and more dials, same core loop."
-        ],
-        analogy: "A child who has heard many names can make up a new one that sounds plausible without copying anyone. The model does the same with patterns.",
-        goDeeper: { text: ["Working at this scale, you can watch loss drop and samples improve in real time, which makes the abstract idea of learning concrete."], videos: [["Andrej Karpathy", "Let's build GPT from scratch, in code", "https://www.youtube.com/watch?v=kCc8FmEb1nY", "~1h 56m"]] }
-      }
-    ],
-    quiz: [
-      { q: "The core of generating an answer is...", options: ["A huge lookup table", "A short loop: predict a token, append it, repeat", "A web search", "A team of humans"], a: 1, why: "Predict a token, append it, repeat. That loop is the whole engine." },
-      { q: "A neuron's weights control...", options: ["The output color", "How much each input matters", "The file format", "The price"], a: 1, why: "How much each input matters; training finds good values." },
-      { q: "A tiny model trained on names will...", options: ["Copy names exactly", "Generate new name like strings from the patterns", "Refuse to answer", "Only work in English"], a: 1, why: "Invent plausible new names, because it learned patterns, not a copy list." },
-      { q: "Why build a model from scratch at all?", options: ["It is faster than using one", "So nothing stays a black box and the ideas click", "It is required by law", "To save money"], a: 1, why: "Building it small makes the ideas concrete instead of magic." }
-    ],
-    assignment: {
-      title: "Watch one built from nothing", xp: 50,
-      steps: "Watch the first 30 minutes of Karpathy's \"Let's build GPT\" or \"micrograd\" from the Go deeper links. You do not need to code along. Write three plain English sentences: what a neuron does, what loss is, and what the generation loop does. Tie each back to a concept from earlier tiers."
-    }
-  },
-
-  /* ============ TIER: BUILD REAL THINGS ============ */
-  {
-    id: "m7", emoji: "🎚️", tier: "Build Real Things",
-    title: "Prompt like a builder",
-    desc: "System prompts, fixed output shapes, and reasoning",
-    bridge: "Reliable prompts are the first step toward real products.",
-    lessons: [
-      {
-        title: "The system prompt",
+        title: "The system prompt", ic: "📋",
         seed: "Apps set standing instructions the user never sees, called the system prompt. It shapes every reply.",
         exercise: {
           type: "pick", intro: "Predict.",
           q: "Where do you put \"always answer as a friendly support agent and never share refund codes\"?",
-          options: ["In every user message", "Once, in the system prompt"],
+          options: ["In every single user message", "Once, in the system prompt"],
           a: 1,
-          good: "Right. The system prompt sets standing rules once, so you do not repeat them each turn.",
-          bad: "In the system prompt, once. It sets standing rules for every turn so you do not repeat yourself."
+          good: "Right. The system prompt sets standing rules once, so you do not repeat them every turn.",
+          bad: "In the system prompt, once. It sets standing rules for every turn so you never repeat yourself."
         },
         idea: [
-          "The <strong>system prompt</strong> is the developer's standing brief: role, rules, tone, and limits. It applies before the user types anything.",
-          "Good products spend real effort here. It is where consistency, safety, and personality live."
+          "The <strong>system prompt</strong> is the developer's standing brief: role, rules, tone, and limits, applied before the user types anything. It is where consistency, safety, and personality live.",
+          "When you build a custom assistant, this is the box you are filling in. Spend real effort here.",
+          "<strong>How it breaks:</strong> stuffing rules into every user message instead of setting them once, or writing a vague system prompt and wondering why behavior drifts."
         ],
-        analogy: "It is the staff handbook a new employee reads before serving any customer. The customer never sees it, but it shapes every interaction.",
+        analogy: "The staff handbook a new employee reads before serving any customer. The customer never sees it, but it shapes every interaction.",
         goDeeper: { text: ["Keep system prompts stable. Many providers cache a repeated prefix, so a steady system prompt is also cheaper to run at scale."], videos: [] }
       },
       {
-        title: "Make it answer in a fixed shape",
+        title: "Make it answer in a fixed shape", ic: "🧱",
         seed: "If software has to use the answer, you need it in a predictable shape, not a friendly paragraph.",
         exercise: {
           type: "pick", intro: "Predict.",
-          q: "You want to feed AI output into a spreadsheet automatically. You should ask for:",
+          q: "You want AI output to flow automatically into a spreadsheet. You should ask for:",
           options: ["A nicely written paragraph", "A fixed structure like JSON or a table with named fields"],
           a: 1,
-          good: "Right. A fixed shape, like JSON, lets other software read it reliably every time.",
-          bad: "Ask for a fixed structure like JSON. Other software can only read the answer reliably if its shape is predictable."
+          good: "Right. A fixed shape, like JSON, lets other software read it the same way every time.",
+          bad: "Ask for a fixed structure like JSON. Software can only read the answer reliably if its shape is predictable."
         },
         idea: [
-          "<strong>Structured output</strong> means asking for a fixed, machine readable shape: JSON, a table, named fields. It is the bridge from a chat answer to something a program can act on.",
-          "State the exact fields you want and give one example. Most providers can even guarantee valid structure."
+          "<strong>Structured output</strong> means asking for a fixed, machine-readable shape: JSON, a table, named fields. It is the bridge from a chat answer to something a program can act on.",
+          "State the exact fields you want and give one example. Most providers can even guarantee valid structure.",
+          "<strong>How it breaks:</strong> asking for prose then trying to parse it. Free-form text shifts shape every run and your automation chokes."
         ],
-        analogy: "A paragraph is a story; a form is a structure. Software wants the form, with every box in the same place each time.",
-        goDeeper: { text: ["Structured output is what turns a prompt into a building block. Once the shape is reliable, you can chain it into automations and tools."], videos: [] }
+        analogy: "A paragraph is a story; a form is a structure. Software wants the form, every box in the same place each time.",
+        goDeeper: { text: ["Structured output is what turns a prompt into a reusable building block. Once the shape is reliable, you can chain it into automations and tools."], videos: [] }
       },
       {
-        title: "Ask it to think first",
+        title: "Ask it to think first", ic: "💭",
         seed: "On hard problems, telling a model to reason step by step before answering measurably improves results.",
         exercise: {
           type: "pick", intro: "Predict.",
-          q: "For a tricky multi step logic question, which prompt tends to do better?",
+          q: "For a tricky multi-step logic question, which prompt tends to do better?",
           options: ["Just give the final answer", "Work through it step by step, then give the answer"],
           a: 1,
           good: "Right. Reasoning out loud first gives the model room to get there, then commit to an answer.",
-          bad: "Step by step first works better. The model uses the reasoning to reach a sounder final answer."
+          bad: "Step by step first works better. The written reasoning becomes scratch paper that improves the final answer."
         },
         idea: [
-          "<strong>Chain of thought</strong> means asking the model to reason before concluding. Because it predicts token by token, written reasoning becomes scratch paper that improves the final guess.",
-          "For simple tasks, skip it. For math, logic, and planning, it earns its extra tokens."
+          "<strong>Chain of thought</strong> means asking the model to reason before concluding. Because it predicts token by token, written reasoning is scratch paper that improves the final guess.",
+          "Use it for math, logic, and planning. Skip it for simple tasks where it just adds delay.",
+          "<strong>How it breaks:</strong> two ways. Forcing it on trivial tasks (slower, no gain), or never using it on genuinely hard ones and getting a rushed wrong answer."
         ],
-        analogy: "Like a student showing their working. The act of writing the steps is part of getting to the right answer.",
-        goDeeper: { text: ["Newer reasoning models do this internally and you may not see the steps, but the principle is the same: thinking time before answering helps on hard tasks."], videos: [] }
+        analogy: "A student showing their working. The act of writing the steps is part of reaching the right answer.",
+        goDeeper: { text: ["Newer reasoning models do this thinking internally and you may not see the steps, but the principle holds: thinking time before answering helps on hard tasks."], videos: [] }
+      },
+      {
+        title: "Context engineering and grounding", ic: "🗂️",
+        seed: "Giving the model exactly the right material, and no junk, is its own discipline. It is also the door to answering from your own documents.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "You are asking questions about a 50 page report. Best way to get accurate answers?",
+          options: ["Paste all 50 pages every time and hope", "Pull the few relevant sections into the prompt, or let a tool fetch them"],
+          a: 1,
+          good: "Right. Feed it the relevant parts. More text is not better; the right text is. This is the seed of grounding and RAG.",
+          bad: "Feed it the relevant sections. Dumping all 50 pages dilutes attention and costs more; the right context beats more context."
+        },
+        idea: [
+          "<strong>Context engineering</strong> is choosing what goes in the window: the right material, in the right order, and nothing that distracts. It is the highest-leverage prompting skill once tasks get real.",
+          "<strong>Grounding</strong> is the next step: instead of hoping the model knows your documents, you give it the relevant source and tell it to answer only from that, with a quote. When the doc set is large, a system fetches the relevant pieces for you (that is RAG, a track you can take later).",
+          "<strong>How it breaks:</strong> assuming more context is always better. Irrelevant text dilutes attention, raises cost, and can make answers worse, not just slower."
+        ],
+        analogy: "A desk with only the files this task needs, open to the right page, beats a desk buried under every file you own.",
+        goDeeper: { text: ["Grounding is the single biggest fix for hallucination. Ask for a quote with every claim; if it cannot quote a source, doubt it. The Automations and Products tracks turn this into a real document assistant."], videos: [] }
       }
     ],
     quiz: [
-      { q: "A system prompt is...", options: ["The user's first message", "Standing developer instructions that shape every reply", "An error log", "A pricing tier"], a: 1, why: "Standing developer instructions that shape every reply before you type." },
-      { q: "Structured output is for...", options: ["Making answers prettier", "Giving a fixed, machine readable shape other software can use", "Faster typing", "Hiding the answer"], a: 1, why: "A fixed shape like JSON that other software can use reliably." },
-      { q: "Chain of thought helps most on...", options: ["Simple greetings", "Math, logic, and planning tasks", "Spelling your name", "Every task equally"], a: 1, why: "Hard tasks like math, logic, and planning; skip it for simple ones." },
-      { q: "Why keep a system prompt stable?", options: ["It looks neat", "Consistency, and a repeated prefix can be cached to cut cost", "It is required", "To confuse users"], a: 1, why: "It stays consistent, and a repeated prefix can be cached to cut cost." }
+      { q: "Why do vague prompts give generic answers?", options: ["The model is lazy", "It predicts the most likely continuation, and vague text continues generically", "A filter blocks them", "Short prompts use a weaker model"], a: 1, why: "Vague in, average-of-the-internet out. Specifics steer the prediction." },
+      { q: "The four levers of a strong prompt are...", options: ["Caps, emojis, length, speed", "Who it is, who it is for, what you want, what to avoid", "Model, price, tokens, temperature", "Hook, body, CTA, hashtag"], a: 1, why: "Each lever removes a category of wrong answers." },
+      { q: "Most reliable way to get a specific style?", options: ["Describe it in adjectives", "Paste two or three examples and ask it to match", "Use all caps", "Ask it to try harder"], a: 1, why: "Few-shot examples beat description; the model matches patterns it can see." },
+      { q: "A system prompt is...", options: ["The user's first message", "Standing developer instructions that shape every reply", "An error log", "A pricing tier"], a: 1, why: "Set once, it governs role, rules, and tone for the whole conversation." },
+      { q: "Structured output (like JSON) is for...", options: ["Making answers prettier", "Giving a fixed, machine-readable shape other software can use", "Faster typing", "Hiding the answer"], a: 1, why: "Predictable shape is what lets an automation read the answer every time." },
+      { q: "More context is...", options: ["Always better", "Better only when it is the right context; junk dilutes and costs more", "Free", "Bad, always keep prompts tiny"], a: 1, why: "Right material helps; irrelevant text hurts attention and cost." }
     ],
     assignment: {
-      title: "Build a reusable prompt", xp: 50,
-      steps: "Pick a repeating task in {{SPINE}}. Write a prompt with: a system style role, the exact output shape (fields or a table), and one example. Run it on three real inputs. If the shape holds every time, you have a reusable building block. Save it."
-    }
-  },
-  {
-    id: "m8", emoji: "📚", tier: "Build Real Things",
-    title: "Give AI your own data",
-    desc: "Grounding, RAG, and why retrieval fails",
-    bridge: "Now the AI can answer from your world, not just its memory.",
-    lessons: [
-      {
-        title: "Grounding beats guessing",
-        seed: "If you want answers about your documents, do not hope the model knows them. Hand them over.",
-        exercise: {
-          type: "pick", intro: "Predict.",
-          q: "You want accurate answers about your company handbook. Best approach?",
-          options: ["Ask the model and hope it knows", "Give it the handbook text and ask it to answer only from that"],
-          a: 1,
-          good: "Right. Grounding it in the real text cuts made up answers and lets it quote sources.",
-          bad: "Give it the real text and ask it to answer only from that. Grounding cuts made up answers and enables quotes."
-        },
-        idea: [
-          "<strong>Grounding</strong> means giving the model trusted source material and telling it to answer from that, not from memory. It is the single biggest fix for made up answers.",
-          "Pasting a document into the chat is grounding by hand. The next lesson automates it for big collections."
-        ],
-        analogy: "Open book exam versus closed book. Give the student the textbook and tell them to cite the page, and the answers get far more reliable.",
-        goDeeper: { text: ["Ask for a quote with each claim. If the model cannot quote a source for something, that is your signal to doubt it."], videos: [] }
-      },
-      {
-        title: "RAG in plain language",
-        seed: "When you have too many documents to paste, you fetch only the relevant bits first, then answer from those.",
-        exercise: {
-          type: "pick", intro: "Predict.",
-          q: "A RAG system answers a question by first:",
-          options: ["Retraining the model on your docs", "Finding the few most relevant chunks and putting them in the prompt"],
-          a: 1,
-          good: "Right. Retrieve the relevant chunks, drop them in the window, then generate a grounded answer. No retraining.",
-          bad: "It retrieves the most relevant chunks and puts them in the prompt, then answers. No retraining needed."
-        },
-        idea: [
-          "<strong>RAG</strong> (retrieval augmented generation) is the standard pattern for AI over big document sets: split docs into chunks, find the chunks closest in meaning to the question (using embeddings from earlier), and feed those to the model.",
-          "It keeps answers grounded and current without retraining, and it can cite which chunk each claim came from."
-        ],
-        analogy: "A librarian who does not memorise every book. They fetch the three relevant pages, then answer with those open in front of them.",
-        goDeeper: { text: ["RAG is why a support bot can answer from your latest docs the day you update them. You change the documents, not the model."], videos: [] }
-      },
-      {
-        title: "When retrieval fails",
-        seed: "RAG breaks when the wrong chunks get fetched. The model then answers confidently from bad context.",
-        exercise: {
-          type: "pick", intro: "Predict.",
-          q: "Your RAG bot gives a wrong answer. The most common root cause is:",
-          options: ["The model is broken", "It retrieved the wrong or incomplete chunks"],
-          a: 1,
-          good: "Right. Garbage in, garbage out. If retrieval pulls the wrong context, the answer follows it.",
-          bad: "Usually retrieval pulled the wrong chunks. The model answered faithfully from bad context, garbage in, garbage out."
-        },
-        idea: [
-          "Most RAG failures are retrieval failures: chunks too big or too small, the right passage missed, or messy source documents.",
-          "Fixes are unglamorous: clean your documents, tune chunk size, and retrieve a few extra candidates then keep the best. Quality of retrieval sets the ceiling on quality of answers."
-        ],
-        analogy: "If the librarian brings the wrong pages, even a brilliant reader gives a wrong answer. Fix the fetching, not the reader.",
-        goDeeper: { text: ["A common upgrade is to retrieve a generous set cheaply, then have a sharper model re-rank and keep only the best few chunks for the final prompt."], videos: [] }
-      }
-    ],
-    quiz: [
-      { q: "Grounding means...", options: ["Making the model slower", "Giving it trusted sources and answering from those", "Turning off the internet", "A type of fine-tuning"], a: 1, why: "Giving it real material and telling it to answer from that, not memory." },
-      { q: "RAG works by...", options: ["Retraining on your docs", "Retrieving relevant chunks and putting them in the prompt", "Guessing harder", "Calling a human"], a: 1, why: "Fetching the most relevant chunks into the prompt, then answering from them." },
-      { q: "Most RAG failures come from...", options: ["The model itself", "Retrieving the wrong or incomplete chunks", "Too few users", "Slow internet"], a: 1, why: "Retrieving the wrong chunks, so the answer follows bad context." },
-      { q: "Best reason to use RAG over retraining?", options: ["It is cheaper and stays current by changing documents, not the model", "It needs no documents", "It is always perfect", "It removes the need for prompts"], a: 0, why: "You update documents, not the model, so it stays cheap and current." }
-    ],
-    assignment: {
-      title: "Build a mini doc answerer", xp: 50,
-      steps: "Use a Custom GPT or Claude Project for {{SPINE}}. (1) Upload three real documents. (2) Ask five questions and require a quote from the source each time. (3) Find one question it answers badly and diagnose: was it retrieval (wrong source) or the docs themselves? Write one line on the fix."
-    }
-  },
-  {
-    id: "m9", emoji: "🦾", tier: "Build Real Things",
-    title: "Give AI hands",
-    desc: "Tools, the difference between automations and agents",
-    bridge: "Answering is useful. Acting is where the value jumps.",
-    lessons: [
-      {
-        title: "Tools: letting AI act",
-        seed: "On its own, a model only writes text. Tools let it actually do things in the world.",
-        exercise: {
-          type: "pick", intro: "Predict.",
-          q: "How does a model actually send an email if it can only output text?",
-          options: ["It connects to the mail server itself", "It outputs a structured request, and your software runs it"],
-          a: 1,
-          good: "Right. The model asks; surrounding code does the action and hands back the result. That is tool use.",
-          bad: "It outputs a structured request and your software performs the action, then returns the result. That is tool use."
-        },
-        idea: [
-          "<strong>Tool use</strong>, also called function calling, lets a model request a real action: search, send, look up, calculate. It emits a structured request; ordinary software runs it and returns the result.",
-          "This is how an assistant checks a calendar or queries a database. The model decides what to do; your code does it safely."
-        ],
-        analogy: "A smart dispatcher who cannot drive. They radio precise instructions, and the drivers carry them out and report back.",
-        goDeeper: { text: ["A shared standard called MCP is making tools plug into any assistant, the way any browser opens any site. Describe the job well and scope what it is allowed to touch."], videos: [] }
-      },
-      {
-        title: "Automations vs agents",
-        seed: "Two ways to put AI to work: a fixed pipeline that runs the same every time, or an agent that decides its own steps.",
-        exercise: {
-          type: "pick", intro: "Predict.",
-          q: "\"When a form arrives, summarise it and draft a reply\" is best built as:",
-          options: ["An agent that figures out what to do", "A fixed automation, the steps never change"],
-          a: 1,
-          good: "Right. Fixed steps means a simple, reliable automation. Save agents for when the path is not known in advance.",
-          bad: "A fixed automation. The steps never change, so you do not need an agent deciding the path. Keep it simple."
-        },
-        idea: [
-          "An <strong>automation</strong> is a set pipeline with AI steps inside: trigger, then the same steps each time. An <strong>agent</strong> is a model in a loop that chooses its own next action toward a goal.",
-          "Start simple. Most real value is plain automations. Reach for an agent only when the steps genuinely cannot be fixed ahead of time."
-        ],
-        analogy: "An automation is a recipe. An agent is a cook improvising toward a dish. Recipes are predictable; cooks handle the unknown, with more risk.",
-        goDeeper: { text: ["The expensive mistake is building a clever agent where a five step automation would do. Simpler is cheaper, faster, and easier to trust."], videos: [] }
-      },
-      {
-        title: "Design one on paper",
-        seed: "Before building anything, sketch the workflow: trigger, steps, the AI part, and the human approval point.",
-        exercise: {
-          type: "pick", intro: "Predict.",
-          q: "When mapping a workflow, where should a human approval step usually go?",
-          options: ["Nowhere, automate it all", "Right before the consequential action, like sending or paying"],
-          a: 1,
-          good: "Right. Put the human check at the step with real world consequences. Automate the rest.",
-          bad: "Put it right before the consequential step, like sending or paying. Automate everything up to that point."
-        },
-        idea: [
-          "A workflow is just: a <strong>trigger</strong>, a sequence of steps, the AI step, and a clearly marked human approval before anything irreversible.",
-          "Mapping it on paper first catches problems early and tells you exactly what to build. Most of the thinking happens here, not in the tool."
-        ],
-        analogy: "Architects draw before they pour concrete. A one page sketch of the flow saves you rebuilding the real thing twice.",
-        goDeeper: { text: ["Name the trigger, the inputs, each step, and the one approval gate. If you can hand that page to someone else and they get it, you are ready to build."], videos: [] }
-      }
-    ],
-    quiz: [
-      { q: "Tool use lets a model...", options: ["Train itself", "Request real actions that your software then runs", "Write faster", "Skip the prompt"], a: 1, why: "Request an action that your software then runs and reports back." },
-      { q: "An automation is...", options: ["A model improvising freely", "A fixed pipeline of steps, often with AI inside", "A type of GPU", "A pricing plan"], a: 1, why: "A fixed pipeline that runs the same steps every time, with AI inside." },
-      { q: "Use an agent when...", options: ["Always, they are best", "The steps genuinely cannot be fixed in advance", "Never", "The task is simple and repetitive"], a: 1, why: "The steps genuinely cannot be fixed in advance." },
-      { q: "Where does the human approval step go?", options: ["Right before the consequential action", "At the very start only", "Nowhere", "After everything is sent"], a: 0, why: "Right before the consequential action; automate everything before it." }
-    ],
-    assignment: {
-      title: "Map your first automation", xp: 50,
-      steps: "Pick the most time eating repetitive task in {{SPINE}}. On one page, draw: the trigger, each step, which step the AI does, and the single human approval gate. Mark whether it should be an automation or an agent, and why. This page is your build spec."
-    }
-  },
-  {
-    id: "m10", emoji: "✅", tier: "Build Real Things",
-    title: "Make it reliable",
-    desc: "Evals: the skill most people skip",
-    bridge: "Before you trust it in the wild, prove it works.",
-    lessons: [
-      {
-        title: "Vibes do not scale",
-        seed: "Trying a prompt twice and feeling good is not proof. To trust AI in real work, you measure it.",
-        exercise: {
-          type: "pick", intro: "Predict.",
-          q: "You tweak a prompt and the demo looks better. Can you ship it?",
-          options: ["Yes, it clearly improved", "Not yet, you only saw a couple of cases"],
-          a: 1,
-          good: "Right. A better demo can hide cases that got worse. You need a fixed test set to know for sure.",
-          bad: "Not yet. A nicer demo can hide cases that quietly broke. You need a fixed test set to be sure."
-        },
-        idea: [
-          "An <strong>eval</strong> is a repeatable test: real cases plus a way to score them, run on every change. It is the unit test of AI work.",
-          "Without it, every tweak is a guess and you cannot tell improvement from a lucky demo. With it, you ship with evidence."
-        ],
-        analogy: "A chef does not change the recipe based on one happy diner. They test the new version on a fixed tasting panel before it hits the menu.",
-        goDeeper: { text: ["This is the rung most courses skip, and the one that separates people who demo from people who deploy. Cheap to start, huge in payoff."], videos: [] }
-      },
-      {
-        title: "Build a tiny test set",
-        seed: "You do not need fancy tools. Twenty real examples with expected outcomes already beats guessing.",
-        exercise: {
-          type: "pick", intro: "Predict.",
-          q: "Which cases should you definitely include in your test set?",
-          options: ["Only the easy, typical ones", "The hard, ambiguous, and edge cases too"],
-          a: 1,
-          good: "Right. Edge cases are where things break, so they have to be in the set, not just the easy wins.",
-          bad: "Include the hard and ambiguous ones too. Edge cases are where systems break, so they must be tested."
-        },
-        idea: [
-          "A starter eval is a <strong>golden set</strong>: 20 or more real input and expected output pairs, including the tricky cases. Score each run against it.",
-          "For fuzzy outputs you can grade by a written checklist, or even use a second model as a judge, once you have checked it agrees with you."
-        ],
-        analogy: "A spelling test with an answer key. Same questions every time, so you can actually tell if the student improved.",
-        goDeeper: { text: ["Keep the set in a simple sheet. When something fails in real use, add it as a new case. Your eval grows stronger every time something breaks."], videos: [] }
-      },
-      {
-        title: "Close the loop",
-        seed: "Evals are not a one time gate. They run on every change, and real failures feed back into the set.",
-        exercise: {
-          type: "pick", intro: "Predict.",
-          q: "A user reports a bad answer in production. Best response?",
-          options: ["Fix that one reply and move on", "Add it to your eval set so the fix is tested forever"],
-          a: 1,
-          good: "Right. Turn each real failure into a permanent test case. That is how the system stops repeating mistakes.",
-          bad: "Add it to the eval set. Turning failures into permanent test cases is how the system stops repeating them."
-        },
-        idea: [
-          "A change that fixes one case can silently break another, a <strong>regression</strong>. Running your eval on every change catches that.",
-          "Log real inputs and outputs, watch for failures, and feed them back into the golden set. The loop is: measure, change, re-measure, capture new failures."
-        ],
-        analogy: "Like a checklist a pilot runs before every flight, updated whenever something new goes wrong. Safety comes from the loop, not a one time pass.",
-        goDeeper: { text: ["This is eval driven development: you decide what good looks like before you build, then let the score, not your mood, tell you if a change helped."], videos: [] }
-      }
-    ],
-    quiz: [
-      { q: "An eval is...", options: ["A type of model", "A repeatable test: real cases plus a scoring method", "A prompt style", "A pricing tier"], a: 1, why: "Real cases plus a score, run on every change. The unit test of AI." },
-      { q: "A golden set should include...", options: ["Only easy cases", "Real cases including the hard and ambiguous ones", "No real data", "Just one example"], a: 1, why: "The hard and ambiguous cases, since that is where things break." },
-      { q: "A regression is...", options: ["A faster model", "A change that fixes one case but breaks another", "A type of prompt", "A GPU"], a: 1, why: "A change that fixes one case but quietly breaks another." },
-      { q: "What do you do with a real production failure?", options: ["Ignore it", "Add it to the eval set as a permanent test case", "Delete the logs", "Switch models"], a: 1, why: "Turn it into a permanent test case in your eval set." }
-    ],
-    assignment: {
-      title: "Eval your own prompt", xp: 50,
-      steps: "Take a prompt you use for {{SPINE}}. (1) Write 10 real inputs and the answer you would accept for each. (2) Run them and score how many pass. (3) Change the prompt and re-run the same 10. Did the score go up or did something break? Keep the sheet."
-    }
-  },
-  {
-    id: "m11", emoji: "🚀", tier: "Build Real Things", build: true,
-    title: "Ship a real thing",
-    desc: "What an app is made of, keys, and shipping",
-    bridge: "Time to put something live that others can use.",
-    lessons: [
-      {
-        title: "What an AI app is made of",
-        seed: "Most AI apps are three parts: a front end people see, a back end that does the work, and a model API it calls.",
-        exercise: {
-          type: "pick", intro: "Predict.",
-          q: "Why should the call to the AI model happen on the back end, not in the page itself?",
-          options: ["It is faster to type", "To keep the secret API key off the public page"],
-          a: 1,
-          good: "Right. Keys must stay server side. Anyone can read a public page's code and steal a key left there.",
-          bad: "To keep the key secret. Anyone can view a public page's source, so the key must live on the back end."
-        },
-        idea: [
-          "The <strong>front end</strong> is the screens and buttons. The <strong>back end</strong> runs on a server: it holds secrets, applies logic, and calls the model. The <strong>API</strong> is how it talks to the model.",
-          "This shape is why a chatbot feature is not just an HTML page. The secret key and the real logic have to live somewhere users cannot see."
-        ],
-        analogy: "A restaurant: the dining room is the front end, the kitchen is the back end, and the supplier you phone is the model API. Customers never enter the kitchen.",
-        goDeeper: { text: ["A database is the fourth common part: it remembers users, content, and history between visits. Front end, back end, database, model API covers most apps."], videos: [] }
-      },
-      {
-        title: "APIs and keys",
-        seed: "An API key is your identity and your bill in one secret string. Treat it like a credit card number.",
-        exercise: {
-          type: "pick", intro: "Predict.",
-          q: "You accidentally paste an API key into a public code file online. What is the right move?",
-          options: ["Leave it, probably fine", "Rotate it now: revoke the old key and make a new one"],
-          a: 1,
-          good: "Right. Rotate first, debate later. A leaked key can be used to spend on your account.",
-          bad: "Rotate it immediately: revoke the old, create a new one. A leaked key can run up your bill fast."
-        },
-        idea: [
-          "An <strong>API key</strong> identifies your account and bills all usage to it. It belongs on a server, never in public code, with spending caps on and usage reviewed.",
-          "Key hygiene is a real discipline. The first reaction to any leak is to rotate, not to assess how bad it might be."
-        ],
-        analogy: "It is the master key to the building. You would not tape it to the front door, and if it goes missing you change the lock immediately.",
-        goDeeper: { text: ["Subscriptions and API keys are different doors: a subscription is a flat fee buffet with rate limits, an API key is pay per token with no cap. Products need the metered door."], videos: [] }
-      },
-      {
-        title: "Shipping beats perfect",
-        seed: "A thin thing that is live and real teaches you more than a perfect thing that never leaves your laptop.",
-        exercise: {
-          type: "pick", intro: "Predict.",
-          q: "Your MVP works but the content feels basic. Best move?",
-          options: ["Hold it back until it is polished", "Ship it to a private link, get real reaction, then improve"],
-          a: 1,
-          good: "Right. Real feedback on a live thing beats more polishing in private. Iterate after it exists.",
-          bad: "Ship it privately and learn from real reaction. Polishing forever in private is how projects quietly die."
-        },
-        idea: [
-          "A <strong>prototype</strong> is meant to be small and real, built to test the idea. Getting it in front of people, even a few, is the point.",
-          "Good taste applied at the wrong moment kills projects. Ship, watch how it is used, then make it better with evidence."
-        ],
-        analogy: "A food stall before a restaurant. You learn what people actually order by selling, not by perfecting a menu nobody has tasted.",
-        goDeeper: { text: ["Version everything with git so you can rewrite fearlessly, and put it on a host that redeploys on every change. Then shipping an improvement costs seconds."], videos: [] }
-      }
-    ],
-    quiz: [
-      { q: "Why call the model from the back end?", options: ["It is prettier", "To keep the secret API key off the public page", "It is required by law", "To slow it down"], a: 1, why: "Anyone can read a public page, so the secret key must stay server side." },
-      { q: "An API key is...", options: ["A public username", "A secret that identifies your account and bills your usage", "A type of model", "A free trial"], a: 1, why: "A secret that identifies you and bills your usage. Guard it like a card number." },
-      { q: "First reaction to a leaked key?", options: ["Wait and see", "Rotate it: revoke the old, create a new one", "Email support", "Delete the app"], a: 1, why: "Rotate it: revoke the old key and make a new one first." },
-      { q: "Why ship a thin prototype early?", options: ["To impress investors", "Real use teaches more than private polishing", "It is cheaper to host", "To avoid feedback"], a: 1, why: "Live and rough teaches more than perfect and hidden." }
-    ],
-    assignment: {
-      title: "Put something live", xp: 150,
-      steps: "Ship the smallest real thing for {{SPINE}}: a Custom GPT, a simple automation, or a one page tool. (1) Build the thin version. (2) Put it somewhere a colleague can open it. (3) Watch one person use it without your help and note one thing to fix. Live and rough beats perfect and hidden."
-    }
-  },
-
-  /* ============ TIER: AGENTS & PRODUCTION ============ */
-  {
-    id: "m12", emoji: "🤖", tier: "Agents & Production",
-    title: "Agents in depth",
-    desc: "The agent loop, guardrails, and many agents",
-    bridge: "When a fixed pipeline is not enough, agents step in.",
-    lessons: [
-      {
-        title: "Anatomy of an agent",
-        seed: "An agent is a model in a loop: it thinks, picks a tool, sees the result, and repeats until the goal is met.",
-        exercise: {
-          type: "pick", intro: "Predict.",
-          q: "What makes an agent different from a single AI answer?",
-          options: ["It uses a bigger model", "It loops: act, observe the result, decide the next action"],
-          a: 1,
-          good: "Right. The loop is the whole idea: take a step, see what happened, choose the next one toward the goal.",
-          bad: "The loop. It acts, observes the result, and chooses the next step, instead of answering once."
-        },
-        idea: [
-          "An <strong>agent</strong> wraps a model in a loop with a goal, tools, and memory. Each turn it decides an action, runs a tool, reads the result, and decides again.",
-          "That loop is powerful and riskier than a single answer, because small errors can compound across steps. Design for that."
-        ],
-        analogy: "A new intern with a to do list and a phone. They make a call, see what comes back, and decide the next call, rather than answering everything in one breath.",
-        goDeeper: { text: ["Useful agent patterns: reflection (check its own work), planning (draft steps before acting), and tool use. Most good agents are a few of these combined simply."], videos: [] }
-      },
-      {
-        title: "Guardrails and a human in the loop",
-        seed: "An agent that can act can also act wrongly at speed. Limits and approval points keep it safe.",
-        exercise: {
-          type: "pick", intro: "Predict.",
-          q: "You give an agent access to send emails to customers. The safest setup is:",
-          options: ["Let it send freely so it is fast", "Let it draft, and require a human to approve sends"],
-          a: 1,
-          good: "Right. Draft freely, approve the consequential step. Speed where it is safe, a human gate where it matters.",
-          bad: "Let it draft but require approval to send. Speed where it is safe, a human gate before anything irreversible."
-        },
-        idea: [
-          "<strong>Guardrails</strong> are the limits around an agent: which tools it may use, spending caps, a sandbox, and approval steps before anything irreversible.",
-          "Keep permissions minimal and treat anything the agent reads from the outside as untrusted. A loose agent is a fast way to make a big mistake."
-        ],
-        analogy: "A trainee with a company card that has a low limit and needs a manager's nod for big purchases. Freedom to work, brakes where it counts.",
-        goDeeper: { text: ["Watch for prompt injection: text in a webpage or email crafted to hijack the agent's instructions. Minimal permissions limit the blast radius."], videos: [] }
-      },
-      {
-        title: "Many agents working together",
-        seed: "For big, divisible jobs you can split work across specialist agents with a coordinator routing between them.",
-        exercise: {
-          type: "pick", intro: "Predict.",
-          q: "When is a multi agent setup worth the extra complexity?",
-          options: ["Always, more agents are better", "Only when the job genuinely splits into distinct specialist parts"],
-          a: 1,
-          good: "Right. Multi agent helps for truly divisible work and is pure overhead for simple tasks. Start simple.",
-          bad: "Only for genuinely divisible work. For simple tasks it is just overhead. Start simple, add agents when forced."
-        },
-        idea: [
-          "A <strong>multi agent system</strong> has specialists, like a researcher, writer, and reviewer, with an <strong>orchestrator</strong> routing work between them.",
-          "It shines on genuinely divisible jobs and adds cost and failure points everywhere else. The discipline is to add complexity only when a simpler design clearly falls short."
-        ],
-        analogy: "A small newsroom: reporters, an editor, a fact checker, and someone assigning stories. Great for a newspaper, overkill for a sticky note.",
-        goDeeper: { text: ["The common antipatterns are one giant do everything agent, over engineered planning, and no way to see what happened. Observability matters as much as cleverness."], videos: [] }
-      }
-    ],
-    quiz: [
-      { q: "An agent is...", options: ["A bigger model", "A model in a loop with a goal, tools, and memory", "A type of prompt", "A database"], a: 1, why: "A model in a loop with a goal, tools, and memory, acting step by step." },
-      { q: "Guardrails include...", options: ["Faster GPUs", "Tool limits, spending caps, sandboxes, and approval steps", "Longer prompts", "More users"], a: 1, why: "Tool limits, spending caps, sandboxes, and approval steps." },
-      { q: "Multi agent systems are worth it when...", options: ["Always", "The job genuinely splits into specialist parts", "Never", "The task is simple"], a: 1, why: "The job genuinely splits into specialist parts; otherwise it is overhead." },
-      { q: "A key agent antipattern is...", options: ["Minimal permissions", "One giant do everything agent with no observability", "Human approval steps", "Small clear goals"], a: 1, why: "One giant do everything agent with no way to see what happened." }
-    ],
-    assignment: {
-      title: "An agent on a real task", xp: 150,
-      steps: "Pick a multi step task in {{SPINE}}, like research a prospect then draft an outreach note. (1) Give an AI tool the goal and let it work step by step. (2) Define the guardrail: what may it touch, and where must you approve? (3) Run it, then write where it went off track and what limit would catch that."
-    }
-  },
-  {
-    id: "m13", emoji: "💸", tier: "Agents & Production",
-    title: "Cost and speed",
-    desc: "Tokens as money, caching, routing, and latency",
-    bridge: "Reliable is not enough. It also has to be affordable and fast.",
-    lessons: [
-      {
-        title: "Tokens are money",
-        seed: "Every token in and out is billed. Cost per task is the number that decides whether a feature ships.",
-        exercise: {
-          type: "pick", intro: "Predict.",
-          q: "A long chat keeps re-sending the whole history each turn. As it gets longer, cost per message:",
-          options: ["Stays the same", "Climbs, because the input grows every turn"],
-          a: 1,
-          good: "Right. The model re-reads the whole conversation each turn, so input tokens, and cost, pile up.",
-          bad: "It climbs. The model re-reads the whole history each turn, so input tokens and cost grow as the chat lengthens."
-        },
-        idea: [
-          "Pricing is per token, with output usually costing several times more than input. A single answer is fractions of a paisa, but multiply by many users and many turns and it becomes a real bill.",
-          "Knowing your <strong>cost per completed task</strong> is the skill. It tells you what is worth automating and where to trim."
-        ],
-        analogy: "A taxi meter running on every word. One ride is cheap; a fleet running all day is a budget you have to manage.",
-        goDeeper: { text: ["Long context is the quiet cost driver, because the whole window is re-read for every token. Shorter, sharper context is a cost discipline, not just tidiness."], videos: [] }
-      },
-      {
-        title: "Spend less: caching and routing",
-        seed: "Two big levers cut cost fast: reuse repeated work, and send easy jobs to cheaper models.",
-        exercise: {
-          type: "pick", intro: "Predict.",
-          q: "Most of your requests are simple, a few are hard. The cheapest sound setup is:",
-          options: ["Use the biggest model for everything", "Route easy requests to a small model, hard ones to a big model"],
-          a: 1,
-          good: "Right. Model routing sends the easy 80 percent to a cheap model and saves the frontier model for the hard part.",
-          bad: "Route by difficulty: cheap model for the easy majority, big model for the hard minority. Often a large saving."
-        },
-        idea: [
-          "<strong>Model routing</strong> matches the model to the task and often cuts cost many times over at the same quality. <strong>Caching</strong> reuses repeated work, like a stable system prompt, instead of paying for it again.",
-          "Most teams overpay out of habit, using the biggest model for jobs a small one handles fine."
-        ],
-        analogy: "You do not send a senior surgeon to apply a plaster. Match the effort, and the cost, to the job.",
-        goDeeper: { text: ["Batching many requests together and reusing cached prompt prefixes are two more easy wins once volume grows."], videos: [] }
-      },
-      {
-        title: "Make it feel fast",
-        seed: "Speed is part of quality. Users feel latency, and it scales with how many tokens you process.",
-        exercise: {
-          type: "pick", intro: "Predict.",
-          q: "Why do chat apps stream the answer word by word instead of waiting for the whole thing?",
-          options: ["It looks fancy", "It feels faster, the user sees progress immediately"],
-          a: 1,
-          good: "Right. Streaming shows progress at once, so the wait feels shorter even if total time is similar.",
-          bad: "It feels faster. Streaming shows progress immediately, so the perceived wait drops even at similar total time."
-        },
-        idea: [
-          "<strong>Latency</strong> is how long the user waits, and it grows with tokens processed. Shorter prompts and outputs mean faster replies.",
-          "Streaming the answer as it generates, and routing simple asks to faster models, are the main ways to make a product feel responsive."
-        ],
-        analogy: "A kitchen that sends out dishes as they are ready, rather than holding the whole table's order until everything is done.",
-        goDeeper: { text: ["Cost and speed pull in the same direction: trimming tokens and right sizing the model usually improves both at once."], videos: [] }
-      }
-    ],
-    quiz: [
-      { q: "Why do long chats get more expensive per message?", options: ["The model gets greedy", "The growing history is re-sent as input each turn", "Prices rise hourly", "Longer answers cost less"], a: 1, why: "The growing history is re-read every turn, so input tokens pile up." },
-      { q: "Model routing means...", options: ["Using one model for all", "Sending easy jobs to cheap models and hard ones to big models", "Routing users to support", "A network setting"], a: 1, why: "Sending easy jobs to cheap models and hard ones to big models." },
-      { q: "Latency scales mainly with...", options: ["The weather", "How many tokens are processed", "The user's age", "The model's name"], a: 1, why: "How many tokens are processed, so shorter is faster." },
-      { q: "Streaming the answer helps because...", options: ["It is cheaper", "It shows progress so the wait feels shorter", "It uses fewer tokens", "It improves accuracy"], a: 1, why: "Seeing words appear makes the wait feel shorter." }
-    ],
-    assignment: {
-      title: "Right size a task", xp: 50,
-      steps: "Take a real task from {{SPINE}}. (1) Run it on a top model and on a smaller, cheaper one with the same prompt. (2) Compare quality honestly. (3) Decide which is good enough, and estimate the cost difference at 1,000 runs a day. Write the one line decision."
-    }
-  },
-  {
-    id: "m14", emoji: "🧭", tier: "Agents & Production", build: true,
-    title: "Lead with AI",
-    desc: "Pick the right use cases, governance, and a plan",
-    bridge: "The last step: turn all of this into a plan others can follow.",
-    lessons: [
-      {
-        title: "Pick the right use case",
-        seed: "Most AI projects stall not on technology but on choosing a bad first target. Choose well and the rest gets easier.",
-        exercise: {
-          type: "pick", intro: "Predict.",
-          q: "Which task is the safest, highest value first thing to automate with AI?",
-          options: ["The rare, high stakes decision", "High volume, text heavy work where an occasional error is tolerable"],
-          a: 1,
-          good: "Right. High volume, text heavy, error tolerant work is where AI pays off first and safely.",
-          bad: "Start with high volume, text heavy, error tolerant work. Save rare high stakes calls for much later."
-        },
-        idea: [
-          "Score candidate use cases by value and feasibility. The sweet spot is repetitive, text heavy work where a mistake is recoverable.",
-          "Buy commodity capabilities; build only what touches your own data and workflow. Most of the win is choosing the right narrow target, not the cleverest tech."
-        ],
-        analogy: "Plant where the soil is good. A great seed in bad ground still fails, and the soil here is high volume, low risk work.",
-        goDeeper: { text: ["Step zero is almost always boring: organise and clean the documents the system will rely on. Data readiness decides whether grounded AI works at all."], videos: [] }
-      },
-      {
-        title: "People, trust, and governance",
-        seed: "AI changes how work is done, so adoption is mostly about people and clear rules, not models.",
-        exercise: {
-          type: "pick", intro: "Predict.",
-          q: "The single most important governance rule for AI output is:",
-          options: ["The AI is responsible for its output", "A named human owns every AI output"],
-          a: 1,
-          good: "Right. A person owns each output. Accountability never sits with the tool.",
-          bad: "A named human owns every output. Accountability stays with a person, never with the tool."
-        },
-        idea: [
-          "<strong>Governance</strong> is the written rules: what data may go into which tools, what needs human review, and who owns each output.",
-          "Pair that with people: find the enthusiasts, show visible wins, and measure outcomes like hours saved, not licenses bought."
-        ],
-        analogy: "New machines on a factory floor need both a safety manual and workers who want to use them. Rules plus willing people, or it stalls.",
-        goDeeper: { text: ["Most stalled corporate AI projects fail on trust and process, not technology: ungrounded answers, no evals, no owner, messy data. Each is a thing you now know how to fix."], videos: [] }
-      },
-      {
-        title: "Your 90 day plan",
-        seed: "A plan beats a wish. Turn what you have learned into a sequence with owners, a metric, and one rule.",
-        exercise: {
-          type: "pick", intro: "Predict.",
-          q: "What makes an AI rollout plan credible to a skeptical boss?",
-          options: ["A long list of exciting tools", "A narrow use case, an owner, a success metric, and a review gate"],
-          a: 1,
-          good: "Right. Narrow scope, clear owner, a real metric, and a human gate. That is a plan, not a wish list.",
-          bad: "Narrow scope, an owner, a measurable outcome, and a review gate. Tool lists do not convince anyone."
-        },
-        idea: [
-          "A good plan picks one use case, attaches proof you can build, defines the eval that measures success, and sets a week by week rollout with owners and one governance rule.",
-          "That is the document that makes you the most useful person in the room: specific, measured, and accountable."
-        ],
-        analogy: "A flight plan, not a daydream about travel. Route, checkpoints, who is flying, and how you know you arrived.",
-        goDeeper: { text: ["Stress test it: ask an AI to critique your plan as a skeptical CFO and find the three weakest assumptions. Then fix them before anyone else does."], videos: [] }
-      }
-    ],
-    quiz: [
-      { q: "Best first use case to automate?", options: ["Rare high stakes decisions", "High volume, text heavy, error tolerant work", "Whatever a demo showed", "Everything at once"], a: 1, why: "High volume, text heavy work where a slip is recoverable." },
-      { q: "Build vs buy rule of thumb?", options: ["Always build", "Buy commodity capabilities, build what touches your own data and workflow", "Always buy", "Flip a coin"], a: 1, why: "Buy commodity capabilities; build what touches your own data and workflow." },
-      { q: "The non negotiable governance rule?", options: ["The AI owns its output", "A named human owns every output", "Vendors take all liability", "Nobody is responsible"], a: 1, why: "A named human owns every output. Accountability never sits with the tool." },
-      { q: "A credible rollout plan has...", options: ["A long tool list", "A narrow use case, an owner, a metric, and a review gate", "No timeline", "Only ambition"], a: 1, why: "A narrow use case, an owner, a metric, and a review gate." }
-    ],
-    assignment: {
-      title: "Capstone: your 90 day AI roadmap", xp: 150,
-      steps: "Produce the plan that makes you the most useful person in the room for {{SPINE}}. (1) Score three real use cases on value and feasibility and pick one. (2) Attach proof: an automation or a shipped tool from earlier. (3) Define the eval that measures success. (4) Write the 90 day rollout with weeks, owners, one governance rule, and the outcome metric. (5) Have an AI critique it as a skeptical CFO and revise. Done means a plan you could present on Monday."
-    }
-  },
-
-  /* ============ TIER: THE FRONTIER ============ */
-  {
-    id: "m15", emoji: "🌊", tier: "The Frontier", build: true,
-    title: "Stay current without drowning",
-    desc: "Signal vs noise, and a habit that lasts",
-    bridge: "The field never stops. Here is how to keep up calmly.",
-    lessons: [
-      {
-        title: "Signal vs noise",
-        seed: "New models and hot takes land weekly. The escape is knowing what actually changes and what does not.",
-        exercise: {
-          type: "pick", intro: "Predict.",
-          q: "Which headline should actually change how you build?",
-          options: ["A new model tops a leaderboard by two points", "Inference prices for a capable model dropped tenfold"],
-          a: 1,
-          good: "Right. A big price drop changes what is worth automating. Leaderboard nudges rarely change your work.",
-          bad: "The price drop. It changes what is worth building. A two point leaderboard move rarely affects your work."
-        },
-        idea: [
-          "Model names, prices, and rankings churn, that is news. Tokens, context, grounding, tool use, evals, and cost per task last, that is the physics.",
-          "Everything in this app was chosen because it survives releases. When a headline lands, you already have the hooks to judge whether it matters to you."
-        ],
-        analogy: "A surfer does not study every wave. They learn to read water, swell, wind, the shape of a break. Waves keep coming; reading them is the permanent skill.",
-        goDeeper: { text: ["A cheap inference headline is the most underrated news in AI, every time it happens, because it quietly makes shelved ideas viable."], videos: [] }
-      },
-      {
-        title: "Test it on your own work",
-        seed: "When a release sounds important, do not argue about it. Run it on a real task from your world within the week.",
-        exercise: {
-          type: "pick", intro: "Predict.",
-          q: "A new model is hyped as much smarter. How do you actually know if it helps you?",
-          options: ["Read the benchmark scores", "Run it on your own eval set and compare to what you use now"],
-          a: 1,
-          good: "Right. Your golden set is a personal benchmark. Let your own tasks, not headlines, decide.",
-          bad: "Run it on your own eval set. Your real tasks are the benchmark that matters, not someone else's scores."
-        },
-        idea: [
-          "Benchmarks are someone else's tasks. The question is always for which task, and the only honest answer comes from your own work.",
-          "If you built a golden set earlier, you already have a personal benchmark. Score the new thing on it and let the number decide."
-        ],
-        analogy: "Test drive the car on your own roads, not the showroom's. Specs are a start; your commute is the test.",
-        goDeeper: { text: ["This is also the I do not know protocol for cold questions: name the category, give the framework answer, and promise specifics within a day after you have tested."], videos: [] }
-      },
-      {
-        title: "Make it a habit",
-        seed: "Keeping current is a small weekly routine, not a panic. One digest, one test, one note.",
-        exercise: {
-          type: "pick", intro: "Predict.",
-          q: "Which habit keeps you current without burning out?",
-          options: ["Read every release and take from a dozen feeds daily", "One trusted weekly digest, plus testing anything big on your own tasks"],
-          a: 1,
-          good: "Right. One digest and a test beats drinking from the firehose. Calm, consistent, and it actually sticks.",
-          bad: "One weekly digest plus a real test. Trying to read everything daily burns out fast and teaches less."
-        },
-        idea: [
-          "A sustainable routine: skim one trusted source weekly, and when something sounds important, test it on a real task that week.",
-          "The Daily Brief in this app is built for exactly this. The fundamentals you learned here are the hooks that make any news easy to place."
-        ],
-        analogy: "Tending a garden with a short weekly visit beats a frantic monthly overhaul. Little and often keeps it alive.",
-        goDeeper: { text: ["The deepest habit is teaching what you learn. Explaining a concept to someone else is the final proof you own it, and it is how this whole path was designed."], videos: [] }
-      }
-    ],
-    quiz: [
-      { q: "Which is durable knowledge, not churn?", options: ["Model names and leaderboard ranks", "Tokens, context, grounding, evals, cost per task", "This week's prices", "The newest release date"], a: 1, why: "Fundamentals like tokens, context, grounding, and evals; names and prices churn." },
-      { q: "Best way to judge a hyped new model for your needs?", options: ["Trust the benchmark scores", "Run it on your own eval set", "Ask social media", "Pick the newest one"], a: 1, why: "Run it on your own eval set; your real tasks are the benchmark." },
-      { q: "A sustainable way to stay current is...", options: ["Read every feed daily", "One weekly digest plus testing big things on real tasks", "Ignore all news", "Only follow hype"], a: 1, why: "One weekly digest plus testing big things on your own tasks." },
-      { q: "The deepest way to lock in what you learn is...", options: ["Re-read notes", "Teach it to someone else", "Watch more videos", "Buy a course"], a: 1, why: "Teach it to someone else. Explaining is the final proof you own it." }
-    ],
-    assignment: {
-      title: "Set up your radar", xp: 50,
-      steps: "Build your keep current routine for {{SPINE}}. (1) Pick one trusted weekly source. (2) Open the Daily Brief here and read one story, noting which fundamental it connects to. (3) Write your one rule for when a release is worth testing on your own tasks. Put a 20 minute weekly slot in your calendar."
+      title: "Build a reusable prompt and a custom assistant", xp: 120,
+      steps: "Make AI a reliable teammate for {{SPINE}}. (1) Pick a recurring task. Write a prompt using all four levers, one example, and an exact output shape. Run it on three real inputs until the shape holds every time. (2) Turn it into a custom assistant: a Custom GPT, a Claude Project, or a Gemini Gem. Put the standing rules in the system prompt and add a reference file or two. (3) Test it on three fresh cases and fix what drifts. You can now hand a repeating task to an assistant that does it your way."
     }
   }
 ];
@@ -2012,9 +1252,9 @@ function renderWelcome(){
   app.innerHTML = `<div class="ob-wrap"><div class="celebrate">
     <div class="big">🎉</div>
     <h2>You're in, ${esc(profile.name)}!</h2>
-    <p>Your path starts at <b>Module 1: ${startM.title}</b>, the foundation everything builds on, and climbs through six tiers all the way to building agents.
-    ${profile.spine ? " Everything you make along the way applies to <b>" + esc(profile.spine) + "</b>, so by the end it has an assistant, an automation, a shipped tool and a roadmap." : ""}
-    <br><br>${({"habit":"Your rhythm: one lesson + quiz a day (15-20 min), with module projects paced across the week. Small daily reps are how this sticks","weekend":"Your rhythm: quick lessons on weekdays, and one real 60-90 min build session each weekend, that's when module projects happen","serious":"Your rhythm: 45-60 min a day, a lesson, a quiz, and steady project progress daily. Strong pace without burnout","immersive":"Full sprint: at 2+ hours a day you'll clear Foundations in under a week. Watch for fatigue, comprehension drops before enthusiasm does","5":"~5 minutes a day","15":"~15 minutes a day","30":"~30 minutes a day","fast":"2-3 hours a day, fast track"})[profile.minutes] || "Your pace, your call"}. There's no daily cap: each module unlocks the moment you finish the one before, all the way through the Advanced build projects. Every lesson, quiz and project earns XP. Don't break the streak. 🔥</p>
+    <p>Your path starts at <b>${startM.title}</b>, where you learn what AI is really doing, then moves into prompting it like a pro.
+    ${profile.spine ? " Everything you do applies to <b>" + esc(profile.spine) + "</b>, and by the end of this stretch you will have a reusable prompt and your own custom assistant for it." : ""}
+    <br><br>${({"habit":"Your rhythm: one lesson + quick check a day (15-20 min). Small daily reps are how this sticks","weekend":"Your rhythm: quick lessons on weekdays, one longer build session on the weekend","serious":"Your rhythm: 45-60 min a day, learning and building steadily. Strong pace without burnout","immersive":"Full sprint: at 2+ hours a day you will move fast. Watch for fatigue, comprehension drops before enthusiasm does"})[profile.minutes] || "Your pace, your call"}. Each stone unlocks the one after it, and finishing a unit drops a treasure. More tracks are landing soon. Don't break the streak. 🔥</p>
     <button class="btn btn-primary" id="go">Start learning</button>
   </div></div>`;
   document.getElementById("go").onclick = () => { currentTab = "home"; renderHome(); };
@@ -2087,7 +1327,7 @@ function renderHome(){
     const unlocked = prevDone;
     const isCurrent = unlocked && !done && !currentSet; if (isCurrent) currentSet = true;
     prevDone = done;
-    const glyph = s.t==="lesson" ? (LESSON_ICONS[MODULES[s.mi].lessons[s.li].title] || "⭐") : s.t==="quiz" ? "🏁" : (m.build ? "🚀" : "🏆");
+    const glyph = s.t==="lesson" ? (MODULES[s.mi].lessons[s.li].ic || LESSON_ICONS[MODULES[s.mi].lessons[s.li].title] || "⭐") : s.t==="quiz" ? "🏁" : (m.build ? "🚀" : "🏆");
     const label = s.t==="lesson" ? MODULES[s.mi].lessons[s.li].title : s.t==="quiz" ? "Quick check" : MODULES[s.mi].assignment.title;
     const col = done ? ["#f5b800","#cf9a00"] : (unlocked ? tc : ["#e6e9f2","#cfd6e6"]);
     const dataAttr = unlocked ? `data-act="${s.t}" data-mi="${s.mi}"${s.t==="lesson"?` data-li="${s.li}"`:""}` : "";
