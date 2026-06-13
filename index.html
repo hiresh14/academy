@@ -200,8 +200,10 @@
   .gd-body p{font-size:15px;line-height:1.62;margin:12px 0;}
   .vid{display:flex;align-items:center;gap:11px;border:2px solid var(--border);border-radius:12px;padding:10px 12px;margin-bottom:8px;text-decoration:none;color:var(--navy);font-weight:700;font-size:14px;}
   .vid:hover{background:var(--surface);}
-  .vid .pl{width:34px;height:34px;border-radius:9px;background:#ffe8e8;color:#e84e4e;display:flex;align-items:center;justify-content:center;font-size:14px;flex:none;}
-  .vid small{display:block;color:var(--muted);font-weight:500;font-size:12px;margin-top:1px;}
+  .vid .pl{width:32px;height:32px;border-radius:8px;background:#ff0000;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;flex:none;}
+  .vid .vid-meta{flex:1;min-width:0;}
+  .vid small{display:block;color:var(--muted);font-weight:600;font-size:11.5px;margin-top:2px;}
+  .vid .vid-go{flex:none;font-size:12px;font-weight:800;color:var(--blue);background:#e8f0ff;border-radius:999px;padding:4px 10px;}
 
   /* ---------- quiz ---------- */
   .feedback{border-radius:14px;padding:13px 16px;font-weight:700;font-size:15px;margin:4px 0 14px;animation:popIn .3s both;}
@@ -376,8 +378,8 @@ const MODULES = [
         goDeeper: {
           text: ["Each step, the model scores every possible next token, then picks one. A setting called <strong>temperature</strong> decides how adventurous the pick is: low stays safe and repetitive, higher gets more creative and more error prone. That is also why the same prompt can give different answers each time."],
           videos: [
-            ["Andrej Karpathy", "Deep Dive into LLMs like ChatGPT", "https://www.youtube.com/watch?v=7xTGNNLPyMI"],
-            ["3Blue1Brown", "But what is a neural network?", "https://www.youtube.com/watch?v=aircAruvnKk"]
+            ["Andrej Karpathy", "Deep Dive into LLMs like ChatGPT", "https://www.youtube.com/watch?v=7xTGNNLPyMI", "~3h 30m"],
+            ["3Blue1Brown", "But what is a neural network?", "https://www.youtube.com/watch?v=aircAruvnKk", "~19 min"]
           ]
         }
       },
@@ -400,7 +402,7 @@ const MODULES = [
         analogy: "A chef trains for years (slow, once). Then they cook your dinner in twenty minutes (fast, every order). Ordering dinner does not send the chef back to school.",
         goDeeper: {
           text: ["Training nudges billions of numbers a tiny bit at a time so the next guess is a little less wrong. Do that trillions of times and you get a model. A second, smaller step then teaches the blunt text predictor to behave like a helpful assistant."],
-          videos: [["Andrej Karpathy", "Deep Dive into LLMs like ChatGPT", "https://www.youtube.com/watch?v=7xTGNNLPyMI"]]
+          videos: [["Andrej Karpathy", "Deep Dive into LLMs like ChatGPT", "https://www.youtube.com/watch?v=7xTGNNLPyMI", "~3h 30m"]]
         }
       },
       {
@@ -422,7 +424,7 @@ const MODULES = [
         analogy: "Picture a whiteboard in a meeting. Anything on it gets used well. But it has edges, so writing too much means the oldest notes get wiped to make space.",
         goDeeper: {
           text: ["The model re-reads the whole window for every token it writes. So a huge context is not just a memory limit, it is a cost and speed cost too. Putting in only what matters is a real skill, not just tidiness."],
-          videos: [["3Blue1Brown", "Attention in transformers, visually explained", "https://www.youtube.com/watch?v=eMlx5fFNoYc"]]
+          videos: [["3Blue1Brown", "Attention in transformers, visually explained", "https://www.youtube.com/watch?v=eMlx5fFNoYc", "~26 min"]]
         }
       }
     ],
@@ -460,7 +462,7 @@ const MODULES = [
           "Tell it <strong>who it is</strong>, <strong>who it is for</strong>, <strong>what you want</strong>, and <strong>what to avoid</strong>. It cannot read your mind, but it is very good at following the mind you put on the page."
         ],
         analogy: "A prompt is a brief for a sharp new hire on day one. World class skills, zero knowledge of you. A one paragraph brief gets you something you would actually ship.",
-        goDeeper: { text: ["A reusable trick: keep a short note of your best brief for a recurring task, and paste it each time. That is the first step from chatting toward building."], videos: [["Andrej Karpathy", "Intro to Large Language Models (1 hour)", "https://www.youtube.com/watch?v=zjkBMFhNj_g"]] }
+        goDeeper: { text: ["A reusable trick: keep a short note of your best brief for a recurring task, and paste it each time. That is the first step from chatting toward building."], videos: [["Andrej Karpathy", "Intro to Large Language Models (1 hour)", "https://www.youtube.com/watch?v=zjkBMFhNj_g", "~1 hr"]] }
       },
       {
         title: "Give it the context",
@@ -606,7 +608,7 @@ const MODULES = [
           "The weights are the <strong>parameters</strong>: the dials. A bigger model has more dials, which lets it capture more patterns, at the cost of more compute to run."
         ],
         analogy: "Think of a giant mixing board with billions of sliders. Training is the long process of finding the slider positions that make good output.",
-        goDeeper: { text: ["No single neuron knows anything. Meaning lives in the pattern across millions of them, which is why you cannot point to where a fact is stored."], videos: [["3Blue1Brown", "But what is a neural network?", "https://www.youtube.com/watch?v=aircAruvnKk"]] }
+        goDeeper: { text: ["No single neuron knows anything. Meaning lives in the pattern across millions of them, which is why you cannot point to where a fact is stored."], videos: [["3Blue1Brown", "But what is a neural network?", "https://www.youtube.com/watch?v=aircAruvnKk", "~19 min"]] }
       },
       {
         title: "How it learns",
@@ -624,7 +626,7 @@ const MODULES = [
           "That nudging is <strong>gradient descent</strong>. One step barely matters. Trillions of steps turn noise into a model."
         ],
         analogy: "Picture finding the bottom of a valley in fog by always stepping downhill. Slow, blind, but it gets there.",
-        goDeeper: { text: ["The trick that makes this efficient across billions of dials is backpropagation: it works out how each dial contributed to the error and corrects all of them at once."], videos: [["3Blue1Brown", "Gradient descent, how networks learn", "https://www.youtube.com/watch?v=IHZwWFHWa-w"], ["3Blue1Brown", "Backpropagation, intuitively", "https://www.youtube.com/watch?v=Ilg3gGewQ5U"]] }
+        goDeeper: { text: ["The trick that makes this efficient across billions of dials is backpropagation: it works out how each dial contributed to the error and corrects all of them at once."], videos: [["3Blue1Brown", "Gradient descent, how networks learn", "https://www.youtube.com/watch?v=IHZwWFHWa-w", "~21 min"], ["3Blue1Brown", "Backpropagation, intuitively", "https://www.youtube.com/watch?v=Ilg3gGewQ5U", "~14 min"]] }
       },
       {
         title: "Meaning as numbers",
@@ -642,7 +644,7 @@ const MODULES = [
           "This is the backbone of search by meaning and of feeding your own data to AI later. It turns the fuzzy idea of similar into plain distance."
         ],
         analogy: "Like placing every word on a giant map where related words sit in the same neighborhood. Paris and London are close; banana is across town.",
-        goDeeper: { text: ["Embeddings can even capture relationships: the direction from king to queen is roughly the same as from man to woman. Meaning becomes geometry."], videos: [["3Blue1Brown", "Transformers, the tech behind LLMs", "https://www.youtube.com/watch?v=wjZofJX0v4M"]] }
+        goDeeper: { text: ["Embeddings can even capture relationships: the direction from king to queen is roughly the same as from man to woman. Meaning becomes geometry."], videos: [["3Blue1Brown", "Transformers, the tech behind LLMs", "https://www.youtube.com/watch?v=wjZofJX0v4M", "~27 min"]] }
       }
     ],
     quiz: [
@@ -678,7 +680,7 @@ const MODULES = [
           "Stacking many attention layers is what made modern models work so well. It is how they track who did what to whom across long passages."
         ],
         analogy: "Like reading a contract and, for each new clause, instantly highlighting the few earlier lines that change its meaning.",
-        goDeeper: { text: ["A model runs many attention heads at once, each watching for a different kind of relationship, like grammar, subject, or tone, then combines them."], videos: [["3Blue1Brown", "Attention in transformers, visually explained", "https://www.youtube.com/watch?v=eMlx5fFNoYc"]] }
+        goDeeper: { text: ["A model runs many attention heads at once, each watching for a different kind of relationship, like grammar, subject, or tone, then combines them."], videos: [["3Blue1Brown", "Attention in transformers, visually explained", "https://www.youtube.com/watch?v=eMlx5fFNoYc", "~26 min"]] }
       },
       {
         title: "From raw model to assistant",
@@ -696,7 +698,7 @@ const MODULES = [
           "A further step uses human preference to push it toward answers people rate as better. That is why today's assistants feel cooperative rather than like raw autocomplete."
         ],
         analogy: "Pretraining is reading the whole library. The assistant step is a finishing school that teaches it how to actually be useful to a person.",
-        goDeeper: { text: ["The same finishing step is where a lot of safety behavior and tone come from. It is also why two models trained on similar data can feel very different to talk to."], videos: [["Andrej Karpathy", "Deep Dive into LLMs like ChatGPT", "https://www.youtube.com/watch?v=7xTGNNLPyMI"]] }
+        goDeeper: { text: ["The same finishing step is where a lot of safety behavior and tone come from. It is also why two models trained on similar data can feel very different to talk to."], videos: [["Andrej Karpathy", "Deep Dive into LLMs like ChatGPT", "https://www.youtube.com/watch?v=7xTGNNLPyMI", "~3h 30m"]] }
       },
       {
         title: "Why tokenizing causes quirks",
@@ -714,7 +716,7 @@ const MODULES = [
           "So letter level tasks, exact counting, and some math get shaky. Knowing this, you can hand those jobs to a tool or spell things out."
         ],
         analogy: "Imagine reading where common words are single stamps. You read fast, but if asked to count the letters on a stamp, you have to stop and squint.",
-        goDeeper: { text: ["This also explains odd behavior with numbers and rare words: they get chopped into unusual chunks the model saw less often during training."], videos: [["Andrej Karpathy", "Let's build the GPT Tokenizer", "https://www.youtube.com/watch?v=zduSFxRajkE"]] }
+        goDeeper: { text: ["This also explains odd behavior with numbers and rare words: they get chopped into unusual chunks the model saw less often during training."], videos: [["Andrej Karpathy", "Let's build the GPT Tokenizer", "https://www.youtube.com/watch?v=zduSFxRajkE", "~2h 13m"]] }
       }
     ],
     quiz: [
@@ -752,7 +754,7 @@ const MODULES = [
           "Seeing it as code removes the mystery. There is no hidden brain, just a function called over and over."
         ],
         analogy: "Like watching a master chef and realising the signature dish is five steps repeated with care, not sorcery.",
-        goDeeper: { text: ["Andrej Karpathy builds a working version of this from scratch. Even watching without coding makes the mechanism click."], videos: [["Andrej Karpathy", "Let's build GPT from scratch, in code", "https://www.youtube.com/watch?v=kCc8FmEb1nY"]] }
+        goDeeper: { text: ["Andrej Karpathy builds a working version of this from scratch. Even watching without coding makes the mechanism click."], videos: [["Andrej Karpathy", "Let's build GPT from scratch, in code", "https://www.youtube.com/watch?v=kCc8FmEb1nY", "~1h 56m"]] }
       },
       {
         title: "A neuron in a few lines",
@@ -770,7 +772,7 @@ const MODULES = [
           "The point of building it small is that nothing stays a black box. You can see exactly where the numbers come from."
         ],
         analogy: "Like learning one Lego brick and one way to connect them. Everything elaborate is just those two ideas at scale.",
-        goDeeper: { text: ["Karpathy's micrograd builds the learning engine itself in pure Python, in about a hundred lines. It is the clearest way to truly get backpropagation."], videos: [["Andrej Karpathy", "Building micrograd, spelled out", "https://www.youtube.com/watch?v=VMj-3S1tku0"]] }
+        goDeeper: { text: ["Karpathy's micrograd builds the learning engine itself in pure Python, in about a hundred lines. It is the clearest way to truly get backpropagation."], videos: [["Andrej Karpathy", "Building micrograd, spelled out", "https://www.youtube.com/watch?v=VMj-3S1tku0", "~2h 25m"]] }
       },
       {
         title: "From characters to a tiny model",
@@ -788,7 +790,7 @@ const MODULES = [
           "This is the honest version of how big models work. Bigger data and more dials, same core loop."
         ],
         analogy: "A child who has heard many names can make up a new one that sounds plausible without copying anyone. The model does the same with patterns.",
-        goDeeper: { text: ["Working at this scale, you can watch loss drop and samples improve in real time, which makes the abstract idea of learning concrete."], videos: [["Andrej Karpathy", "Let's build GPT from scratch, in code", "https://www.youtube.com/watch?v=kCc8FmEb1nY"]] }
+        goDeeper: { text: ["Working at this scale, you can watch loss drop and samples improve in real time, which makes the abstract idea of learning concrete."], videos: [["Andrej Karpathy", "Let's build GPT from scratch, in code", "https://www.youtube.com/watch?v=kCc8FmEb1nY", "~1h 56m"]] }
       }
     ],
     quiz: [
@@ -1997,7 +1999,7 @@ function renderLessonDoing(mi, li){
       <button class="gd-head" id="gd-head">🎬 Go deeper, when you want it<span class="chev">▶</span></button>
       <div class="gd-body">
         ${gd.text.map(p=>`<p>${p}</p>`).join("")}
-        ${gd.videos.map(v=>`<a class="vid" href="${v[2]}" target="_blank" rel="noopener"><span class="pl">▶</span><span>${esc(v[1])}<small>${esc(v[0])}</small></span></a>`).join("")}
+        ${gd.videos.map(v=>`<a class="vid" href="${v[2]}" target="_blank" rel="noopener"><span class="pl">▶</span><span class="vid-meta">${esc(v[1])}<small>YouTube · ${esc(v[0])}${v[3] ? " · " + esc(v[3]) : ""}</small></span><span class="vid-go">Watch ↗</span></a>`).join("")}
       </div>
     </div>` : "";
   setScreen(`
