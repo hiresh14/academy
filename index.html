@@ -1048,6 +1048,389 @@ const MODULES = [
       steps: "Build a daily-work system for {{SPINE}}. (1) Put an AI note-taker on your next real meeting and get the action items. (2) Connect it so those items land in your task tool automatically. (3) Pick one weekly chore and build a custom assistant (Custom GPT, Claude Project, or Gemini Gem) that does it your way, tested on three real cases. You can now run your week with AI handling the busywork."
     }
   }
+,
+  {
+    id: "m5", emoji: "🌐", tier: "Websites & Landing Pages", build: true,
+    title: "Websites and Landing Pages",
+    desc: "Design and ship real sites yourself, no developer, just you and AI",
+    bridge: "A live link people can open is the most convincing thing you can make.",
+    lessons: [
+      {
+        title: "Why AI sites look generic", ic: "🎭",
+        seed: "Type \"make me a website\" and you get a bland, templated page. The fix is not a better tool, it is better input.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "Two people use the same AI site builder. One gets a stunning page, one gets a generic one. The difference is usually:",
+          options: ["The first paid more", "The first gave references and clear taste, the second said \"make a website\""],
+          a: 1,
+          good: "Right. The model defaults to the average of the web unless you show it what good looks like for you.",
+          bad: "It is the input. With references and clear taste it makes something sharp; with \"make a website\" it gives the average."
+        },
+        idea: [
+          "AI builders generate from the most likely pattern, which is generic. What pulls a page out of generic is <strong>taste and references</strong>: showing the model specific sites you admire and what you like about them.",
+          "Design is a skill you can learn fast, and it matters more than the tool you pick.",
+          "<strong>How it breaks:</strong> judging the tool by a one-line prompt. The tool is fine, the brief was empty."
+        ],
+        analogy: "Briefing an architect with \"build me a house\" versus showing three homes you love and pointing at what works.",
+        goDeeper: { text: ["This is the same lesson as image prompting: show, do not just tell. References are your fastest path to a non-generic result."], videos: [] }
+      },
+      {
+        title: "Steal like a designer", ic: "🧲",
+        seed: "Great design starts by collecting references and naming exactly what you like about each one.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "Best way to get a layout you will actually love?",
+          options: ["Describe it in adjectives like \"clean and modern\"", "Collect 3 to 5 real sites you admire and tell the AI what you like in each"],
+          a: 1,
+          good: "Right. Concrete references plus what you like beats vague adjectives every time. Mobbin and Dribbble are goldmines.",
+          bad: "Collect real references and point at what works. \"Clean and modern\" means nothing; a screenshot plus a reason means everything."
+        },
+        idea: [
+          "Pull 3 to 5 references (Mobbin for real app and web screens, Dribbble for visual ideas) and for each, note the one thing you want: this hero layout, that type, this spacing.",
+          "Hand those to your builder as the brief. You are directing, not hoping.",
+          "<strong>How it breaks:</strong> copying one site wholesale (it shows) or giving adjectives instead of examples (it drifts generic)."
+        ],
+        analogy: "A mood board before a photo shoot. You gather the look first, then shoot to match it.",
+        goDeeper: { text: ["Reference well and you also learn faster, because you start seeing why good pages work: hierarchy, restraint, rhythm."], videos: [] }
+      },
+      {
+        title: "What makes design good", ic: "🎨",
+        seed: "A few fundamentals do most of the work: clear hierarchy, generous spacing, one accent color, consistent type.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "Which change most improves a cluttered page?",
+          options: ["Add more colors and fonts to make it lively", "Clear hierarchy, more whitespace, and one accent color"],
+          a: 1,
+          good: "Right. Restraint reads as premium. Hierarchy, space, and a single accent beat a rainbow every time.",
+          bad: "Restraint wins: clear hierarchy, whitespace, one accent. More colors and fonts make it look amateur, not lively."
+        },
+        idea: [
+          "<strong>Hierarchy</strong> (what the eye sees first, second, third), <strong>whitespace</strong> (room to breathe), one <strong>accent color</strong>, and one or two fonts. That is 80 percent of looking professional.",
+          "When you review an AI-made page, judge it against these, then ask for specific fixes.",
+          "<strong>How it breaks:</strong> trying to make it lively with more colors and fonts. Visual noise reads as amateur; restraint reads as premium."
+        ],
+        analogy: "A well-set table: a few good pieces with space around them, not every dish you own crammed on at once.",
+        goDeeper: { text: ["Give the model your rules: \"one accent color, lots of whitespace, large headline, one clear button.\" Specific constraints produce specific taste."], videos: [] }
+      },
+      {
+        title: "Site or app?", ic: "🧩",
+        seed: "A landing page shows information. An app remembers users and data. Knowing which you need decides how you build.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "You want a page where visitors leave their email for a waitlist. That needs:",
+          options: ["Just a static page", "A page plus somewhere to store the emails (a backend)"],
+          a: 1,
+          good: "Right. The moment you collect or remember data, you need a backend. A pure brochure page does not.",
+          bad: "It needs a backend to store the emails. A static page shows info; the moment you collect data, you need storage."
+        },
+        idea: [
+          "A <strong>static site</strong> is a brochure: it shows content. An <strong>app</strong> has logins, saved data, and logic behind it. Most marketing pages are static plus one form.",
+          "You can build both yourself. Knowing which one you need tells you whether to add a database (you will, for forms and accounts).",
+          "<strong>How it breaks:</strong> trying to fake data features in a static page, or over-building an app when a one-page site would do."
+        ],
+        analogy: "A poster on a wall versus a shop with a till and a customer list. Different needs, different build.",
+        goDeeper: { text: ["When you need data, Supabase gives you a database, accounts, and storage without running servers, all wired into your AI-built front end."], videos: [] }
+      },
+      {
+        title: "The vibe-coding loop", ic: "🌀",
+        seed: "Building with AI is a loop: describe what you want, look at what it made, and refine in small steps.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "Fastest way to build a real page in Lovable, v0, or Bolt without getting lost?",
+          options: ["One giant prompt describing the whole site", "Small steps: one section, review, refine, then the next"],
+          a: 1,
+          good: "Right. Build and review in small chunks. Big-bang prompts produce a mess you cannot debug.",
+          bad: "Small steps win. Build one section, look, refine, move on. One giant prompt gives a tangle you cannot fix."
+        },
+        idea: [
+          "Tools like <strong>Lovable, v0, Bolt, and Cursor</strong> turn plain English into a working site or app. The skill is the loop: describe a piece, review it, give a precise fix, repeat.",
+          "When something breaks, read the error out loud and paste it back to the AI with what you expected. You fix it yourself, you do not hand it off.",
+          "<strong>How it breaks:</strong> a giant all-at-once prompt, then no idea why it broke. Small steps keep you in control and able to debug."
+        ],
+        analogy: "Sculpting, not casting. You shape a bit, step back, shape the next bit, instead of pouring the whole statue at once.",
+        goDeeper: { text: ["Commit your work to GitHub as you go (a checkpoint you can roll back to). It is your safety net so a bad change never loses your progress."], videos: [] }
+      },
+      {
+        title: "Copy that converts", ic: "✍️",
+        seed: "A landing page lives or dies on its words: a clear headline, one promise, one call to action.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "Which landing-page headline performs better?",
+          options: ["A clever pun about your brand", "A clear line saying exactly what the visitor gets"],
+          a: 1,
+          good: "Right. Clarity beats clever. Say the benefit plainly, then give one obvious next step.",
+          bad: "Clarity wins. A clear benefit beats a clever pun, and one clear call to action beats five competing buttons."
+        },
+        idea: [
+          "Lead with the benefit in plain words, support it with how it works, and give <strong>one</strong> clear call to action. Frameworks like problem-agitate-solution help you order it.",
+          "Write the copy before you obsess over visuals; the words carry the page.",
+          "<strong>How it breaks:</strong> clever-but-vague headlines and five competing buttons. Confused visitors do nothing."
+        ],
+        analogy: "A good shop sign says what is inside and points at the door, it does not make you decode a riddle.",
+        goDeeper: { text: ["Use AI to generate ten headline options and three CTA variants, then pick. Quantity to choose from beats agonizing over one."], videos: [] }
+      },
+      {
+        title: "Motion with restraint", ic: "✨",
+        seed: "A little purposeful motion feels premium. Animation everywhere feels like a toy.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "You want an immersive, high-end feel. Best approach to animation?",
+          options: ["Animate everything that moves", "A few purposeful effects: a smooth scroll reveal, one tasteful hero motion"],
+          a: 1,
+          good: "Right. Restraint reads as premium. A couple of well-timed effects beat a page that never sits still.",
+          bad: "Purposeful and few. One smooth scroll reveal and a tasteful hero beat a page where everything wiggles."
+        },
+        idea: [
+          "Named effects to ask for: scroll-reveal (content fades in as you scroll), parallax (layers move at different speeds), and subtle hover states. Tools like Framer, plus GSAP or Lottie, do this well.",
+          "Motion should guide attention, not compete for it.",
+          "<strong>How it breaks:</strong> animating everything. It buries the message and tanks load speed. Pick two effects that earn their place."
+        ],
+        analogy: "Seasoning a dish. A pinch lifts it; dumping the whole jar ruins it.",
+        goDeeper: { text: ["For a truly immersive site, Framer handles scroll-driven motion without code, and Spline adds interactive 3D. Add them after the page works, not before."], videos: [] }
+      },
+      {
+        title: "Wire the form", ic: "📨",
+        seed: "A contact or signup form is only useful if the submissions go somewhere and someone gets told.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "A visitor submits your waitlist form. For it to be useful, the data must:",
+          options: ["Just show a thank-you message", "Get stored somewhere and ideally notify you"],
+          a: 1,
+          good: "Right. Collect to a store (a database or sheet) and send yourself a notification. A thank-you alone loses the lead.",
+          bad: "It must be stored and ideally notify you. A thank-you message with no saved data loses every lead."
+        },
+        idea: [
+          "Connect the form to a store: a <strong>Supabase</strong> table, a Google Sheet, or a form service, and add a notification (email or Slack) so you act on it.",
+          "This is your first real data flow: submit, store, notify. The same pattern powers every app you will build.",
+          "<strong>How it breaks:</strong> a pretty form that goes nowhere. Test it by submitting once and checking the data actually landed."
+        ],
+        analogy: "A suggestion box bolted shut. Looks the part, but nothing you drop in is ever read.",
+        goDeeper: { text: ["Supabase gives you the table plus a dashboard to see entries, and connects to your AI-built front end with a few lines the builder writes for you."], videos: [] }
+      },
+      {
+        title: "Ship it live", ic: "🚀",
+        seed: "A site on your laptop helps no one. Deploying puts it on a real link anyone can open.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "How does the world actually reach your site?",
+          options: ["You email them the files", "You deploy it to a host, which gives you a public URL"],
+          a: 1,
+          good: "Right. Deploy to a host (Vercel, Netlify) for a live URL, then point a custom domain at it when ready.",
+          bad: "You deploy it to a host, which serves it at a public URL. Then a custom domain makes it yours."
+        },
+        idea: [
+          "<strong>Deploying</strong> publishes your site to a host so it has a public address. Vibe-coding tools deploy in one click, or push to <strong>Vercel</strong> or <strong>Netlify</strong>. Add a custom domain when you are ready.",
+          "Once deployed, every future change can redeploy automatically, so updates go live in seconds.",
+          "<strong>How it breaks:</strong> perfecting forever on your laptop. Ship the rough version, get it in front of people, then improve."
+        ],
+        analogy: "Opening the shop doors. The fit-out can keep improving, but customers can only come in once you are open.",
+        goDeeper: { text: ["Connect the host to your GitHub and every commit auto-deploys. That is the professional loop: change, save, push, live."], videos: [] }
+      }
+    ],
+    quiz: [
+      { q: "Why do AI-built sites often look generic?", options: ["The tools are bad", "The brief was empty; no references or taste were given", "AI cannot design", "They need code"], a: 1, why: "The model defaults to the average of the web unless you show it what good looks like." },
+      { q: "Best way to get a great-looking layout?", options: ["Describe it in adjectives", "Collect real references and say what you like in each", "Use more colors", "Pick a random template"], a: 1, why: "Concrete references plus reasons beat vague adjectives." },
+      { q: "Which most improves a cluttered page?", options: ["More colors and fonts", "Hierarchy, whitespace, and one accent color", "Bigger logo", "More text"], a: 1, why: "Restraint reads as premium; visual noise reads as amateur." },
+      { q: "A waitlist form needs...", options: ["Only a thank-you message", "Somewhere to store the emails and ideally a notification", "A bigger button", "Nothing extra"], a: 1, why: "The moment you collect data you need a place to store it, or you lose the lead." },
+      { q: "Fastest way to build without getting lost?", options: ["One giant prompt", "Small steps: section, review, refine, repeat", "Copy a finished site", "Avoid AI tools"], a: 1, why: "Small reviewable steps keep you in control and able to debug." },
+      { q: "To make your site reachable you...", options: ["Email the files", "Deploy it to a host for a public URL", "Keep it on your laptop", "Print it"], a: 1, why: "Deploying publishes it to a live address; a custom domain makes it yours." }
+    ],
+    assignment: {
+      title: "Design and ship a landing page", xp: 150,
+      steps: "Build a real one-page site for {{SPINE}}, entirely yourself. (1) Collect 3 references and note what you like. (2) Write the copy first: a clear headline, the offer, one call to action. (3) Build it in Lovable, v0, or Bolt in small steps, applying hierarchy, whitespace, and one accent. (4) Wire a signup form to a store. (5) Deploy it to a live URL. Stretch: add one tasteful scroll animation. You can now design and ship a site on your own."
+    }
+  },
+  {
+    id: "m6", emoji: "📣", tier: "Marketing & Content", build: true,
+    title: "Marketing and Content",
+    desc: "Make scroll-stopping content and ads with AI, from copy to video",
+    bridge: "Making it is half the job. Getting it seen is the other half.",
+    lessons: [
+      {
+        title: "Brand voice first", ic: "🗣️",
+        seed: "Before you make anything, define how your brand sounds. Then every piece comes out consistent.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "You will generate a lot of content. The highest-leverage first step is:",
+          options: ["Pick the trendiest AI tool", "Write a short brand-voice spec the AI can follow every time"],
+          a: 1,
+          good: "Right. A reusable voice spec (tone, words you use, words you avoid, an example) keeps everything sounding like you.",
+          bad: "Write the brand-voice spec first. Tone, words to use and avoid, one example. It keeps every piece on-brand."
+        },
+        idea: [
+          "A <strong>brand-voice spec</strong> is a few lines: who you sound like, the tone, words you use, words you ban, and one sample. Paste it into any tool and output stops sounding generic.",
+          "Voice is the thread that makes a pile of AI content feel like one brand.",
+          "<strong>How it breaks:</strong> generating content with no voice defined. It comes out as the bland AI average, and audiences feel it."
+        ],
+        analogy: "A style guide for a magazine. Many writers, one recognizable voice, because the guide came first.",
+        goDeeper: { text: ["Claude, ChatGPT, and Gemini all hold a pasted voice spec well. Save it once and reuse it across copy, captions, scripts, and emails."], videos: [] }
+      },
+      {
+        title: "Hooks and headlines", ic: "🪝",
+        seed: "The first line decides whether anyone reads the rest. Hooks are a skill you can drill.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "What most determines whether a post or ad gets watched?",
+          options: ["The production quality", "The hook, the first second or first line"],
+          a: 1,
+          good: "Right. The hook wins or loses attention instantly. Generate many, pick the sharpest, and test.",
+          bad: "The hook. The first line or first second decides if anyone stays. Write lots, test, keep the winners."
+        },
+        idea: [
+          "A <strong>hook</strong> is the opening that stops the scroll: a bold claim, a question, a pattern break. Use AI to generate twenty and keep the three sharpest.",
+          "Hooks are testable. Run a few against each other and let attention decide.",
+          "<strong>How it breaks:</strong> a great piece behind a weak opening. If the hook fails, nothing after it matters."
+        ],
+        analogy: "A shop window. People walk past in a second; the window decides if they stop.",
+        goDeeper: { text: ["A reusable structure: one strong body, several swappable hooks. Produce one core asset, then test many openings cheaply."], videos: [] }
+      },
+      {
+        title: "Static ad creatives", ic: "🖼️",
+        seed: "AI can generate gorgeous ad images. There is one rule that separates pro from amateur output.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "Should you let the image model render your logo and headline text directly into the image?",
+          options: ["Yes, ask it to add the logo and text", "No, generate the scene, then composite a real logo and clean text on top"],
+          a: 1,
+          good: "Right. Image models mangle logos and text. Generate the scene, then layer your real logo and typed headline.",
+          bad: "Generate the scene, then composite real logo and text. Models garble logos and letters; never let them render those."
+        },
+        idea: [
+          "Tools like <strong>Nano Banana, Midjourney, and Ideogram</strong> make stunning scenes. But they distort logos and often misspell text. The <strong>composite rule</strong>: generate the visual, then add your real logo and headline in Canva.",
+          "This one habit is the difference between a believable ad and an obvious AI one.",
+          "<strong>How it breaks:</strong> letting the model write your headline. You get warped letters and a fake-looking logo that kills trust."
+        ],
+        analogy: "Photograph the set, then add the title card in the edit. You would never let the camera scribble the logo.",
+        goDeeper: { text: ["Ideogram and Nano Banana Pro handle short text better than older models, but for brand-critical logos and headlines, composite real assets every time."], videos: [] }
+      },
+      {
+        title: "Video ads, the smart way", ic: "🎬",
+        seed: "AI video is real now, but the on-brand way is to animate a still you control, not roll the dice on text-to-video.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "You want a 15-second product video that matches your brand. Best approach?",
+          options: ["Type a paragraph and hope the model invents the whole scene", "Make a controlled product image first, then animate it (image-to-video)"],
+          a: 1,
+          good: "Right. Image-to-video keeps it on-brand: you fix the look in a still, then bring it to life.",
+          bad: "Image-to-video. Lock the look in a still you control, then animate it. Pure text-to-video drifts off-brand."
+        },
+        idea: [
+          "Models like <strong>Veo, Kling, and Runway</strong> turn text or images into short clips. The reliable path: create a controlled keyframe image, then animate it, and stitch a few clips into a 15 to 30 second ad.",
+          "Storyboard first, generate clips, then assemble and caption (CapCut, Captions).",
+          "<strong>How it breaks:</strong> expecting one prompt to produce a finished multi-shot ad. Models give you clips; you direct and edit them into an ad."
+        ],
+        analogy: "A director shoots controlled shots and edits them together. They do not film one continuous lucky take.",
+        goDeeper: { text: ["Veo can generate synced audio with the video; otherwise add a voiceover. Tools change fast, so anchor on the skill: storyboard, controlled keyframes, edit."], videos: [] }
+      },
+      {
+        title: "UGC ads at scale", ic: "🤳",
+        seed: "Creator-style talking-to-camera ads are the workhorse of paid social, and AI can produce them in volume.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "You want to test which ad angle wins, cheaply. Best move?",
+          options: ["Film one polished brand video", "Generate one script as many AI-actor variants and test them"],
+          a: 1,
+          good: "Right. AI UGC tools spin one script into many actor and hook variants, perfect for cheap ad testing.",
+          bad: "Generate many variants from one script and test. AI UGC tools are built for cheap, high-volume ad testing."
+        },
+        idea: [
+          "Tools like <strong>Arcads, Creatify, and Captions</strong> generate creator-style ads with AI actors. Write one first-person script (hook, problem, product, call to action) and spin many variants for testing.",
+          "Think in batches: one script, many openings and actors, let performance pick the winner.",
+          "<strong>How it breaks:</strong> AI UGC can feel slightly uncanny for trust-building brand content. It is great for direct-response testing, weaker for deep brand trust. Know which job you are doing."
+        ],
+        analogy: "A casting call where you can run the same lines past twenty actors overnight and keep the best takes.",
+        goDeeper: { text: ["The first-person hook-led script structure is what makes UGC work. Keep the body fixed and swap the opening hook to test angles."], videos: [] }
+      },
+      {
+        title: "Clone yourself", ic: "🧬",
+        seed: "You can create an AI version of yourself that speaks in your voice, so you scale your presence without filming daily.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "To make a talking-head video of yourself without recording each time, you need:",
+          options: ["A better camera", "An AI avatar trained on your footage, plus a voice clone"],
+          a: 1,
+          good: "Right. A short recording becomes an avatar, and a voice clone makes it sound like you. Then you script and generate.",
+          bad: "An AI avatar from your footage plus a voice clone. Record once, then generate talking-head videos from a script."
+        },
+        idea: [
+          "Tools like <strong>HeyGen</strong> and <strong>Argil</strong> turn a short recording into an avatar that speaks any script, and <strong>ElevenLabs</strong> clones your voice. Together: your face and voice, scaled.",
+          "Record clean source once (good light, clear audio), then publish from a script.",
+          "<strong>How it breaks:</strong> treating a clone as a way to fake events you did not do. It is for scaling your real presence; be honest about it."
+        ],
+        analogy: "A stunt double for your content: it handles the repetitive takes so you do not have to be on camera every day.",
+        goDeeper: { text: ["Good source footage is everything: even lighting, neutral framing, clean audio. Garbage in, uncanny out."], videos: [] }
+      },
+      {
+        title: "AI influencer (consistency)", ic: "🪞",
+        seed: "You can build a consistent AI character that posts across a feed. The whole challenge is keeping it looking the same.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "The hard part of running an AI character across many posts is:",
+          options: ["Writing captions", "Keeping the same face and look consistent across every image and video"],
+          a: 1,
+          good: "Right. Consistency is the game. Lock a master reference and anchor every new image to it.",
+          bad: "Consistency. The face and style must match across posts. You anchor everything to one master reference."
+        },
+        idea: [
+          "Make one master reference image, then anchor every new scene to it (tools like <strong>Higgsfield</strong> with character-consistency, or a trained <strong>LoRA</strong> for the most reliable identity).",
+          "Once the character is consistent, animate it and give it a synthetic voice for video.",
+          "<strong>How it breaks:</strong> the face drifts between posts and the illusion collapses. Reference the master every time, and fix drift early."
+        ],
+        analogy: "Casting one actor for a series. If the face changed every episode, no one would believe the character.",
+        goDeeper: { text: ["A consistent character feed is genuinely achievable in 2026. The honest part: it is real work, not passive income, despite what the hype says."], videos: [] }
+      },
+      {
+        title: "Repurpose long to short", ic: "♻️",
+        seed: "One long video can feed a week of content if you clip and reshape it instead of making everything from scratch.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "You recorded one 30-minute talk. Smartest way to get a week of posts?",
+          options: ["Record new content for each platform", "Clip the best moments into shorts, a carousel, and a thumbnail"],
+          a: 1,
+          good: "Right. One source, many formats. AI clippers find the strong moments and cut vertical shorts with captions.",
+          bad: "Repurpose the one source into shorts, a carousel, and a thumbnail. Making everything fresh each time is wasted effort."
+        },
+        idea: [
+          "Tools like <strong>Opus Clip</strong> find the strong moments in a long video and cut captioned vertical shorts. Pair with a carousel and a thumbnail to cover a week from one recording.",
+          "Create once, distribute many. That is how solo creators keep up.",
+          "<strong>How it breaks:</strong> trying to produce original content for every platform every day. It burns you out; repurposing is the sustainable engine."
+        ],
+        analogy: "Cooking one big pot and plating it several ways, instead of a new recipe for every meal.",
+        goDeeper: { text: ["Hook detection matters here too: the clipper picks moments, but you still choose the opening line that makes each short stop the scroll."], videos: [] }
+      },
+      {
+        title: "Distribution beats production", ic: "📡",
+        seed: "A great ad nobody sees does nothing. Where and how it runs matters as much as how it looks.",
+        exercise: {
+          type: "pick", intro: "Predict.",
+          q: "You made a beautiful ad. What decides whether it works?",
+          options: ["The visual polish alone", "A plan for where it runs, who sees it, and what you test"],
+          a: 1,
+          good: "Right. Distribution is half the job: placement, audience, and testing decide results, not polish alone.",
+          bad: "The distribution plan. Where it runs, who sees it, and what you test decide results. Polish alone does nothing."
+        },
+        idea: [
+          "Decide the channel, the audience, and what you are testing before you hit publish. Run variants, read what wins, double down.",
+          "A new layer in 2026 is showing up inside AI answers themselves (generative engine optimization), alongside classic SEO and social.",
+          "<strong>How it breaks:</strong> pouring all effort into production and none into distribution. The best creative still needs a plan to be seen."
+        ],
+        analogy: "A brilliant billboard in a desert. The art is fine; the location is the problem.",
+        goDeeper: { text: ["Use the one-body, many-hooks model to feed testing: produce a core asset, run many openings, and let the data, not your taste, pick the winner."], videos: [] }
+      }
+    ],
+    quiz: [
+      { q: "The highest-leverage first step in content?", options: ["Pick a trendy tool", "Write a reusable brand-voice spec", "Buy ads", "Post daily"], a: 1, why: "A voice spec keeps everything consistent and on-brand across every tool." },
+      { q: "What most decides if content gets watched?", options: ["Production budget", "The hook, the first line or second", "The hashtag", "The length"], a: 1, why: "The opening wins or loses attention instantly; test many hooks." },
+      { q: "Should an image model render your logo and headline?", options: ["Yes", "No, composite real logo and text on top of the generated scene"], a: 1, why: "Models garble logos and text; generate the scene, add real assets." },
+      { q: "Most on-brand way to make a video ad?", options: ["One text prompt for the whole scene", "Animate a controlled keyframe image (image-to-video)"], a: 1, why: "Lock the look in a still you control, then animate it." },
+      { q: "The hard part of an AI influencer is...", options: ["Writing captions", "Keeping the character consistent across posts"], a: 1, why: "Anchor every image to a master reference to hold identity." },
+      { q: "A beautiful ad works only if...", options: ["It is polished enough", "It has a distribution plan: channel, audience, testing"], a: 1, why: "Distribution is half the job; unseen creative does nothing." }
+    ],
+    assignment: {
+      title: "Run a mini campaign", xp: 150,
+      steps: "Produce a small campaign for {{SPINE}}. (1) Write a brand-voice spec. (2) Write a copy set: one body and three hooks. (3) Make one static ad (generate the scene, composite your real logo and headline). (4) Make one 15 to 30 second video ad from a controlled keyframe. (5) Repurpose it into one short and one carousel, and write a one-line distribution plan: where it runs and what you will test. You can now take an idea to a testable set of creative, solo."
+    }
+  }
 
 ];
 
