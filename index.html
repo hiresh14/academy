@@ -1601,23 +1601,34 @@ async function loadRemote(){
     }
   } catch(e){}
 }
-function route(){ if (!profile) renderIntro(); else renderHome(); }
+function route(){
+  // Not signed in (Supabase on): start with onboarding, ask for email only at the end.
+  if (SB && !authUser){
+    if (profile) renderSignIn();   // finished onboarding, now save via email
+    else renderIntro();            // brand new: go learn the flow first
+    return;
+  }
+  // Signed in, or running on localStorage only.
+  if (!profile) renderIntro();
+  else if (localStorage.getItem("aicademy_welcome") === "1"){ localStorage.removeItem("aicademy_welcome"); renderWelcome(); }
+  else renderHome();
+}
 async function initAuth(){
   app.innerHTML = `<div class="ob-wrap"><div class="logo-line" style="justify-content:center;"><span class="mark">A</span>AIcademy</div><p class="muted" style="text-align:center;margin-top:22px;font-weight:500;">Loading...</p></div>`;
   SB.auth.onAuthStateChange((event, session) => {
     if (event === "SIGNED_IN" && session){ authUser = session.user; loadRemote().then(route); }
-    else if (event === "SIGNED_OUT"){ authUser = null; renderSignIn(); }
+    else if (event === "SIGNED_OUT"){ authUser = null; route(); }
   });
   const { data: { session } } = await SB.auth.getSession();
   if (session){ authUser = session.user; await loadRemote(); route(); }
-  else { renderSignIn(); }
+  else { route(); }
 }
 function renderSignIn(){
   app.innerHTML = `<div class="ob-wrap">
     <div class="logo-line"><span class="mark">A</span>AIcademy</div>
     <div class="screen no-tabs" style="padding:0;flex:none;">
-      <div class="ob-q">Save your progress</div>
-      <div class="ob-sub">Enter your email and we will send a one tap sign in link. No password to remember, and your streak follows you to any device.</div>
+      <div class="ob-q">${profile && profile.name ? "Almost there, " + esc(profile.name) + "!" : "Save your progress"}</div>
+      <div class="ob-sub">Last step: enter your email and we will send a one tap sign in link. It saves everything you just set up and lets your streak follow you to any device. No password to remember.</div>
       <input type="email" id="sb-email" placeholder="you@email.com" autocomplete="email">
       <div style="height:14px"></div>
       <button class="btn btn-primary" id="sb-go" disabled>Send my link</button>
@@ -1863,8 +1874,14 @@ function advance(val){
 }
 function obProceed(){
   obStep++;
-  if (obStep < OB_QUESTIONS.length) renderOnboarding();
-  else { profile = obAnswers; save(); renderWelcome(); }
+  if (obStep < OB_QUESTIONS.length){ renderOnboarding(); return; }
+  profile = obAnswers; save();
+  if (SB && !authUser){
+    localStorage.setItem("aicademy_welcome", "1"); // show the welcome after they return signed in
+    renderSignIn();                                 // capture email at the end to save progress
+  } else {
+    renderWelcome();
+  }
 }
 function renderAffirm(a, onContinue){
   app.innerHTML = `<div class="ob-wrap"><div class="celebrate" style="padding:48px 10px;">
