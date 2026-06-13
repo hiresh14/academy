@@ -176,6 +176,11 @@
   .lvl-ic.dim{opacity:.4;}
   .fadein{animation:fade .4s ease both;}
   @keyframes fade{from{opacity:0;}to{opacity:1;}}
+  .confetti-wrap{position:fixed;inset:0;pointer-events:none;z-index:300;overflow:hidden;}
+  .confetti{position:absolute;top:-16px;width:9px;height:14px;border-radius:2px;animation:fall 1.3s ease-in forwards;}
+  @keyframes fall{to{transform:translateY(105vh) rotate(540deg);opacity:0;}}
+  .toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);z-index:310;background:var(--navy);color:#fff;font-weight:800;font-size:14.5px;padding:11px 18px;border-radius:999px;box-shadow:0 6px 20px rgba(10,22,51,.25);animation:toastIn .25s ease both;}
+  @keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(10px);}to{opacity:1;transform:translateX(-50%) translateY(0);}}
 
   /* ---------- module detail ---------- */
   .item-row{
@@ -1590,7 +1595,8 @@ let S = JSON.parse(localStorage.getItem(LS_STATE) || "null") || {
   quizDone: {},    // "m1": score
   quizAwarded: {}, // "m1_2": true (XP given for this question)
   assignDone: {},  // "m1": true
-  chests: {}       // "m1": true (unit reward claimed)
+  chests: {},      // "m1": true (unit reward claimed)
+  todayXP: 0, todayDate: null, freezes: 1
 };
 
 function save(){ localStorage.setItem(LS_STATE, JSON.stringify(S)); if(profile) localStorage.setItem(LS_PROFILE, JSON.stringify(profile)); syncRemote(); }
@@ -1688,15 +1694,51 @@ function renderCheckEmail(email){
   document.getElementById("sb-again").onclick = renderSignIn;
 }
 function todayStr(){ const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function dateNAgo(n){ const d=new Date(); d.setDate(d.getDate()-n); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
 function touchStreak(){
   const t = todayStr();
   if (S.lastActive === t){ if (S.streak < 1) S.streak = 1; return; }
-  const y = new Date(); y.setDate(y.getDate()-1);
-  const yStr = y.getFullYear()+"-"+String(y.getMonth()+1).padStart(2,"0")+"-"+String(y.getDate()).padStart(2,"0");
-  S.streak = (S.lastActive === yStr) ? S.streak + 1 : 1;
+  if (S.lastActive === dateNAgo(1)){ S.streak = (S.streak||0) + 1; }
+  else if (S.lastActive === dateNAgo(2) && (S.freezes||0) > 0){ S.freezes--; S.streak = (S.streak||0) + 1; } // a streak freeze saved you
+  else { S.streak = 1; }
   S.lastActive = t;
 }
-function addXP(n){ touchStreak(); S.xp += n; save(); }
+function dailyGoalXP(){ return ({habit:20,weekend:20,serious:50,immersive:100})[profile && profile.minutes] || 30; }
+function addXP(n){
+  touchStreak();
+  const t = todayStr();
+  if (S.todayDate !== t){ S.todayDate = t; S.todayXP = 0; }
+  const before = S.todayXP || 0;
+  S.todayXP = before + n;
+  S.xp += n;
+  save();
+  const goal = dailyGoalXP();
+  if (before < goal && S.todayXP >= goal && S.goalDate !== t){ S.goalDate = t; save(); setTimeout(()=>{ burstConfetti(); toast("Daily goal hit! 🎯"); }, 250); }
+  const M = [3,7,14,30,50,100];
+  if (M.indexOf(S.streak) >= 0 && S.streakHit !== S.streak){ S.streakHit = S.streak; save(); setTimeout(()=>{ burstConfetti(); toast("🔥 " + S.streak + " day streak!"); }, 450); }
+  if (S.streak > 0 && S.streak % 7 === 0 && (S.freezes||0) < 2 && S.freezeAt !== S.streak){ S.freezeAt = S.streak; S.freezes = (S.freezes||0) + 1; save(); }
+}
+function burstConfetti(){
+  const w = document.createElement("div"); w.className = "confetti-wrap";
+  const cols = ["#1a6aff","#f5b800","#2bb673","#e84e4e","#6b4fd4"];
+  for (let i=0;i<30;i++){ const p = document.createElement("i"); p.className="confetti"; p.style.left=(Math.random()*100)+"%"; p.style.background=cols[i%cols.length]; p.style.animationDelay=(Math.random()*0.25)+"s"; p.style.animationDuration=(1+Math.random()*0.6)+"s"; w.appendChild(p); }
+  document.body.appendChild(w); setTimeout(()=>w.remove(), 1900);
+}
+function toast(msg){
+  const el = document.createElement("div"); el.className="toast"; el.textContent=msg;
+  document.body.appendChild(el); setTimeout(()=>el.remove(), 1700);
+}
+function dailyRing(){
+  const goal = dailyGoalXP(), cur = Math.min(S.todayXP||0, goal), frac = goal ? cur/goal : 0, met = cur >= goal;
+  const r = 24, c = 2*Math.PI*r;
+  return `<div style="position:relative;width:58px;height:58px;flex:none;">
+    <svg width="58" height="58" style="transform:rotate(-90deg);">
+      <circle cx="29" cy="29" r="${r}" fill="none" stroke="var(--border)" stroke-width="6"></circle>
+      <circle cx="29" cy="29" r="${r}" fill="none" stroke="${met?'var(--green)':'var(--gold)'}" stroke-width="6" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c*(1-frac)}"></circle>
+    </svg>
+    <span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:21px;">${met?'✅':'🔥'}</span>
+  </div>`;
+}
 function displayStreak(){
   if (!S.lastActive) return 0;
   const t = todayStr();
@@ -2026,10 +2068,11 @@ function renderHome(){
       ${displayStreak() > 1 ? ` You're on a <b>${displayStreak()}-day streak</b> 🔥` : ""}</div>
     ${profile.spine ? `<div class="spine-line">🔨 Building: <b>${esc(profile.spine)}</b></div>` : ""}
     <div class="card" style="display:flex;align-items:center;gap:14px;margin-bottom:22px;background:var(--surface);">
-      <div style="font-size:26px;">🏅</div>
+      ${dailyRing()}
       <div style="flex:1;">
-        <div style="font-weight:800;font-size:14px;margin-bottom:6px;">Level ${level()} · ${S.xp % 200}/200 XP to Level ${level()+1}</div>
-        <div class="pbar"><div style="width:${(S.xp % 200)/2}%"></div></div>
+        <div style="font-weight:800;font-size:14.5px;">🔥 ${displayStreak()} day streak${(S.freezes||0)>0?` <span style="color:var(--muted);font-weight:700;">· ❄️ ${S.freezes}</span>`:""}</div>
+        <div style="font-size:12.5px;color:var(--muted);font-weight:600;margin:3px 0 7px;">Today ${S.todayXP||0}/${dailyGoalXP()} XP · Level ${level()}</div>
+        <div class="pbar"><div style="width:${Math.min(100,(S.xp % 200)/2)}%"></div></div>
       </div>
     </div>
     <div class="trail">
@@ -2065,6 +2108,7 @@ function openChest(mi){
   if (S.chests[id]){ renderHome(); return; }
   S.chests[id] = true; addXP(25);
   setScreen(`<div class="celebrate"><div class="big">🎁</div><h2>Treasure unlocked!</h2><p>You finished <b>${esc(MODULES[mi].title)}</b>. Here's <b class="xp-float">+25 XP</b> to keep the streak fed.</p><button class="btn btn-primary" id="chest-go">Back to the path</button></div>`, {});
+  burstConfetti();
   document.getElementById("chest-go").onclick = renderHome;
 }
 function trailRing(frac){
@@ -2244,8 +2288,8 @@ function renderLessonDoing(mi, li){
   const gdHead = document.getElementById("gd-head");
   if (gdHead) gdHead.onclick = () => document.getElementById("gd").classList.toggle("open");
   document.getElementById("done-btn").onclick = () => {
-    if (!already){ S.lessons[m.id + "_" + li] = true; addXP(10); }
-    renderHome();
+    if (!already){ S.lessons[m.id + "_" + li] = true; addXP(10); renderHome(); burstConfetti(); toast("+10 XP ⭐"); }
+    else renderHome();
   };
 }
 
@@ -2377,6 +2421,7 @@ function finishQuiz(){
       <button class="btn btn-ghost" id="retake">Retake quiz</button>
     </div>
   `);
+  if (correctBase >= Math.ceil(baseTotal * 0.6)) setTimeout(burstConfetti, 150);
   document.getElementById("cont").onclick = () => renderHome();
   document.getElementById("retake").onclick = () => startQuiz(mi);
 }
@@ -2409,7 +2454,7 @@ function renderAssignment(mi){
     document.getElementById("mark").onclick = () => {
       S.assignDone[m.id] = true;
       addXP(xp);
-      renderAssignment(mi);
+      renderAssignment(mi); burstConfetti(); toast("+" + xp + " XP 🏆");
     };
   }
 }
