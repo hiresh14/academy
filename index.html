@@ -164,6 +164,9 @@
   .item-row p{font-size:12.5px;color:var(--muted);font-weight:500;margin-top:1px;}
   .item-row .tick{margin-left:auto;color:var(--gold-dark);font-weight:800;font-size:18px;flex:none;}
   .item-row .xp-tag{margin-left:auto;font-size:12px;font-weight:800;color:var(--blue);background:#e8f0ff;border-radius:999px;padding:3px 9px;flex:none;}
+  .item-row.locked{cursor:default;background:var(--surface);opacity:.8;}
+  .item-row.locked:active{transform:none;border-bottom-width:5px;}
+  .item-row.locked .ic{background:#e6e9f2;}
 
   /* ---------- lesson ---------- */
   .lesson-body{font-size:16.5px;line-height:1.65;font-weight:400;}
@@ -429,11 +432,11 @@ const MODULES = [
       }
     ],
     quiz: [
-      { q: "What does a language model fundamentally do?", options: ["Searches a database of stored answers", "Predicts the next token from everything so far", "Copies text from websites live", "Runs rules written by programmers"], a: 1 },
-      { q: "What is a token?", options: ["A payment for AI services", "A small chunk of text, like a word or piece of one", "A login key", "A type of chip"], a: 1 },
-      { q: "Which phase happens while you chat?", options: ["Training", "Inference", "Fine-tuning", "Data collection"], a: 1 },
-      { q: "Why does a model have a knowledge cutoff?", options: ["The company blocks recent news", "Its training data ended on a date and chatting adds no new knowledge", "It forgets old facts to save space", "Recent events are too controversial"], a: 1 },
-      { q: "Your assistant forgot an instruction from early in a long chat. Most likely why?", options: ["It retrained itself mid chat", "The instruction fell outside the context window", "Moderators deleted it", "Models ignore old instructions"], a: 1 }
+      { q: "What does a language model fundamentally do?", options: ["Searches a database of stored answers", "Predicts the next token from everything so far", "Copies text from websites live", "Runs rules written by programmers"], a: 1, why: "It predicts the next token over and over. No stored answers, no live web copying." },
+      { q: "What is a token?", options: ["A payment for AI services", "A small chunk of text, like a word or piece of one", "A login key", "A type of chip"], a: 1, why: "A token is a chunk of text, often a word or a piece of one. Models read and price by tokens." },
+      { q: "Which phase happens while you chat?", options: ["Training", "Inference", "Fine-tuning", "Data collection"], a: 1, why: "Chatting is inference: the trained model is frozen and just predicting for you." },
+      { q: "Why does a model have a knowledge cutoff?", options: ["The company blocks recent news", "Its training data ended on a date and chatting adds no new knowledge", "It forgets old facts to save space", "Recent events are too controversial"], a: 1, why: "Its training data stops on a date, and chatting adds no new knowledge." },
+      { q: "Your assistant forgot an instruction from early in a long chat. Most likely why?", options: ["It retrained itself mid chat", "The instruction fell outside the context window", "Moderators deleted it", "Models ignore old instructions"], a: 1, why: "The window has edges, so the oldest text scrolls out and the model stops seeing it." }
     ],
     assignment: {
       title: "Watch prediction happen", xp: 50,
@@ -502,10 +505,10 @@ const MODULES = [
       }
     ],
     quiz: [
-      { q: "Why do vague prompts give generic answers?", options: ["The model is lazy", "It predicts the most likely continuation, and vague text continues generically", "A filter blocks them", "Short prompts use a weaker model"], a: 1 },
-      { q: "Most reliable way to get a specific writing style?", options: ["Name the style in adjectives", "Paste two or three examples and ask it to match", "Use all caps", "Ask it to try harder"], a: 1 },
-      { q: "Structure is right, tone is wrong. Best move?", options: ["Start over from scratch", "Repeat the same prompt", "Say what is right and wrong, ask for a revision", "Switch AI brands"], a: 2 },
-      { q: "When is starting a fresh chat the smart move?", options: ["Never", "When a chat is stuck in circles and the context is full of failed tries", "After every single message", "Only when the app crashes"], a: 1 }
+      { q: "Why do vague prompts give generic answers?", options: ["The model is lazy", "It predicts the most likely continuation, and vague text continues generically", "A filter blocks them", "Short prompts use a weaker model"], a: 1, why: "Vague text has a generic most likely continuation, so that is what you get." },
+      { q: "Most reliable way to get a specific writing style?", options: ["Name the style in adjectives", "Paste two or three examples and ask it to match", "Use all caps", "Ask it to try harder"], a: 1, why: "Showing two or three real samples beats describing a style in words." },
+      { q: "Structure is right, tone is wrong. Best move?", options: ["Start over from scratch", "Repeat the same prompt", "Say what is right and wrong, ask for a revision", "Switch AI brands"], a: 2, why: "Steer it: keep what works, change what does not, in one follow up." },
+      { q: "When is starting a fresh chat the smart move?", options: ["Never", "When a chat is stuck in circles and the context is full of failed tries", "After every single message", "Only when the app crashes"], a: 1, why: "A clean restart beats fighting a context full of failed attempts." }
     ],
     assignment: {
       title: "The one brief upgrade", xp: 50,
@@ -574,10 +577,10 @@ const MODULES = [
       }
     ],
     quiz: [
-      { q: "A hallucination is...", options: ["A rare bug in old models", "A confident answer that is false, a side effect of predicting plausible text", "A type of prompt", "When the app crashes"], a: 1 },
-      { q: "The jagged frontier means...", options: ["AI is bad at everything", "Strong and weak spots sit side by side and are hard to predict", "AI only works on weekdays", "Bigger models have no weaknesses"], a: 1 },
-      { q: "Best defence against made up facts?", options: ["Ask more politely", "Give it real sources and verify what matters", "Use a longer prompt", "Trust longer answers more"], a: 1 },
-      { q: "Human in the loop means...", options: ["A person approves the consequential step", "The AI is fully responsible", "You watch it work all day", "No automation is allowed"], a: 0 }
+      { q: "A hallucination is...", options: ["A rare bug in old models", "A confident answer that is false, a side effect of predicting plausible text", "A type of prompt", "When the app crashes"], a: 1, why: "A confident but false answer, a side effect of predicting plausible text." },
+      { q: "The jagged frontier means...", options: ["AI is bad at everything", "Strong and weak spots sit side by side and are hard to predict", "AI only works on weekdays", "Bigger models have no weaknesses"], a: 1, why: "Skill is uneven and hard to predict, so test rather than assume." },
+      { q: "Best defence against made up facts?", options: ["Ask more politely", "Give it real sources and verify what matters", "Use a longer prompt", "Trust longer answers more"], a: 1, why: "Ground it in real sources and verify what matters." },
+      { q: "Human in the loop means...", options: ["A person approves the consequential step", "The AI is fully responsible", "You watch it work all day", "No automation is allowed"], a: 0, why: "The AI drafts; a person approves anything with real consequences." }
     ],
     assignment: {
       title: "Catch it, then ground it", xp: 50,
@@ -648,10 +651,10 @@ const MODULES = [
       }
     ],
     quiz: [
-      { q: "A model's parameters are...", options: ["Stored facts", "Adjustable numbers set during training", "User settings", "Safety rules"], a: 1 },
-      { q: "Loss measures...", options: ["File size", "How wrong the model's guess was", "Speed", "Token price"], a: 1 },
-      { q: "Gradient descent is...", options: ["Nudging the dials downhill to reduce error, over and over", "A type of prompt", "A cooling system for GPUs", "A pricing model"], a: 0 },
-      { q: "An embedding is...", options: ["A picture of a word", "A list of numbers capturing meaning, so similar text sits close", "A login token", "A database table"], a: 1 }
+      { q: "A model's parameters are...", options: ["Stored facts", "Adjustable numbers set during training", "User settings", "Safety rules"], a: 1, why: "Tunable numbers set during training, not stored facts." },
+      { q: "Loss measures...", options: ["File size", "How wrong the model's guess was", "Speed", "Token price"], a: 1, why: "The gap between the guess and the right answer, which training shrinks." },
+      { q: "Gradient descent is...", options: ["Nudging the dials downhill to reduce error, over and over", "A type of prompt", "A cooling system for GPUs", "A pricing model"], a: 0, why: "Nudging every dial a little to lower the error, repeated many times." },
+      { q: "An embedding is...", options: ["A picture of a word", "A list of numbers capturing meaning, so similar text sits close", "A login token", "A database table"], a: 1, why: "Meaning turned into numbers, so similar text sits close together." }
     ],
     assignment: {
       title: "See similarity in action", xp: 50,
@@ -720,10 +723,10 @@ const MODULES = [
       }
     ],
     quiz: [
-      { q: "Attention lets a model...", options: ["Run faster", "Weigh which earlier tokens matter most for the next guess", "Store more facts", "Skip training"], a: 1 },
-      { q: "A base model, before the assistant step, mostly...", options: ["Answers like a polite chatbot", "Continues text in a plausible way", "Refuses everything", "Searches the web"], a: 1 },
-      { q: "Why do models miscount letters?", options: ["They rush", "They see tokens, not individual letters", "Bad training data", "It is a myth"], a: 1 },
-      { q: "The assistant behavior comes from...", options: ["Pretraining alone", "A later step that tunes the base model on helpful examples and preferences", "The user's prompt only", "The context window"], a: 1 }
+      { q: "Attention lets a model...", options: ["Run faster", "Weigh which earlier tokens matter most for the next guess", "Store more facts", "Skip training"], a: 1, why: "Weigh which earlier words matter most for the next guess." },
+      { q: "A base model, before the assistant step, mostly...", options: ["Answers like a polite chatbot", "Continues text in a plausible way", "Refuses everything", "Searches the web"], a: 1, why: "Just continues text, with no manners yet." },
+      { q: "Why do models miscount letters?", options: ["They rush", "They see tokens, not individual letters", "Bad training data", "It is a myth"], a: 1, why: "They see chunks, not individual letters, so letter tasks are hard." },
+      { q: "The assistant behavior comes from...", options: ["Pretraining alone", "A later step that tunes the base model on helpful examples and preferences", "The user's prompt only", "The context window"], a: 1, why: "A smaller tuning step after pretraining teaches it to be helpful." }
     ],
     assignment: {
       title: "Probe the quirks", xp: 50,
@@ -794,10 +797,10 @@ const MODULES = [
       }
     ],
     quiz: [
-      { q: "The core of generating an answer is...", options: ["A huge lookup table", "A short loop: predict a token, append it, repeat", "A web search", "A team of humans"], a: 1 },
-      { q: "A neuron's weights control...", options: ["The output color", "How much each input matters", "The file format", "The price"], a: 1 },
-      { q: "A tiny model trained on names will...", options: ["Copy names exactly", "Generate new name like strings from the patterns", "Refuse to answer", "Only work in English"], a: 1 },
-      { q: "Why build a model from scratch at all?", options: ["It is faster than using one", "So nothing stays a black box and the ideas click", "It is required by law", "To save money"], a: 1 }
+      { q: "The core of generating an answer is...", options: ["A huge lookup table", "A short loop: predict a token, append it, repeat", "A web search", "A team of humans"], a: 1, why: "Predict a token, append it, repeat. That loop is the whole engine." },
+      { q: "A neuron's weights control...", options: ["The output color", "How much each input matters", "The file format", "The price"], a: 1, why: "How much each input matters; training finds good values." },
+      { q: "A tiny model trained on names will...", options: ["Copy names exactly", "Generate new name like strings from the patterns", "Refuse to answer", "Only work in English"], a: 1, why: "Invent plausible new names, because it learned patterns, not a copy list." },
+      { q: "Why build a model from scratch at all?", options: ["It is faster than using one", "So nothing stays a black box and the ideas click", "It is required by law", "To save money"], a: 1, why: "Building it small makes the ideas concrete instead of magic." }
     ],
     assignment: {
       title: "Watch one built from nothing", xp: 50,
@@ -868,10 +871,10 @@ const MODULES = [
       }
     ],
     quiz: [
-      { q: "A system prompt is...", options: ["The user's first message", "Standing developer instructions that shape every reply", "An error log", "A pricing tier"], a: 1 },
-      { q: "Structured output is for...", options: ["Making answers prettier", "Giving a fixed, machine readable shape other software can use", "Faster typing", "Hiding the answer"], a: 1 },
-      { q: "Chain of thought helps most on...", options: ["Simple greetings", "Math, logic, and planning tasks", "Spelling your name", "Every task equally"], a: 1 },
-      { q: "Why keep a system prompt stable?", options: ["It looks neat", "Consistency, and a repeated prefix can be cached to cut cost", "It is required", "To confuse users"], a: 1 }
+      { q: "A system prompt is...", options: ["The user's first message", "Standing developer instructions that shape every reply", "An error log", "A pricing tier"], a: 1, why: "Standing developer instructions that shape every reply before you type." },
+      { q: "Structured output is for...", options: ["Making answers prettier", "Giving a fixed, machine readable shape other software can use", "Faster typing", "Hiding the answer"], a: 1, why: "A fixed shape like JSON that other software can use reliably." },
+      { q: "Chain of thought helps most on...", options: ["Simple greetings", "Math, logic, and planning tasks", "Spelling your name", "Every task equally"], a: 1, why: "Hard tasks like math, logic, and planning; skip it for simple ones." },
+      { q: "Why keep a system prompt stable?", options: ["It looks neat", "Consistency, and a repeated prefix can be cached to cut cost", "It is required", "To confuse users"], a: 1, why: "It stays consistent, and a repeated prefix can be cached to cut cost." }
     ],
     assignment: {
       title: "Build a reusable prompt", xp: 50,
@@ -940,10 +943,10 @@ const MODULES = [
       }
     ],
     quiz: [
-      { q: "Grounding means...", options: ["Making the model slower", "Giving it trusted sources and answering from those", "Turning off the internet", "A type of fine-tuning"], a: 1 },
-      { q: "RAG works by...", options: ["Retraining on your docs", "Retrieving relevant chunks and putting them in the prompt", "Guessing harder", "Calling a human"], a: 1 },
-      { q: "Most RAG failures come from...", options: ["The model itself", "Retrieving the wrong or incomplete chunks", "Too few users", "Slow internet"], a: 1 },
-      { q: "Best reason to use RAG over retraining?", options: ["It is cheaper and stays current by changing documents, not the model", "It needs no documents", "It is always perfect", "It removes the need for prompts"], a: 0 }
+      { q: "Grounding means...", options: ["Making the model slower", "Giving it trusted sources and answering from those", "Turning off the internet", "A type of fine-tuning"], a: 1, why: "Giving it real material and telling it to answer from that, not memory." },
+      { q: "RAG works by...", options: ["Retraining on your docs", "Retrieving relevant chunks and putting them in the prompt", "Guessing harder", "Calling a human"], a: 1, why: "Fetching the most relevant chunks into the prompt, then answering from them." },
+      { q: "Most RAG failures come from...", options: ["The model itself", "Retrieving the wrong or incomplete chunks", "Too few users", "Slow internet"], a: 1, why: "Retrieving the wrong chunks, so the answer follows bad context." },
+      { q: "Best reason to use RAG over retraining?", options: ["It is cheaper and stays current by changing documents, not the model", "It needs no documents", "It is always perfect", "It removes the need for prompts"], a: 0, why: "You update documents, not the model, so it stays cheap and current." }
     ],
     assignment: {
       title: "Build a mini doc answerer", xp: 50,
@@ -1012,10 +1015,10 @@ const MODULES = [
       }
     ],
     quiz: [
-      { q: "Tool use lets a model...", options: ["Train itself", "Request real actions that your software then runs", "Write faster", "Skip the prompt"], a: 1 },
-      { q: "An automation is...", options: ["A model improvising freely", "A fixed pipeline of steps, often with AI inside", "A type of GPU", "A pricing plan"], a: 1 },
-      { q: "Use an agent when...", options: ["Always, they are best", "The steps genuinely cannot be fixed in advance", "Never", "The task is simple and repetitive"], a: 1 },
-      { q: "Where does the human approval step go?", options: ["Right before the consequential action", "At the very start only", "Nowhere", "After everything is sent"], a: 0 }
+      { q: "Tool use lets a model...", options: ["Train itself", "Request real actions that your software then runs", "Write faster", "Skip the prompt"], a: 1, why: "Request an action that your software then runs and reports back." },
+      { q: "An automation is...", options: ["A model improvising freely", "A fixed pipeline of steps, often with AI inside", "A type of GPU", "A pricing plan"], a: 1, why: "A fixed pipeline that runs the same steps every time, with AI inside." },
+      { q: "Use an agent when...", options: ["Always, they are best", "The steps genuinely cannot be fixed in advance", "Never", "The task is simple and repetitive"], a: 1, why: "The steps genuinely cannot be fixed in advance." },
+      { q: "Where does the human approval step go?", options: ["Right before the consequential action", "At the very start only", "Nowhere", "After everything is sent"], a: 0, why: "Right before the consequential action; automate everything before it." }
     ],
     assignment: {
       title: "Map your first automation", xp: 50,
@@ -1084,10 +1087,10 @@ const MODULES = [
       }
     ],
     quiz: [
-      { q: "An eval is...", options: ["A type of model", "A repeatable test: real cases plus a scoring method", "A prompt style", "A pricing tier"], a: 1 },
-      { q: "A golden set should include...", options: ["Only easy cases", "Real cases including the hard and ambiguous ones", "No real data", "Just one example"], a: 1 },
-      { q: "A regression is...", options: ["A faster model", "A change that fixes one case but breaks another", "A type of prompt", "A GPU"], a: 1 },
-      { q: "What do you do with a real production failure?", options: ["Ignore it", "Add it to the eval set as a permanent test case", "Delete the logs", "Switch models"], a: 1 }
+      { q: "An eval is...", options: ["A type of model", "A repeatable test: real cases plus a scoring method", "A prompt style", "A pricing tier"], a: 1, why: "Real cases plus a score, run on every change. The unit test of AI." },
+      { q: "A golden set should include...", options: ["Only easy cases", "Real cases including the hard and ambiguous ones", "No real data", "Just one example"], a: 1, why: "The hard and ambiguous cases, since that is where things break." },
+      { q: "A regression is...", options: ["A faster model", "A change that fixes one case but breaks another", "A type of prompt", "A GPU"], a: 1, why: "A change that fixes one case but quietly breaks another." },
+      { q: "What do you do with a real production failure?", options: ["Ignore it", "Add it to the eval set as a permanent test case", "Delete the logs", "Switch models"], a: 1, why: "Turn it into a permanent test case in your eval set." }
     ],
     assignment: {
       title: "Eval your own prompt", xp: 50,
@@ -1156,10 +1159,10 @@ const MODULES = [
       }
     ],
     quiz: [
-      { q: "Why call the model from the back end?", options: ["It is prettier", "To keep the secret API key off the public page", "It is required by law", "To slow it down"], a: 1 },
-      { q: "An API key is...", options: ["A public username", "A secret that identifies your account and bills your usage", "A type of model", "A free trial"], a: 1 },
-      { q: "First reaction to a leaked key?", options: ["Wait and see", "Rotate it: revoke the old, create a new one", "Email support", "Delete the app"], a: 1 },
-      { q: "Why ship a thin prototype early?", options: ["To impress investors", "Real use teaches more than private polishing", "It is cheaper to host", "To avoid feedback"], a: 1 }
+      { q: "Why call the model from the back end?", options: ["It is prettier", "To keep the secret API key off the public page", "It is required by law", "To slow it down"], a: 1, why: "Anyone can read a public page, so the secret key must stay server side." },
+      { q: "An API key is...", options: ["A public username", "A secret that identifies your account and bills your usage", "A type of model", "A free trial"], a: 1, why: "A secret that identifies you and bills your usage. Guard it like a card number." },
+      { q: "First reaction to a leaked key?", options: ["Wait and see", "Rotate it: revoke the old, create a new one", "Email support", "Delete the app"], a: 1, why: "Rotate it: revoke the old key and make a new one first." },
+      { q: "Why ship a thin prototype early?", options: ["To impress investors", "Real use teaches more than private polishing", "It is cheaper to host", "To avoid feedback"], a: 1, why: "Live and rough teaches more than perfect and hidden." }
     ],
     assignment: {
       title: "Put something live", xp: 150,
@@ -1230,10 +1233,10 @@ const MODULES = [
       }
     ],
     quiz: [
-      { q: "An agent is...", options: ["A bigger model", "A model in a loop with a goal, tools, and memory", "A type of prompt", "A database"], a: 1 },
-      { q: "Guardrails include...", options: ["Faster GPUs", "Tool limits, spending caps, sandboxes, and approval steps", "Longer prompts", "More users"], a: 1 },
-      { q: "Multi agent systems are worth it when...", options: ["Always", "The job genuinely splits into specialist parts", "Never", "The task is simple"], a: 1 },
-      { q: "A key agent antipattern is...", options: ["Minimal permissions", "One giant do everything agent with no observability", "Human approval steps", "Small clear goals"], a: 1 }
+      { q: "An agent is...", options: ["A bigger model", "A model in a loop with a goal, tools, and memory", "A type of prompt", "A database"], a: 1, why: "A model in a loop with a goal, tools, and memory, acting step by step." },
+      { q: "Guardrails include...", options: ["Faster GPUs", "Tool limits, spending caps, sandboxes, and approval steps", "Longer prompts", "More users"], a: 1, why: "Tool limits, spending caps, sandboxes, and approval steps." },
+      { q: "Multi agent systems are worth it when...", options: ["Always", "The job genuinely splits into specialist parts", "Never", "The task is simple"], a: 1, why: "The job genuinely splits into specialist parts; otherwise it is overhead." },
+      { q: "A key agent antipattern is...", options: ["Minimal permissions", "One giant do everything agent with no observability", "Human approval steps", "Small clear goals"], a: 1, why: "One giant do everything agent with no way to see what happened." }
     ],
     assignment: {
       title: "An agent on a real task", xp: 150,
@@ -1302,10 +1305,10 @@ const MODULES = [
       }
     ],
     quiz: [
-      { q: "Why do long chats get more expensive per message?", options: ["The model gets greedy", "The growing history is re-sent as input each turn", "Prices rise hourly", "Longer answers cost less"], a: 1 },
-      { q: "Model routing means...", options: ["Using one model for all", "Sending easy jobs to cheap models and hard ones to big models", "Routing users to support", "A network setting"], a: 1 },
-      { q: "Latency scales mainly with...", options: ["The weather", "How many tokens are processed", "The user's age", "The model's name"], a: 1 },
-      { q: "Streaming the answer helps because...", options: ["It is cheaper", "It shows progress so the wait feels shorter", "It uses fewer tokens", "It improves accuracy"], a: 1 }
+      { q: "Why do long chats get more expensive per message?", options: ["The model gets greedy", "The growing history is re-sent as input each turn", "Prices rise hourly", "Longer answers cost less"], a: 1, why: "The growing history is re-read every turn, so input tokens pile up." },
+      { q: "Model routing means...", options: ["Using one model for all", "Sending easy jobs to cheap models and hard ones to big models", "Routing users to support", "A network setting"], a: 1, why: "Sending easy jobs to cheap models and hard ones to big models." },
+      { q: "Latency scales mainly with...", options: ["The weather", "How many tokens are processed", "The user's age", "The model's name"], a: 1, why: "How many tokens are processed, so shorter is faster." },
+      { q: "Streaming the answer helps because...", options: ["It is cheaper", "It shows progress so the wait feels shorter", "It uses fewer tokens", "It improves accuracy"], a: 1, why: "Seeing words appear makes the wait feel shorter." }
     ],
     assignment: {
       title: "Right size a task", xp: 50,
@@ -1374,10 +1377,10 @@ const MODULES = [
       }
     ],
     quiz: [
-      { q: "Best first use case to automate?", options: ["Rare high stakes decisions", "High volume, text heavy, error tolerant work", "Whatever a demo showed", "Everything at once"], a: 1 },
-      { q: "Build vs buy rule of thumb?", options: ["Always build", "Buy commodity capabilities, build what touches your own data and workflow", "Always buy", "Flip a coin"], a: 1 },
-      { q: "The non negotiable governance rule?", options: ["The AI owns its output", "A named human owns every output", "Vendors take all liability", "Nobody is responsible"], a: 1 },
-      { q: "A credible rollout plan has...", options: ["A long tool list", "A narrow use case, an owner, a metric, and a review gate", "No timeline", "Only ambition"], a: 1 }
+      { q: "Best first use case to automate?", options: ["Rare high stakes decisions", "High volume, text heavy, error tolerant work", "Whatever a demo showed", "Everything at once"], a: 1, why: "High volume, text heavy work where a slip is recoverable." },
+      { q: "Build vs buy rule of thumb?", options: ["Always build", "Buy commodity capabilities, build what touches your own data and workflow", "Always buy", "Flip a coin"], a: 1, why: "Buy commodity capabilities; build what touches your own data and workflow." },
+      { q: "The non negotiable governance rule?", options: ["The AI owns its output", "A named human owns every output", "Vendors take all liability", "Nobody is responsible"], a: 1, why: "A named human owns every output. Accountability never sits with the tool." },
+      { q: "A credible rollout plan has...", options: ["A long tool list", "A narrow use case, an owner, a metric, and a review gate", "No timeline", "Only ambition"], a: 1, why: "A narrow use case, an owner, a metric, and a review gate." }
     ],
     assignment: {
       title: "Capstone: your 90 day AI roadmap", xp: 150,
@@ -1448,10 +1451,10 @@ const MODULES = [
       }
     ],
     quiz: [
-      { q: "Which is durable knowledge, not churn?", options: ["Model names and leaderboard ranks", "Tokens, context, grounding, evals, cost per task", "This week's prices", "The newest release date"], a: 1 },
-      { q: "Best way to judge a hyped new model for your needs?", options: ["Trust the benchmark scores", "Run it on your own eval set", "Ask social media", "Pick the newest one"], a: 1 },
-      { q: "A sustainable way to stay current is...", options: ["Read every feed daily", "One weekly digest plus testing big things on real tasks", "Ignore all news", "Only follow hype"], a: 1 },
-      { q: "The deepest way to lock in what you learn is...", options: ["Re-read notes", "Teach it to someone else", "Watch more videos", "Buy a course"], a: 1 }
+      { q: "Which is durable knowledge, not churn?", options: ["Model names and leaderboard ranks", "Tokens, context, grounding, evals, cost per task", "This week's prices", "The newest release date"], a: 1, why: "Fundamentals like tokens, context, grounding, and evals; names and prices churn." },
+      { q: "Best way to judge a hyped new model for your needs?", options: ["Trust the benchmark scores", "Run it on your own eval set", "Ask social media", "Pick the newest one"], a: 1, why: "Run it on your own eval set; your real tasks are the benchmark." },
+      { q: "A sustainable way to stay current is...", options: ["Read every feed daily", "One weekly digest plus testing big things on real tasks", "Ignore all news", "Only follow hype"], a: 1, why: "One weekly digest plus testing big things on your own tasks." },
+      { q: "The deepest way to lock in what you learn is...", options: ["Re-read notes", "Teach it to someone else", "Watch more videos", "Buy a course"], a: 1, why: "Teach it to someone else. Explaining is the final proof you own it." }
     ],
     assignment: {
       title: "Set up your radar", xp: 50,
@@ -1889,6 +1892,7 @@ function renderModule(mi){
   }).join("");
   const qDone = quizComplete(mi);
   const aDone = assignComplete(mi);
+  const lessonsDone = m.lessons.every((_, li) => lessonRead(mi, li));
   setScreen(`
     <button class="back-link" id="back">← Back to path</button>
     <div style="display:flex;align-items:center;gap:14px;margin:10px 0 4px;">
@@ -1901,22 +1905,33 @@ function renderModule(mi){
     ${isSkipReview(mi)?`<div class="soon-banner" style="margin-top:10px;">Optional review, skim it, skip it, or earn the XP. Your call.</div>`:""}
     <div class="section-title">Lessons</div>
     ${rows}
-    <div class="section-title">Quiz</div>
-    <button class="item-row ${qDone?"complete":""}" data-act="quiz">
-      <div class="ic">${qDone?"✓":"❓"}</div>
-      <div><h4>${m.title}, quiz</h4><p>6 questions + spaced review${qDone?` · best run: ${S.quizDone[m.id]}/6 correct`:""}</p></div>
-      ${qDone?`<span class="tick">✓</span>`:`<span class="xp-tag">+20 XP / correct</span>`}
-    </button>
+    <div class="section-title">Quick check</div>
+    ${lessonsDone
+      ? `<button class="item-row ${qDone?"complete":""}" data-act="quiz">
+          <div class="ic">${qDone?"✓":"❓"}</div>
+          <div><h4>Quick check: ${m.title}</h4><p>${m.quiz.length} questions, each one teaches as you answer${qDone?` · best run ${S.quizDone[m.id]}/${m.quiz.length}`:""}</p></div>
+          ${qDone?`<span class="tick">✓</span>`:`<span class="xp-tag">+20 XP / correct</span>`}
+        </button>`
+      : `<div class="item-row locked">
+          <div class="ic">🔒</div>
+          <div><h4>Quick check: ${m.title}</h4><p>Finish the lessons above to unlock</p></div>
+        </div>`}
     <div class="section-title">${m.build ? "Build project" : "Assignment"}</div>
-    <button class="item-row ${aDone?"complete":""}" data-act="assign">
-      <div class="ic">${aDone?"✓":"🎯"}</div>
-      <div><h4>${m.assignment.title}</h4><p>${m.build ? "Build project · plan 2-3 focused hours" : "Hands-on, in your own ChatGPT or Claude"}</p></div>
-      ${aDone?`<span class="tick">✓</span>`:`<span class="xp-tag">+${m.assignment.xp || 50} XP</span>`}
-    </button>
+    ${qDone
+      ? `<button class="item-row ${aDone?"complete":""}" data-act="assign">
+          <div class="ic">${aDone?"✓":"🎯"}</div>
+          <div><h4>${m.assignment.title}</h4><p>${m.build ? "Build project · plan 2-3 focused hours" : "Hands-on, in your own ChatGPT or Claude"}</p></div>
+          ${aDone?`<span class="tick">✓</span>`:`<span class="xp-tag">+${m.assignment.xp || 50} XP</span>`}
+        </button>`
+      : `<div class="item-row locked">
+          <div class="ic">🔒</div>
+          <div><h4>${m.assignment.title}</h4><p>Pass the quick check to unlock</p></div>
+        </div>`}
   `);
   document.getElementById("back").onclick = renderHome;
   document.querySelectorAll(".item-row").forEach(r => {
     r.onclick = () => {
+      if (r.classList.contains("locked")) return;
       const act = r.dataset.act;
       if (act === "lesson") renderLesson(mi, +r.dataset.li);
       else if (act === "quiz") startQuiz(mi);
@@ -2095,7 +2110,7 @@ function renderQuizQ(){
   const { mi, qi, questions } = quizState;
   const q = questions[qi];
   setScreen(`
-    <button class="back-link" id="back">← Exit quiz</button>
+    <button class="back-link" id="back">← Exit</button>
     <div style="display:flex;align-items:center;gap:12px;margin:12px 0 18px;">
       <div class="pbar"><div style="width:${(qi/questions.length)*100}%"></div></div>
       <span style="font-weight:800;font-size:14px;color:var(--muted);flex:none;">${qi+1}/${questions.length}</span>
@@ -2130,8 +2145,12 @@ function answerQuiz(pick){
     if (i === q.a) b.classList.add("correct");
     else if (i === pick) b.classList.add("wrong");
   });
+  const whyLine = q.why ? `<div style="font-size:14px;font-weight:500;margin-top:7px;line-height:1.5;">${q.why}</div>` : "";
+  const head = right
+    ? "Correct!" + xpLine
+    : `Not quite. Answer: <b>${esc(q.options[q.a])}</b>`;
   document.getElementById("fb").innerHTML = `
-    <div class="feedback ${right?"good":"bad"}">${right ? "Correct!" + xpLine : "Not quite, the highlighted answer is right."}</div>
+    <div class="feedback ${right?"good":"bad"}">${head}${whyLine}</div>
     <button class="btn btn-primary" id="next">${qi === questions.length-1 ? "See results" : "Next question"}</button>`;
   document.getElementById("next").onclick = () => {
     quizState.qi++;
