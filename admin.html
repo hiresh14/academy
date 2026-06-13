@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>AIcademy · Admin</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root{ --blue:#1a6aff; --navy:#0a1633; --surface:#f3f6fe; --border:#dde6f7; --muted:#5b6a8c; --green:#1f9159; --red:#c0392b; --gold:#cf9a00; }
+  *{box-sizing:border-box;} body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#f7f9fe;color:var(--navy);}
+  .wrap{max-width:1100px;margin:0 auto;padding:24px 18px 60px;}
+  h1{font-size:22px;margin:0;} h2{font-size:16px;margin:28px 0 12px;font-weight:800;}
+  .muted{color:var(--muted);}
+  .gate{max-width:420px;margin:80px auto;background:#fff;border:1px solid var(--border);border-radius:16px;padding:22px;}
+  input{width:100%;padding:11px 13px;border:2px solid var(--border);border-radius:11px;font-size:15px;margin:8px 0;}
+  button{background:var(--blue);color:#fff;border:0;border-radius:11px;padding:11px 16px;font-weight:700;font-size:15px;cursor:pointer;}
+  button.ghost{background:#eef3fe;color:var(--blue);}
+  .top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:14px;}
+  .card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:14px 16px;}
+  .card .lab{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);}
+  .card .val{font-size:28px;font-weight:800;margin-top:4px;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;} @media(max-width:760px){.grid2{grid-template-columns:1fr;}}
+  .panel{background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px;}
+  table{width:100%;border-collapse:collapse;font-size:13px;} th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--border);white-space:nowrap;}
+  th{color:var(--muted);font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;}
+  .tbl-wrap{overflow:auto;max-height:460px;border:1px solid var(--border);border-radius:12px;}
+  .pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;}
+  .pill.m{background:#eaf0ff;color:var(--blue);} .pill.d{background:#fff4e0;color:var(--gold);}
+  .bars div{display:flex;align-items:center;gap:8px;margin:5px 0;font-size:13px;}
+  .bars .bar{height:14px;background:var(--blue);border-radius:4px;min-width:2px;}
+  .bars .k{width:130px;flex:none;color:var(--navy);font-weight:600;} .bars .n{width:34px;flex:none;text-align:right;color:var(--muted);}
+  .err{color:var(--red);font-size:13px;margin-top:8px;}
+</style>
+</head>
+<body>
+<div id="gate" class="gate">
+  <h1>AIcademy admin</h1>
+  <p class="muted" style="font-size:14px;">Enter the project URL and your admin token. Stored only in this browser.</p>
+  <input id="base" placeholder="https://YOURPROJECT.supabase.co">
+  <input id="anon" placeholder="anon public key">
+  <input id="tok" type="password" placeholder="admin token">
+  <button id="go">Open dashboard</button>
+  <div id="gerr" class="err"></div>
+</div>
+
+<div id="app" class="wrap" style="display:none;">
+  <div class="top">
+    <div><h1>AIcademy analytics</h1><div class="muted" id="gen" style="font-size:12.5px;"></div></div>
+    <div><button class="ghost" id="refresh">Refresh</button> <button class="ghost" id="logout">Sign out</button></div>
+  </div>
+  <div class="cards" id="kpis"></div>
+
+  <div class="grid2" style="margin-top:18px;">
+    <div class="panel"><h2 style="margin-top:0;">Signups by day</h2><canvas id="cSign" height="150"></canvas></div>
+    <div class="panel"><h2 style="margin-top:0;">Device</h2><canvas id="cDev" height="150"></canvas></div>
+  </div>
+  <div class="grid2" style="margin-top:18px;">
+    <div class="panel"><h2 style="margin-top:0;">Active minutes by day</h2><canvas id="cMin" height="150"></canvas></div>
+    <div class="panel"><h2 style="margin-top:0;">When they use it (hour of day)</h2><canvas id="cHour" height="150"></canvas></div>
+  </div>
+
+  <h2>Funnel · reached vs completed by track</h2>
+  <div class="panel"><canvas id="cFunnel" height="220"></canvas></div>
+
+  <div class="grid2" style="margin-top:18px;">
+    <div class="panel"><h2 style="margin-top:0;">Where people are (furthest track)</h2><div class="bars" id="furthest"></div></div>
+    <div class="panel"><h2 style="margin-top:0;">Where stalled users stopped <span class="muted" style="font-weight:500;font-size:12px;">(inactive 3+ days)</span></h2><div class="bars" id="stalled"></div></div>
+  </div>
+
+  <h2>Onboarding preferences</h2>
+  <div class="grid2">
+    <div class="panel"><b>Who they are</b><div class="bars" id="ob_role"></div><b>Experience level</b><div class="bars" id="ob_level"></div><b>Main goal</b><div class="bars" id="ob_goal"></div></div>
+    <div class="panel"><b>Chosen rhythm</b><div class="bars" id="ob_minutes"></div><b>Applying it to</b><div class="bars" id="ob_spineType"></div></div>
+  </div>
+
+  <h2>Users <span class="muted" style="font-weight:500;font-size:13px;" id="ucount"></span></h2>
+  <div class="tbl-wrap"><table id="utable"><thead><tr>
+    <th>Email</th><th>Role</th><th>Level</th><th>Goal</th><th>Device</th><th>Min</th><th>Lessons</th><th>Tracks done</th><th>Furthest</th><th>XP</th><th>Streak</th><th>Last seen</th>
+  </tr></thead><tbody></tbody></table></div>
+</div>
+
+<script>
+const TRACKS = ["Foundations","Prompting & Context","Automations & Agents","Everyday AI","Websites & Landing","Marketing & Content","Data & Analysis","Build AI Products","Leading AI","The Frontier","Make Money","Sales & Outreach","Search & GEO","AI Career"];
+const LAB = {
+  role:{founder:"Founder",marketer:"Marketer",student:"Student",engineer:"Engineer",other:"Other"},
+  level:{never:"Never used",chat:"Chats daily",tried:"Tried building",regular:"Builds regularly"},
+  goal:{work:"Use at work",build:"Build products",automate:"Automate business",curious:"Curious"},
+  minutes:{habit:"Daily habit",weekend:"Weekday+weekend",serious:"Serious",immersive:"Immersive"},
+  spineType:{business:"Business",job:"Job",hobby:"Hobby/project"}
+};
+const $=id=>document.getElementById(id);
+let CFG={base:localStorage.getItem("ax_base")||"",anon:localStorage.getItem("ax_anon")||"",tok:localStorage.getItem("ax_tok")||""};
+let charts=[];
+
+function fmtDate(s){ if(!s) return ""; const d=new Date(s); return isNaN(d)?"":d.toLocaleString(undefined,{month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}); }
+function lab(group,k){ return (LAB[group]&&LAB[group][k])||k; }
+function bars(elId,obj,labelGroup){
+  const el=$(elId); el.innerHTML="";
+  const entries=Object.entries(obj||{}).filter(([k])=>k!=="unknown"||Object.keys(obj).length===1).sort((a,b)=>b[1]-a[1]);
+  const max=Math.max(1,...entries.map(e=>e[1]));
+  for(const [k,v] of entries){
+    const row=document.createElement("div");
+    row.innerHTML=`<span class="k">${labelGroup?lab(labelGroup,k):k}</span><span class="bar" style="width:${Math.round(v/max*150)}px"></span><span class="n">${v}</span>`;
+    el.appendChild(row);
+  }
+  if(!entries.length) el.innerHTML='<span class="muted" style="font-size:13px;">No data yet</span>';
+}
+
+async function load(){
+  $("gerr").textContent="";
+  try{
+    const u=CFG.base.replace(/\/$/,"")+"/functions/v1/admin-stats";
+    const res=await fetch(u,{headers:{"x-admin-token":CFG.tok,"apikey":CFG.anon,"Authorization":"Bearer "+CFG.anon}});
+    const d=await res.json();
+    if(!d.ok){ throw new Error(d.error||("HTTP "+res.status)); }
+    render(d);
+    $("gate").style.display="none"; $("app").style.display="block";
+  }catch(e){ $("gerr").textContent="Could not load: "+e.message; $("gate").style.display="block"; }
+}
+
+function render(d){
+  $("gen").textContent="Generated "+fmtDate(d.generatedAt);
+  const t=d.totals;
+  $("kpis").innerHTML=[
+    ["Total users",t.users],["Active 7d",t.active7d],["New 7d",t.new7d],
+    ["Completed onboarding",t.completedOnboarding],["Avg min / user",d.engagement.avgMinutesPerUser],["Total minutes",d.engagement.totalMinutes]
+  ].map(c=>`<div class="card"><div class="lab">${c[0]}</div><div class="val">${c[1]}</div></div>`).join("");
+
+  charts.forEach(c=>c.destroy()); charts=[];
+  const mk=(id,cfg)=>charts.push(new Chart($(id),cfg));
+  const keys=o=>Object.keys(o||{}).sort();
+
+  const sd=d.signupsByDay||{}; const sdk=keys(sd);
+  mk("cSign",{type:"bar",data:{labels:sdk,datasets:[{data:sdk.map(k=>sd[k]),backgroundColor:"#1a6aff"}]},options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{precision:0}}}}});
+
+  mk("cDev",{type:"doughnut",data:{labels:["Mobile","Desktop","Unknown"],datasets:[{data:[d.device.mobile||0,d.device.desktop||0,d.device.unknown||0],backgroundColor:["#1a6aff","#1f9159","#b4b2a9"]}]}});
+
+  const md=d.minutesByDay||{}; const mdk=keys(md);
+  mk("cMin",{type:"line",data:{labels:mdk,datasets:[{data:mdk.map(k=>md[k]),borderColor:"#cf9a00",backgroundColor:"rgba(207,154,0,.12)",fill:true,tension:.3}]},options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});
+
+  const mh=d.minutesByHour||{}; const hrs=Array.from({length:24},(_,i)=>String(i));
+  mk("cHour",{type:"bar",data:{labels:hrs.map(h=>h+":00"),datasets:[{data:hrs.map(h=>mh[h]||0),backgroundColor:"#7b3fb0"}]},options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});
+
+  const f=d.funnel||[];
+  mk("cFunnel",{type:"bar",data:{labels:TRACKS,datasets:[
+    {label:"Reached",data:f.map(x=>x.reached),backgroundColor:"#9fc0f5"},
+    {label:"Completed",data:f.map(x=>x.completed),backgroundColor:"#1a6aff"}
+  ]},options:{scales:{y:{beginAtZero:true,ticks:{precision:0}}}}});
+
+  // furthest histogram -> friendly track names
+  const fh={}; for(const k in (d.dropoff.furthest||{})){ const m=k.match(/^m(\d+)$/); fh[m?TRACKS[+m[1]-1]:k]=d.dropoff.furthest[k]; }
+  bars("furthest",fh);
+  bars("stalled",d.dropoff.stalledAt);
+
+  bars("ob_role",d.onboarding.role,"role"); bars("ob_level",d.onboarding.level,"level");
+  bars("ob_goal",d.onboarding.goal,"goal"); bars("ob_minutes",d.onboarding.minutes,"minutes");
+  bars("ob_spineType",d.onboarding.spineType,"spineType");
+
+  const tb=$("utable").querySelector("tbody"); tb.innerHTML="";
+  $("ucount").textContent="("+(d.users||[]).length+")";
+  for(const u of (d.users||[])){
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td>${u.email}</td><td>${lab("role",u.role)}</td><td>${lab("level",u.level)}</td><td>${lab("goal",u.goal)}</td>
+      <td><span class="pill ${u.device==="mobile"?"m":"d"}">${u.device}</span></td><td>${u.minutesTotal}</td><td>${u.lessonsDone}</td>
+      <td>${u.modulesComplete}</td><td>${u.furthest}</td><td>${u.xp}</td><td>${u.streak}</td><td>${fmtDate(u.lastSeen)}</td>`;
+    tb.appendChild(tr);
+  }
+}
+
+$("go").onclick=()=>{ CFG={base:$("base").value.trim(),anon:$("anon").value.trim(),tok:$("tok").value.trim()};
+  localStorage.setItem("ax_base",CFG.base);localStorage.setItem("ax_anon",CFG.anon);localStorage.setItem("ax_tok",CFG.tok); load(); };
+$("refresh").onclick=load;
+$("logout").onclick=()=>{ localStorage.removeItem("ax_tok"); location.reload(); };
+
+if(CFG.base&&CFG.tok){ $("base").value=CFG.base;$("anon").value=CFG.anon;$("tok").value=CFG.tok; load(); }
+</script>
+</body>
+</html>

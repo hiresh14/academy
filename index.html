@@ -5227,6 +5227,49 @@ let S = JSON.parse(localStorage.getItem(LS_STATE) || "null") || {
 function save(){ localStorage.setItem(LS_STATE, JSON.stringify(S)); if(profile) localStorage.setItem(LS_PROFILE, JSON.stringify(profile)); syncRemote(); }
 
 /* =====================================================================
+   ANALYTICS (rides inside S, synced via the progress row; read by the
+   admin-stats Edge Function with the service role. No third party.)
+   ===================================================================== */
+const DEVICE = ((window.matchMedia && matchMedia("(pointer:coarse)").matches) || window.innerWidth < 768) ? "mobile" : "desktop";
+function aInit(){
+  if (!S.firstSeen) S.firstSeen = new Date().toISOString();
+  if (!S.minutes)   S.minutes = {};     // { "2026-06-14": minutes }
+  if (!S.minByHour) S.minByHour = {};   // { "18": minutes } (local hour 0-23)
+  if (!S.devices)   S.devices = {};     // { desktop:true, mobile:true }
+  S.devices[DEVICE] = true;
+  S.device = DEVICE;
+  S.lastSeen = new Date().toISOString();
+}
+let _activeSec = 0, _lastTick = Date.now();
+function _accrue(mins){
+  const d = new Date(), day = d.toISOString().slice(0,10), hr = String(d.getHours());
+  S.minutes = S.minutes || {}; S.minByHour = S.minByHour || {};
+  S.minutes[day] = (S.minutes[day] || 0) + mins;
+  S.minByHour[hr] = (S.minByHour[hr] || 0) + mins;
+  S.lastSeen = d.toISOString();
+}
+function aTick(){
+  const now = Date.now();
+  if (document.visibilityState === "visible") _activeSec += Math.min(30, (now - _lastTick) / 1000);
+  _lastTick = now;
+  if (_activeSec >= 60){ const m = Math.floor(_activeSec / 60); _activeSec -= m * 60; _accrue(m); save(); }
+}
+function aFlush(){
+  if (_activeSec >= 30){ _accrue(1); _activeSec = 0; }
+  S.lastSeen = new Date().toISOString(); save();
+}
+setInterval(aTick, 20000);
+document.addEventListener("visibilitychange", () => { _lastTick = Date.now(); if (document.visibilityState === "hidden") aFlush(); });
+window.addEventListener("pagehide", aFlush);
+function markScreen(t, mi, li){
+  S.lastScreen = { t: t, mi: (mi == null ? null : mi), li: (li == null ? null : li), ts: new Date().toISOString() };
+  const depth = (mi || 0) * 100 + (li || 0);
+  const fd = S.furthest ? (S.furthest.mi * 100 + (S.furthest.li || 0)) : -1;
+  if (depth > fd) S.furthest = { t: t, mi: mi || 0, li: li || 0, ts: new Date().toISOString() };
+  save();
+}
+
+/* =====================================================================
    SUPABASE  (progress sync + email magic link sign in)
    To switch it on: paste your project URL and anon key below, then run
    the SQL in the setup notes. Left blank, the app runs on localStorage.
@@ -5263,6 +5306,7 @@ async function loadRemote(){
   } catch(e){}
 }
 function route(){
+  aInit();
   // Not signed in (Supabase on): start with onboarding, ask for email only at the end.
   if (SB && !authUser){
     if (profile) renderSignIn();   // finished onboarding, now save via email
@@ -5608,7 +5652,7 @@ function advance(val){
 function obProceed(){
   obStep++;
   if (obStep < OB_QUESTIONS.length){ renderOnboarding(); return; }
-  profile = obAnswers; save();
+  profile = obAnswers; profile.device = DEVICE; profile.obAt = new Date().toISOString(); save();
   if (SB && !authUser){
     localStorage.setItem("aicademy_welcome", "1"); // show the welcome after they return signed in
     renderSignIn();                                 // capture email at the end to save progress
@@ -5920,6 +5964,7 @@ function bindExercise(ex, onDone){
 
 function renderLessonDoing(mi, li){
   const m = MODULES[mi], l = m.lessons[li];
+  markScreen("lesson", mi, li);
   const dots = m.lessons.map((_,i)=>`<span class="${i<=li?"on":""}"></span>`).join("");
   const already = lessonRead(mi, li);
   const isLast = li === m.lessons.length - 1;
@@ -6037,6 +6082,7 @@ function sampleReview(mi){
   return picks;
 }
 function startQuiz(mi){
+  markScreen("quiz", mi, null);
   const base = MODULES[mi].quiz.map((q, qi) => Object.assign({}, q, { srcMi: mi, srcQi: qi }));
   quizState = { mi, qi: 0, correctBase: 0, correctReview: 0, earned: 0, questions: base.concat(sampleReview(mi)) };
   renderQuizQ();
@@ -6123,6 +6169,7 @@ function finishQuiz(){
    ASSIGNMENT
    ===================================================================== */
 function renderAssignment(mi){
+  markScreen("assign", mi, null);
   const m = MODULES[mi];
   const done = assignComplete(mi);
   const xp = m.assignment.xp || 50;
