@@ -299,6 +299,7 @@
 </head>
 <body>
 <div id="app"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
 /* =====================================================================
@@ -1562,7 +1563,89 @@ let S = JSON.parse(localStorage.getItem(LS_STATE) || "null") || {
   assignDone: {}   // "m1": true
 };
 
-function save(){ localStorage.setItem(LS_STATE, JSON.stringify(S)); if(profile) localStorage.setItem(LS_PROFILE, JSON.stringify(profile)); }
+function save(){ localStorage.setItem(LS_STATE, JSON.stringify(S)); if(profile) localStorage.setItem(LS_PROFILE, JSON.stringify(profile)); syncRemote(); }
+
+/* =====================================================================
+   SUPABASE  (progress sync + email magic link sign in)
+   To switch it on: paste your project URL and anon key below, then run
+   the SQL in the setup notes. Left blank, the app runs on localStorage.
+   ===================================================================== */
+const SUPABASE_URL = "";        // e.g. https://xxxxx.supabase.co
+const SUPABASE_ANON_KEY = "";   // the public anon key (safe to expose, guarded by RLS)
+const SB = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : null;
+let authUser = null;
+let _syncT = null;
+function syncRemote(){
+  if (!SB || !authUser) return;
+  clearTimeout(_syncT);
+  _syncT = setTimeout(() => {
+    SB.from("progress").upsert(
+      { user_id: authUser.id, email: authUser.email || null, profile: profile, state: S, updated_at: new Date().toISOString() },
+      { onConflict: "user_id" }
+    ).then(()=>{}, ()=>{});
+  }, 800);
+}
+async function loadRemote(){
+  if (!SB || !authUser) return;
+  try {
+    const { data } = await SB.from("progress").select("profile,state").eq("user_id", authUser.id).maybeSingle();
+    if (data && data.state){
+      S = data.state;
+      profile = data.profile || null;
+      localStorage.setItem(LS_STATE, JSON.stringify(S));
+      if (profile) localStorage.setItem(LS_PROFILE, JSON.stringify(profile));
+    } else if (profile || (S && S.xp > 0)){
+      syncRemote(); // first login with existing local progress: push it up
+    }
+  } catch(e){}
+}
+function route(){ if (!profile) renderIntro(); else renderHome(); }
+async function initAuth(){
+  app.innerHTML = `<div class="ob-wrap"><div class="logo-line" style="justify-content:center;"><span class="mark">A</span>AIcademy</div><p class="muted" style="text-align:center;margin-top:22px;font-weight:500;">Loading...</p></div>`;
+  SB.auth.onAuthStateChange((event, session) => {
+    if (event === "SIGNED_IN" && session){ authUser = session.user; loadRemote().then(route); }
+    else if (event === "SIGNED_OUT"){ authUser = null; renderSignIn(); }
+  });
+  const { data: { session } } = await SB.auth.getSession();
+  if (session){ authUser = session.user; await loadRemote(); route(); }
+  else { renderSignIn(); }
+}
+function renderSignIn(){
+  app.innerHTML = `<div class="ob-wrap">
+    <div class="logo-line"><span class="mark">A</span>AIcademy</div>
+    <div class="screen no-tabs" style="padding:0;flex:none;">
+      <div class="ob-q">Save your progress</div>
+      <div class="ob-sub">Enter your email and we will send a one tap sign in link. No password to remember, and your streak follows you to any device.</div>
+      <input type="email" id="sb-email" placeholder="you@email.com" autocomplete="email">
+      <div style="height:14px"></div>
+      <button class="btn btn-primary" id="sb-go" disabled>Send my link</button>
+      <p class="muted" style="font-size:12.5px;margin-top:12px;font-weight:500;">We use your email only to save your progress and send program updates.</p>
+    </div>
+  </div>`;
+  const inp = document.getElementById("sb-email"), btn = document.getElementById("sb-go");
+  inp.focus();
+  inp.oninput = () => btn.disabled = !/.+@.+\..+/.test(inp.value.trim());
+  const send = async () => {
+    btn.disabled = true; btn.textContent = "Sending...";
+    const { error } = await SB.auth.signInWithOtp({ email: inp.value.trim(), options: { emailRedirectTo: location.origin + location.pathname } });
+    if (error){ btn.textContent = "Send my link"; btn.disabled = false; alert(error.message); return; }
+    renderCheckEmail(inp.value.trim());
+  };
+  inp.onkeydown = e => { if (e.key === "Enter" && !btn.disabled) send(); };
+  btn.onclick = send;
+}
+function renderCheckEmail(email){
+  app.innerHTML = `<div class="ob-wrap"><div class="celebrate" style="padding:48px 10px;">
+    <div class="big">📬</div>
+    <h2 style="margin-top:12px;">Check your email</h2>
+    <p class="muted">We sent a sign in link to <b>${esc(email)}</b>. Open it on this device to continue.</p>
+    <div style="height:10px"></div>
+    <button class="btn btn-ghost" id="sb-again">Use a different email</button>
+  </div></div>`;
+  document.getElementById("sb-again").onclick = renderSignIn;
+}
 function todayStr(){ const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
 function touchStreak(){
   const t = todayStr();
@@ -1868,7 +1951,10 @@ function renderHome(){
       <div class="path-line"></div>
       ${nodes}
     </div>
+    ${(SB && authUser) ? `<div style="text-align:center;margin-top:14px;"><button class="back-link" id="sign-out" style="color:var(--muted);font-size:13px;">Signed in as ${esc(authUser.email||"you")} · Sign out</button></div>` : ""}
   `);
+  const _so = document.getElementById("sign-out");
+  if (_so) _so.onclick = () => SB.auth.signOut();
   document.querySelectorAll(".mcard").forEach(c => {
     c.onclick = () => {
       const mi = +c.dataset.mi;
@@ -2336,7 +2422,8 @@ function renderIntro(){
 /* =====================================================================
    BOOT
    ===================================================================== */
-if (!profile) renderIntro();
+if (SB) initAuth();
+else if (!profile) renderIntro();
 else renderHome();
 </script>
 </body>
