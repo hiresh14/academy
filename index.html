@@ -393,6 +393,25 @@
   .sp-reward h2{font-size:26px;font-weight:800;margin:10px 0 6px;}
   .sp-reward .stat{display:inline-block;background:var(--surface);border:2px solid var(--border);border-radius:14px;padding:10px 18px;margin:6px;font-weight:800;}
   .sp-reward .perfect{color:var(--gold-dark);font-weight:800;font-size:18px;margin-top:8px;}
+
+  /* ===== sticky unit header + jump-to-current + track menu ===== */
+  .unit-banner{position:sticky;top:6px;z-index:8;cursor:pointer;}
+  .unit-banner .ub-menu{margin-left:auto;display:flex;align-items:center;gap:10px;}
+  .unit-banner .ub-menu .ub-emoji{margin-left:0;}
+  .unit-banner .ub-list{font-size:20px;opacity:.9;}
+  .jumpbtn{position:fixed;right:16px;bottom:84px;z-index:40;background:var(--blue);color:#fff;border:none;border-radius:999px;box-shadow:0 4px 14px rgba(26,106,255,.4);font-weight:800;font-size:13px;padding:11px 16px;display:none;align-items:center;gap:7px;cursor:pointer;animation:popIn .25s both;}
+  .jumpbtn.show{display:inline-flex;}
+  .track-sheet{position:fixed;inset:0;z-index:60;background:rgba(10,22,51,.5);display:none;align-items:flex-end;justify-content:center;}
+  .track-sheet.open{display:flex;}
+  .track-sheet-inner{background:#fff;width:100%;max-width:520px;max-height:78vh;overflow:auto;border-radius:20px 20px 0 0;padding:16px 14px 28px;animation:riseIn .25s both;}
+  .track-sheet h3{font-size:17px;font-weight:800;margin:4px 6px 12px;display:flex;align-items:center;justify-content:space-between;}
+  .ts-item{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:2px solid var(--border);border-radius:14px;padding:11px 13px;margin-bottom:9px;background:#fff;cursor:pointer;font-family:inherit;}
+  .ts-item:active{transform:translateY(2px);}
+  .ts-item .ts-emoji{width:36px;height:36px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:19px;color:#fff;flex:none;}
+  .ts-item .ts-t{font-weight:800;font-size:14.5px;color:var(--navy);}
+  .ts-item .ts-p{font-size:12px;color:var(--muted);font-weight:600;margin-top:1px;}
+  .ts-item .ts-chev{margin-left:auto;color:var(--muted);font-weight:800;}
+  .ts-item.tdone .ts-t::after{content:" ✓";color:var(--green-dark);}
 </style>
 </head>
 <body>
@@ -16715,9 +16734,9 @@ function renderHome(){
     const m = MODULES[s.mi];
     const tc = tierStyle(m.tier);
     if (s.t === "banner"){
-      nodes += `<div class="unit-banner rise" style="background:${tc[0]};box-shadow:0 5px 0 ${tc[1]};">
+      nodes += `<div class="unit-banner rise" id="unit-${s.mi}" data-jump-mi="${s.mi}" style="background:${tc[0]};box-shadow:0 5px 0 ${tc[1]};">
         <div><div class="ub-sub">${m.tier} · Unit ${s.unit}</div><div class="ub-title">${m.title}</div></div>
-        <div class="ub-emoji">${m.emoji}</div></div>`;
+        <div class="ub-menu"><div class="ub-emoji">${m.emoji}</div><span class="ub-list">☰</span></div></div>`;
       return;
     }
     const off = Math.round(Math.sin(b * 0.8) * 60); b++;
@@ -16741,7 +16760,7 @@ function renderHome(){
     const label = s.t==="lesson" ? MODULES[s.mi].lessons[s.li].title : s.t==="quiz" ? "Quick check" : MODULES[s.mi].assignment.title;
     const col = done ? ["#f5b800","#cf9a00"] : (unlocked ? tc : ["#e6e9f2","#cfd6e6"]);
     const dataAttr = unlocked ? `data-act="${s.t}" data-mi="${s.mi}"${s.t==="lesson"?` data-li="${s.li}"`:""}` : "";
-    nodes += `<div class="lvl fadein" style="transform:translateX(${off}px);">
+    nodes += `<div class="lvl fadein"${isCurrent?' id="cur-stone"':''} style="transform:translateX(${off}px);">
       <div style="position:relative;display:flex;justify-content:center;">
         ${isCurrent ? `<span class="lvl-start">${started?"Continue":"Start"}</span>` : ""}
         <button class="lvl-btn ${unlocked?"":"locked"}" style="--bbg:${col[0]};--bsh:${col[1]};" ${dataAttr}>
@@ -16772,6 +16791,11 @@ function renderHome(){
       ${nodes}
     </div>
     ${(SB && authUser) ? `<div style="text-align:center;margin-top:14px;"><button class="back-link" id="sign-out" style="color:var(--muted);font-size:13px;">Signed in as ${esc(authUser.email||"you")} · Sign out</button></div>` : ""}
+    <button class="jumpbtn" id="jumpbtn">↓ Jump to where you are</button>
+    <div class="track-sheet" id="track-sheet"><div class="track-sheet-inner">
+      <h3>Jump to a track <span class="back-link" id="ts-close" style="font-size:13px;color:var(--muted);font-weight:700;">Close</span></h3>
+      ${order.map((mi,idx)=>{ const mm=MODULES[mi], c=tierStyle(mm.tier); const tl=mm.lessons.length; let dl=0; mm.lessons.forEach((_,li)=>{ if(lessonRead(mi,li)) dl++; }); const ad=assignComplete(mi); return `<button class="ts-item${(dl===tl&&ad)?" tdone":""}" data-jump-mi="${mi}"><span class="ts-emoji" style="background:${c[0]};">${mm.emoji}</span><span><span class="ts-t">${mm.title}</span><span class="ts-p">Unit ${idx+1} · ${dl}/${tl} lessons${ad?" · project done":""}</span></span><span class="ts-chev">&rsaquo;</span></button>`; }).join("")}
+    </div></div>
   `);
   const _so = document.getElementById("sign-out");
   if (_so) _so.onclick = () => SB.auth.signOut();
@@ -16786,6 +16810,31 @@ function renderHome(){
       else if (act === "chest") openChest(mi);
     };
   });
+  // ---- track jump menu (tap any unit banner) ----
+  const sheet = document.getElementById("track-sheet");
+  const openSheet = () => sheet.classList.add("open");
+  const closeSheet = () => sheet.classList.remove("open");
+  document.querySelectorAll(".unit-banner").forEach(b => b.onclick = openSheet);
+  const tsClose = document.getElementById("ts-close");
+  if (tsClose) tsClose.onclick = (e) => { e.stopPropagation(); closeSheet(); };
+  if (sheet) sheet.onclick = (e) => { if (e.target === sheet) closeSheet(); };
+  document.querySelectorAll(".ts-item").forEach(it => it.onclick = () => {
+    closeSheet();
+    const el = document.getElementById("unit-" + it.dataset.jumpMi);
+    if (el) el.scrollIntoView({ behavior:"smooth", block:"start" });
+  });
+  // ---- jump to current stone + auto-scroll there on open ----
+  const cur = document.getElementById("cur-stone");
+  const jb = document.getElementById("jumpbtn");
+  if (cur && jb){
+    const r = cur.getBoundingClientRect();
+    if (r.top > window.innerHeight * 0.9) cur.scrollIntoView({ block:"center" });
+    jb.onclick = () => cur.scrollIntoView({ behavior:"smooth", block:"center" });
+    if ("IntersectionObserver" in window){
+      const io = new IntersectionObserver(es => es.forEach(e => jb.classList.toggle("show", !e.isIntersecting)), { threshold:0.4 });
+      io.observe(cur);
+    }
+  } else if (jb){ jb.remove(); }
 }
 function tierStyle(t){
   return ({
