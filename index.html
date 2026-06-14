@@ -409,39 +409,68 @@
    ===================================================================== */
 const NEWS = [
   {
-    date: "2026-06-10",
-    headline: "Major labs ship cheaper 'small' models tuned for everyday tasks",
-    tldr: "Routine AI work, summaries, drafts, classification, now costs a fraction of last year's price, which quietly changes what's worth automating.",
+    date: "2026-06-13",
+    headline: "A frontier model got pulled after a government ban",
+    tldr: "The U.S. moved to ban foreign use of Anthropic's newest model, and access was restricted in response. Which model you can use is now a policy question, not only a tech one.",
+    tags: ["Policy", "Models"],
+    source: { name: "Washington Post", url: "https://www.washingtonpost.com/technology/2026/06/13/anthropic-shuts-down-newest-ai-model-after-us-bans-foreign-use/" },
+    article: {
+      what_happened: "According to the Washington Post, the U.S. government acted to ban foreign use of Anthropic's newest and most capable models, and the company limited access in response. Details are still developing, but the shape is clear: access to a frontier model changed overnight because of a policy decision, not a product one.",
+      why_it_matters: "This is the open versus closed question from the Frontier track made real. When you build on one closed model through an API, your access depends on that vendor and on rules outside your control. Geography and regulation now sit next to price and capability when you pick a model.",
+      how_to_use: "Do not single-thread your work on one provider. Keep your prompts and your own eval set portable so you could swap models in a day. If continuity really matters to you, know which open-weight models you could run yourself as a backup (Foundations, the model landscape).",
+      our_take: "Capability gets the headlines, access is the quiet risk. Teams that stayed flexible barely felt this; the ones locked into a single vendor spent the week scrambling. Build for swappability."
+    }
+  },
+  {
+    date: "2026-06-12",
+    headline: "The AI video race heats up again, and Sora's exit is the lesson",
+    tldr: "Seedance, Runway, and Kling keep trading the lead in video generation while OpenAI's once-viral Sora stays shut. Learn the skill, not the tool of the week.",
+    tags: ["Marketing", "Tools"],
+    source: { name: "TechCrunch", url: "https://techcrunch.com/2026/03/29/why-openai-really-shut-down-sora/" },
+    article: {
+      what_happened: "New and updated video models, Seedance 2.0, Runway Gen-4.5, Kling 3.0, and Pika's latest, are leapfrogging each other in creator tests this month. Meanwhile OpenAI's Sora, viral less than a year ago, stays shut down after reportedly burning around a million dollars a day and losing most of its users.",
+      why_it_matters: "This is the skill-spine versus tool-layer idea from the Marketing track in one headline. The tool on top changes every few weeks and even big ones vanish. What does not change is the skill: a controlled keyframe, image to video, a storyboard, and a clear edit.",
+      how_to_use: "Do not marry a tool. Run this month's leader against your current one on a real ad from your own work, the way the Marketing track teaches, and switch only if it clearly wins. Keep your brand assets and your storyboard, those carry across any model.",
+      our_take: "Every few months a new video model is the one. Treat them as interchangeable engines and you stay calm and productive while everyone else chases the leaderboard. Losing a tool you relied on hurts far less when the skill was always yours."
+    }
+  },
+  {
+    date: "2026-06-12",
+    headline: "A new open model claims big savings on reasoning",
+    tldr: "Moonshot's Kimi K2.7-Code says it uses about 30 percent fewer reasoning tokens than its last version, under an open license. Cheaper capable models keep arriving.",
     tags: ["Models", "Costs"],
+    source: { name: "LLM-Stats", url: "https://llm-stats.com/ai-news" },
     article: {
-      what_happened: "Over the past few weeks, each of the major labs released compact versions of their flagship models, priced at a small fraction of the frontier tier per million tokens. They're tuned for the everyday middle of AI work: summarizing, classifying, extracting, drafting. On routine tasks, independent testers report them performing close to last year's flagships, at prices that round to pennies per thousand requests.",
-      why_it_matters: "Cost per task is the number that decides whether an AI feature ships (Module 6). When the price of a summary drops tenfold, automation ideas that were marginal, triaging every inquiry, summarizing every call, classifying every form, suddenly clear the bar. It also makes model routing the default architecture: cheap model for the easy 80%, frontier model for the hard 20%.",
-      how_to_use: "Pull out an automation idea you shelved because it felt expensive, and re-run the maths. If you've done Module 10, open a playground and put a small model head-to-head against a frontier one on a real task from your own work, same prompt, both models. If you built a Module 11 golden set, you have a personal benchmark: score the small model on it and let the number decide.",
-      our_take: "Capability headlines get the attention; price collapses change behavior. Most people are still over-paying out of habit, using the biggest model for tasks a small one handles fine. The compounding skill isn't following releases; it's knowing your cost per completed task and re-checking it quarterly. Cheaper inference is the most under-rated news in AI, every single time it happens."
+      what_happened: "Moonshot AI released Kimi K2.7-Code, claiming roughly 30 percent lower reasoning-token usage than the prior version, under a modified open license you can run yourself. It is the latest in a steady stream of capable models that cost a fraction of the frontier tier.",
+      why_it_matters: "Cost per task is the number that decides whether an AI feature ships (Foundations, what it costs). Fewer reasoning tokens means lower cost for the same answer, and an open license means you can host it for privacy or scale. Both push the cheap-model-for-the-easy-80-percent default further.",
+      how_to_use: "Pull an automation idea you shelved as too pricey and re-run the maths at today's rates. If you keep a personal eval (the Frontier track), score a cheap open model on it against your current one and let the number, not the brand, decide.",
+      our_take: "Capability headlines get the clicks, price drops change behavior. The most underrated AI news, every single time, is that the same task got cheaper. Most people are still overpaying out of habit."
     }
   },
   {
-    date: "2026-06-08",
-    headline: "Agent frameworks converge on a shared standard for connecting tools",
-    tldr: "Assistants from different vendors can increasingly plug into the same calendars, databases and apps, so describing the job well matters more than picking the platform.",
-    tags: ["Agents", "Tools"],
+    date: "2026-06-11",
+    headline: "OpenAI is reportedly heading for an IPO",
+    tldr: "Reports say OpenAI has confidentially filed to go public, possibly as soon as the autumn. AI is turning from a tool into financial-market infrastructure.",
+    tags: ["Industry", "Strategy"],
+    source: { name: "LLM-Stats", url: "https://llm-stats.com/llm-updates" },
     article: {
-      what_happened: "The major agent frameworks and assistant products have been adopting a shared standard for how AI connects to external tools, calendars, databases, CRMs, file stores. Practically, it means a tool integration built once works across assistants from different vendors, the way any browser can open any website. Vendor-specific plugin systems are giving way to one common protocol.",
-      why_it_matters: "This is the moment tool use (Module 4) stops being a per-platform science project. When every assistant can reach the same tools, the differentiator shifts from 'which platform did you bet on' to the things that were always going to matter: how clearly you describe the job, how well-scoped the agent's permissions are, and whether a human approves the consequential steps. Lock-in fear, a real reason companies stalled, just got weaker.",
-      how_to_use: "If you've done the Module 9 build project, check whether your automation tool (n8n, Zapier, Make) exposes or consumes the standard, most now do. When you next evaluate an AI product, ask one question: 'what can it connect to, and what is it allowed to do there?' That answer now matters more than the model behind it. And keep guardrails non-negotiable: shared plumbing means prompt injection travels too.",
-      our_take: "Standards moments look boring and change everything, this is AI's USB moment for tools. Our advice doesn't change, it strengthens: invest in the evergreen skills (describing workflows, scoping permissions, placing approval steps) rather than any vendor's flavor of the month. The plumbing is becoming universal; the judgment about what flows through it is still entirely yours."
+      what_happened: "Multiple reports this week say OpenAI has confidentially filed paperwork for an initial public offering, with a potential listing as early as September, and that other labs are weighing the same path.",
+      why_it_matters: "When the biggest labs go public, AI stops being a side experiment and becomes core business infrastructure with quarterly pressure behind it. For the Leading AI track that means faster shipping, more enterprise features, and more noise to filter, exactly when a clear use case and ROI matter most.",
+      how_to_use: "Do not let the hype set your roadmap. Use the Leading AI checklist: pick a use case high on value and feasibility, check data readiness, name a human owner, and judge it on ROI. The headlines change weekly, that discipline does not.",
+      our_take: "An IPO is a financing event, not a capability event. It is a signal that the tools you are learning are here to stay and worth getting good at, not a reason to chase whatever launched today."
     }
   },
   {
-    date: "2026-06-05",
-    headline: "Survey: most companies stuck at the pilot stage with AI projects",
-    tldr: "A large industry survey finds the majority of corporate AI projects never leave the pilot phase, and the blockers are process and trust, not the technology.",
-    tags: ["Business", "Adoption"],
+    date: "2026-06-11",
+    headline: "The big labs are pushing agents into real work",
+    tldr: "Google, OpenAI, and Anthropic are all moving from chat to agents that take actions in your tools. The 'AI employee' is becoming a product category.",
+    tags: ["Agents", "Automation"],
+    source: { name: "BuildFastWithAI", url: "https://www.buildfastwithai.com/blogs/ai-news-today-june-8-2026" },
     article: {
-      what_happened: "A widely covered industry survey of enterprise AI programs found that most projects stall at the pilot stage: impressive demo, enthusiastic kickoff, then quiet death before company-wide rollout. The cited blockers are strikingly consistent, answers that can't be trusted on company-specific questions, no agreed way to measure quality, unclear ownership when AI output is wrong, and disorganized internal documents feeding the system.",
-      why_it_matters: "Read that blocker list again: ungrounded answers (Module 3), no evals (Module 11), no governance rule about who owns output (Module 12), and poor data readiness (Module 12). Not one blocker is about the model. This is the deployment ladder from Module 6 in action, the gap between 'employees quietly use ChatGPT' and 'AI runs inside our workflows' is process and trust, and that gap is exactly where a person with fundamentals becomes valuable.",
-      how_to_use: "If you're inside a company, pick the narrowest workflow you can find, one team, one document type, one output, and apply the Module 12 scoring: high-volume, text-heavy, error-tolerant first. Ground it in curated documents, define a 20-case eval before rollout, and name a human owner for every output. A pilot designed that way has an exit plan from day one, which is precisely what the stalled ones lack.",
-      our_take: "The pilot graveyard isn't an indictment of AI; it's an indictment of skipping the unglamorous steps. Companies keep buying the engine and forgetting the road. Our honest read: the winners of the next two years won't be the ones with the best model access, everyone has that now, but the ones who cleaned their documents, wrote down what 'good' means, and put a name next to every output. None of that requires a single new release."
+      what_happened: "This week each major lab pushed further into agents that do tasks rather than just answer: managed task flows, agents that improve over time, and more usable live voice for support and sales. OpenAI also expanded its Codex coding agent across more roles and workflows.",
+      why_it_matters: "This is the whole Automations and Agents track becoming the mainstream way AI is sold. The durable skills do not change: describe the job well, give the agent the right tools, set stopping conditions and guardrails, and keep a human in the loop for risky actions.",
+      how_to_use: "Do not wait for a vendor's agent. Build a small one yourself for one real task (the email-triage or scheduling capstone) so you understand the loop and can judge any 'AI employee' a vendor sells you.",
+      our_take: "Agent is the word of the year, which means most things labeled agent are simple automations in a costume. Learn the loop once and you see straight through the marketing, and build the few that are genuinely worth it."
     }
   }
 ];
@@ -16129,7 +16158,33 @@ const GLOSSARY = [
   ["Sandbox", "An isolated environment where an agent's actions can't affect real systems, mistakes stay contained."],
   ["Semantic search", "Finding text by closeness of meaning (via embeddings) rather than shared keywords."],
   ["Structured output", "Model output in a fixed machine-readable shape (JSON, tables) so other software can reliably use it."],
-  ["Temperature", "The API setting controlling how predictable (low) or varied (high) the model's token sampling is."]
+  ["Temperature", "The API setting controlling how predictable (low) or varied (high) the model's token sampling is."],
+  ["GEO (generative engine optimization)", "Shaping your content so AI answer tools quote and cite it. The AI-era companion to SEO."],
+  ["SEO (search engine optimization)", "Making your pages easy for search engines to understand and rank, so the right people find you."],
+  ["Vibe coding", "Building software by describing what you want to an AI in plain language and iterating, instead of writing every line by hand."],
+  ["Value-based pricing", "Setting your price by the value the result delivers to the client, not the hours you spent."],
+  ["RAG (retrieval-augmented generation)", "Giving a model the right documents to read before it answers, so it grounds its reply in real sources instead of guessing."],
+  ["MCP (model context protocol)", "A shared standard for connecting AI assistants to tools and data, the way any browser can open any website."],
+  ["Deploy", "Putting your app or site on a server so it has a public link anyone can open."],
+  ["Authentication (auth)", "How an app knows who a user is, usually sign-up and login handled by a trusted service."],
+  ["Portfolio", "A small set of real things you have built and shipped, with links, that proves your skill better than a certificate."],
+  ["Productized service", "A service packaged with a fixed name, scope, and price, so it is easy to buy."],
+  ["Hook", "The opening line or first second of content that decides whether anyone keeps watching or reading."],
+  ["Brand voice", "A short spec of how your brand sounds, tone, words to use and avoid, so AI output stays consistent."],
+  ["Composite rule", "Generate the visual with AI, then add your real logo and typed text on top, because models garble logos and letters."],
+  ["Image-to-video", "Animating a still image you control into a short clip, the reliable way to keep AI video on-brand."],
+  ["Text-to-SQL", "Turning a plain-English question into a database query you can read and run yourself."],
+  ["Database", "An organised store of data in tables that an app reads from and writes to so information survives."],
+  ["Frontend", "The part of an app a user sees and clicks."],
+  ["Hosting", "The server that makes your app reachable at a web address."],
+  ["Git", "A tool that saves snapshots of your project so you can roll back to a working version anytime."],
+  ["Eval", "A saved set of your real tasks with trusted answers, used to compare models or prompts on what you actually do."],
+  ["Build vs buy", "Deciding whether to make a capability yourself or use an existing tool. Buy for common needs, build for what is unique to you."],
+  ["ROI (return on investment)", "The value an effort returns compared to its full cost. The number that decides if an AI idea is worth doing."],
+  ["Custom assistant", "A reusable AI helper you set up once with instructions and knowledge, like a Custom GPT, Claude Project, or Gemini Gem."],
+  ["Guardrails", "Limits on what an AI agent is allowed to do, so it cannot take risky actions without permission."],
+  ["Human in the loop", "Keeping a person to approve an AI's high-stakes actions before they happen."],
+  ["Cost per task", "What one completed AI job costs once you add up the tokens in and out. The real number for deciding what to automate."]
 ];
 
 /* =====================================================================
@@ -17340,8 +17395,8 @@ function renderGlossary(){
   currentTab = "glossary";
   setScreen(`
     ${topbarHTML()}
-    <div class="section-title">📖 Glossary</div>
-    <p class="muted" style="font-weight:500;font-size:14px;margin-bottom:14px;">Every term used in AIcademy, in plain language.</p>
+    <div class="section-title" style="margin-bottom:2px;">📖 Glossary</div>
+    <p class="muted" style="font-weight:500;font-size:14px;margin-bottom:14px;"><b style="color:var(--navy);">${GLOSSARY.length} terms</b> from across every track, in plain language.</p>
     <input type="text" id="gl-search" placeholder="Search terms…" autocomplete="off">
     <div style="height:16px"></div>
     <div id="gl-list"></div>
@@ -17351,9 +17406,14 @@ function renderGlossary(){
     const f = (filter||"").toLowerCase();
     const items = GLOSSARY.slice().sort((a,b)=>a[0].localeCompare(b[0]))
       .filter(t => !f || t[0].toLowerCase().includes(f) || t[1].toLowerCase().includes(f));
-    list.innerHTML = items.length
-      ? items.map(t=>`<div class="card gl-term rise"><h4>${t[0]}</h4><p>${t[1]}</p></div>`).join("")
-      : `<p class="muted" style="text-align:center;font-weight:500;padding:20px;">No matches for "${esc(filter)}"</p>`;
+    if (!items.length){ list.innerHTML = `<p class="muted" style="text-align:center;font-weight:500;padding:20px;">No matches for "${esc(filter)}"</p>`; return; }
+    let html = "", letter = "";
+    items.forEach(t => {
+      const L = t[0][0].toUpperCase();
+      if (L !== letter){ letter = L; html += `<div style="font-size:13px;font-weight:800;color:var(--blue);letter-spacing:.06em;margin:18px 2px 8px;">${L}</div>`; }
+      html += `<div class="card gl-term rise"><h4>${t[0]}</h4><p>${t[1]}</p></div>`;
+    });
+    list.innerHTML = html;
   }
   draw("");
   document.getElementById("gl-search").oninput = e => draw(e.target.value);
@@ -17363,21 +17423,35 @@ function renderGlossary(){
    DAILY BRIEF
    ===================================================================== */
 const fmtBriefDate = d => new Date(d + "T00:00:00").toLocaleDateString(undefined, { weekday:"short", day:"numeric", month:"short" });
+function relTime(d){
+  const days = Math.round((Date.now() - new Date(d + "T00:00:00").getTime()) / 86400000);
+  if (days <= 0) return "Today";
+  if (days === 1) return "Yesterday";
+  if (days < 7) return days + " days ago";
+  return fmtBriefDate(d);
+}
+let LIVE_BRIEF = null;
+function briefItems(){ return (LIVE_BRIEF && LIVE_BRIEF.length) ? LIVE_BRIEF : NEWS; }
 let briefSorted = [];
 function renderBrief(){
   currentTab = "brief";
-  briefSorted = NEWS.slice().sort((a,b)=>b.date.localeCompare(a.date));
+  briefSorted = briefItems().slice().sort((a,b)=>b.date.localeCompare(a.date));
+  const freshest = briefSorted.length ? relTime(briefSorted[0].date).toLowerCase() : "today";
   setScreen(`
     ${topbarHTML()}
-    <div class="section-title">📰 Daily Brief</div>
-    <p class="muted" style="font-weight:500;font-size:14px;margin-bottom:16px;">What's happening in AI, and why it matters to you. Tap a story for the full brief. The fundamentals you're learning here don't change with the news.</p>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+      <div class="section-title" style="margin-bottom:2px;">📰 Daily Brief</div>
+      <span style="flex:none;display:inline-flex;align-items:center;gap:6px;background:#e6f8ef;color:var(--green-dark);font-size:11.5px;font-weight:800;border-radius:999px;padding:4px 11px;text-transform:uppercase;letter-spacing:.04em;"><span style="width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;"></span>Live</span>
+    </div>
+    <p class="muted" style="font-weight:500;font-size:14px;margin-bottom:16px;">The AI news that matters to you, refreshed automatically. Updated ${freshest}. The fundamentals you're learning here don't change with the headlines.</p>
     ${briefSorted.map((n,i)=>`
       <button class="card brief-card rise" data-i="${i}" style="animation-delay:${i*0.07}s">
-        <div class="date">${fmtBriefDate(n.date)}</div>
+        <div class="date">${relTime(n.date)}${n.source && n.source.name ? " · " + esc(n.source.name) : ""}</div>
         <h4>${n.headline}</h4>
         <p>${n.tldr}</p>
         <div>${n.tags.map(t=>`<span class="tag-pill">${t}</span>`).join("")}</div>
       </button>`).join("")}
+    <p class="muted" style="text-align:center;font-size:12.5px;font-weight:500;margin-top:14px;">New stories land here automatically. Check back daily.</p>
   `);
   document.querySelectorAll(".brief-card").forEach(c => c.onclick = () => renderArticle(+c.dataset.i));
 }
@@ -17386,7 +17460,7 @@ function renderArticle(i){
   setScreen(`
     <div class="reader">
       <button class="back-link" id="back">← All briefs</button>
-      <div class="meta">${fmtBriefDate(n.date)} &nbsp; ${n.tags.map(t=>`<span class="tag-pill">${t}</span>`).join("")}</div>
+      <div class="meta">${relTime(n.date)} &nbsp; ${n.tags.map(t=>`<span class="tag-pill">${t}</span>`).join("")}</div>
       <h1>${n.headline}</h1>
       <p class="lede">${n.tldr}</p>
       <h3>What happened</h3>
@@ -17397,12 +17471,23 @@ function renderArticle(i){
       <p>${n.article.how_to_use}</p>
       <h3>Our take</h3>
       <p>${n.article.our_take}</p>
-      <div style="height:20px"></div>
+      ${n.source && n.source.url ? `<p style="font-size:13.5px;font-weight:600;margin-top:18px;">Source: <a href="${n.source.url}" target="_blank" rel="noopener" style="color:var(--blue);">${esc(n.source.name||"link")} ↗</a></p>` : ""}
+      <div style="height:14px"></div>
       <button class="btn btn-ghost" id="back2">← Back to all briefs</button>
     </div>
   `, { noTabs: true });
   document.getElementById("back").onclick = renderBrief;
   document.getElementById("back2").onclick = renderBrief;
+}
+async function loadBrief(){
+  if (!SB) return;
+  try{
+    const { data } = await SB.from("brief").select("items, generated_at").order("generated_at", { ascending:false }).limit(1).maybeSingle();
+    if (data && Array.isArray(data.items) && data.items.length){
+      LIVE_BRIEF = data.items;
+      if (currentTab === "brief") renderBrief();
+    }
+  }catch(e){}
 }
 
 /* =====================================================================
@@ -17454,6 +17539,7 @@ function renderIntro(){
    BOOT
    ===================================================================== */
 if (SB) initAuth();
+if (SB) loadBrief();
 else if (!profile) renderIntro();
 else renderHome();
 </script>
