@@ -16990,8 +16990,18 @@ function renderStone(mi, li){
   }
   if (l.tryit) steps.push({k:"apply"});
   steps.push({k:"recap"});
-  SP = { mi, li, steps, idx:0, totalQ:qs.length, doneQ:0, combo:0, best:0, wrong:0, xp:0, already:lessonRead(mi,li) };
+  const key = m.id + "_" + li;
+  if (S.spResume && S.spResume.key === key && S.spResume.sp && S.spResume.sp.steps && S.spResume.sp.idx > 0){
+    SP = S.spResume.sp;   // resume exactly where they left off
+  } else {
+    SP = { mi, li, steps, idx:0, totalQ:qs.length, doneQ:0, combo:0, best:0, wrong:0, xp:0, already:lessonRead(mi,li) };
+  }
   spRender();
+}
+function saveSP(){
+  if (!SP) return;
+  S.spResume = { key: MODULES[SP.mi].id + "_" + SP.li, sp: SP };
+  save();
 }
 function spTeachHTML(l){
   const w=l.worked;
@@ -17012,6 +17022,7 @@ function spRecapHTML(l){
 function spRender(){
   const m=MODULES[SP.mi], l=m.lessons[SP.li], step=SP.steps[SP.idx];
   if (!step) return spReward();
+  saveSP();
   const frac = SP.totalQ ? SP.doneQ/SP.totalQ : 0;
   const top = `<div class="sp-top">
       <button class="sp-x" id="sp-x" aria-label="Exit">✕</button>
@@ -17044,6 +17055,7 @@ function spRender(){
 }
 function spReward(){
   const m=MODULES[SP.mi], l=m.lessons[SP.li];
+  S.spResume = null; save();   // finished, clear any saved resume point
   const perfect = SP.wrong===0;
   let gained = SP.already ? 0 : 10 + (perfect?5:0);
   if (!SP.already){ S.lessons[m.id+"_"+SP.li]=true; if(perfect) S.perfect=(S.perfect||0)+1; addXP(gained); }
