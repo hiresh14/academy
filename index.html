@@ -16255,7 +16255,7 @@ let S = JSON.parse(localStorage.getItem(LS_STATE) || "null") || {
   swipeFile: []    // Build Studio saved Build Cards
 };
 
-function save(){ localStorage.setItem(LS_STATE, JSON.stringify(S)); if(profile) localStorage.setItem(LS_PROFILE, JSON.stringify(profile)); syncRemote(); }
+function save(){ S.lastSeen = new Date().toISOString(); localStorage.setItem(LS_STATE, JSON.stringify(S)); if(profile) localStorage.setItem(LS_PROFILE, JSON.stringify(profile)); syncRemote(); }
 
 /* =====================================================================
    ANALYTICS (rides inside S, synced via the progress row; read by the
@@ -16312,27 +16312,43 @@ const SB = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   : null;
 let authUser = null;
 let _syncT = null;
-function syncRemote(){
+function _pushRemote(){
+  if (!SB || !authUser) return;
+  S.lastSeen = new Date().toISOString();   // stamp so loadRemote can pick the newer copy
+  SB.from("progress").upsert(
+    { user_id: authUser.id, email: authUser.email || null, profile: profile, state: S, updated_at: new Date().toISOString() },
+    { onConflict: "user_id" }
+  ).then(()=>{}, ()=>{});
+}
+function syncRemote(){            // debounced: for frequent saves
   if (!SB || !authUser) return;
   clearTimeout(_syncT);
-  _syncT = setTimeout(() => {
-    SB.from("progress").upsert(
-      { user_id: authUser.id, email: authUser.email || null, profile: profile, state: S, updated_at: new Date().toISOString() },
-      { onConflict: "user_id" }
-    ).then(()=>{}, ()=>{});
-  }, 800);
+  _syncT = setTimeout(_pushRemote, 800);
+}
+function syncNow(){              // immediate: for moments we must not lose (e.g. exiting a lesson)
+  if (!SB || !authUser) return;
+  clearTimeout(_syncT);
+  _pushRemote();
 }
 async function loadRemote(){
   if (!SB || !authUser) return;
   try {
     const { data } = await SB.from("progress").select("profile,state").eq("user_id", authUser.id).maybeSingle();
-    if (data && data.state){
-      S = data.state;
+    const remote = data && data.state ? data.state : null;
+    // Keep whichever copy is newer. This stops a reload (e.g. the phone back
+    // gesture) from clobbering in-progress local work — including a half-done
+    // lesson's resume point — with an older server snapshot.
+    const t = s => (s && s.lastSeen) ? new Date(s.lastSeen).getTime() : 0;
+    const localNewer = remote && t(S) > t(remote);
+    if (remote && !localNewer){
+      S = remote;
       profile = data.profile || null;
       localStorage.setItem(LS_STATE, JSON.stringify(S));
       if (profile) localStorage.setItem(LS_PROFILE, JSON.stringify(profile));
-    } else if (profile || (S && S.xp > 0)){
-      syncRemote(); // first login with existing local progress: push it up
+    } else {
+      // No remote yet, or local is ahead of it: keep local and push it up now.
+      if (data && data.profile && !profile) profile = data.profile;
+      if (profile || (S && (S.xp > 0 || S.spResume))) syncNow();
     }
   } catch(e){}
 }
@@ -17064,7 +17080,7 @@ function spRender(){
   else if (step.k==="recap") body = spRecapHTML(l);
   else body = `<div class="sp-wrap" id="sp-wrap">${exHTML(step.ex)}</div><div id="sp-fb"></div>`;
   setScreen(top + body + `<div class="sp-foot"><button class="btn btn-primary" id="sp-next" ${isQ?'disabled':''}>Continue</button></div>`, {noTabs:true});
-  document.getElementById("sp-x").onclick = ()=>{ SP=null; renderHome(); };
+  document.getElementById("sp-x").onclick = ()=>{ saveSP(); syncNow(); SP=null; renderHome(); };
   document.getElementById("sp-mute").onclick = (e)=>{ e.target.textContent = toggleMute()?'🔇':'🔊'; };
   const nextBtn = document.getElementById("sp-next");
   nextBtn.onclick = ()=>{ SP.idx++; spRender(); };
@@ -17085,6 +17101,7 @@ function spReward(){
   const perfect = SP.wrong===0;
   let gained = SP.already ? 0 : 10 + (perfect?5:0);
   if (!SP.already){ S.lessons[m.id+"_"+SP.li]=true; if(perfect) S.perfect=(S.perfect||0)+1; addXP(gained); }
+  syncNow();   // persist completion (and the cleared resume point) immediately
   sComplete(); vibrate([15,30,15,30,40]); burstConfetti();
   setScreen(`<div class="sp-reward">
       <div class="big">${perfect?'🏆':'⭐'}</div>
