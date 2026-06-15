@@ -1,2 +1,4 @@
 .DS_Store
 PUSH_SECRETS.local.txt
+deploy-studio.sh
+supabase/.temp/
