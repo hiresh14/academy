@@ -1,5 +1,10 @@
 // AIcademy Build Studio — reverse-engineer + adapt (Supabase Edge Function, Deno).
 //
+// DORMANT (not called by the app). The Studio uses the no-cost "handoff" model:
+// the frontend composes a prompt and the user runs it in their OWN Claude/ChatGPT,
+// so no server LLM call is billed. Kept here in case the in-app (LevelUp-funded)
+// model is ever revisited; the already-deployed copy is harmless and idle.
+//
 // Takes something a founder saw (a tweet/LinkedIn/YouTube/Loom/website URL, or a
 // free-text description) plus their business context ("Second Brain"), works out
 // what the build actually is and how it's made, then rewrites the whole plan for
