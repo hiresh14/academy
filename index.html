@@ -412,6 +412,30 @@
   .ts-item .ts-p{font-size:12px;color:var(--muted);font-weight:600;margin-top:1px;}
   .ts-item .ts-chev{margin-left:auto;color:var(--muted);font-weight:800;}
   .ts-item.tdone .ts-t::after{content:" ✓";color:var(--green-dark);}
+
+  /* ===== Build Studio ===== */
+  .studio-in{width:100%;min-height:84px;border:2px solid var(--border);border-radius:14px;padding:13px 15px;font-size:15.5px;font-family:inherit;line-height:1.5;}
+  .src-chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;}
+  .src-chip{font-size:12px;font-weight:700;color:var(--muted);background:var(--surface);border:1.5px solid var(--border);border-radius:999px;padding:4px 11px;}
+  .studio-sec{margin:18px 0;}
+  .studio-sec h4{font-size:13px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--blue);margin-bottom:8px;}
+  .step-row{display:flex;gap:11px;align-items:flex-start;margin-bottom:10px;}
+  .step-row .n{width:24px;height:24px;border-radius:50%;background:var(--blue);color:#fff;font-size:12.5px;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none;margin-top:1px;}
+  .step-row p{font-size:15px;line-height:1.5;margin:0;}
+  .prompt-box{background:#0f1729;color:#e7edf7;border-radius:14px;padding:14px 16px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;line-height:1.55;white-space:pre-wrap;word-break:break-word;position:relative;}
+  .stack-pill{display:inline-block;background:#eef4ff;color:var(--blue-dark);font-size:12px;font-weight:700;border-radius:999px;padding:4px 11px;margin:0 6px 6px 0;}
+  .swipe-card{display:flex;gap:11px;align-items:center;width:100%;text-align:left;border:2px solid var(--border);border-radius:14px;padding:12px 14px;margin-bottom:9px;background:#fff;cursor:pointer;font-family:inherit;}
+  .swipe-card .em{font-size:20px;flex:none;}
+  .swipe-card .st{font-weight:800;font-size:14.5px;color:var(--navy);}
+  .swipe-card .ss{font-size:12px;color:var(--muted);font-weight:600;margin-top:1px;}
+  .seg-wrap{display:flex;gap:6px;background:var(--surface);border-radius:12px;padding:4px;margin:14px 0 16px;}
+  .seg{flex:1;border:none;background:transparent;font-family:inherit;font-size:13.5px;font-weight:800;color:var(--muted);border-radius:9px;padding:9px 8px;cursor:pointer;}
+  .seg.on{background:#fff;color:var(--blue);box-shadow:0 1px 4px rgba(0,0,0,.08);}
+  .st-chip{display:inline-block;font-size:11px;font-weight:800;border-radius:999px;padding:3px 9px;text-transform:uppercase;letter-spacing:.03em;}
+  .st-idea{background:#eef1f6;color:var(--muted);}
+  .st-building{background:#fff3df;color:var(--gold-dark);}
+  .st-shipped{background:#e6f8ef;color:var(--green-dark);}
+  .copy-btn{position:absolute;top:9px;right:9px;background:rgba(255,255,255,.14);color:#e7edf7;border:none;border-radius:8px;font-size:11px;font-weight:800;padding:5px 9px;cursor:pointer;font-family:inherit;}
 </style>
 </head>
 <body>
@@ -16227,7 +16251,8 @@ let S = JSON.parse(localStorage.getItem(LS_STATE) || "null") || {
   quizAwarded: {}, // "m1_2": true (XP given for this question)
   assignDone: {},  // "m1": true
   chests: {},      // "m1": true (unit reward claimed)
-  todayXP: 0, todayDate: null, freezes: 1
+  todayXP: 0, todayDate: null, freezes: 1,
+  swipeFile: []    // Build Studio saved Build Cards
 };
 
 function save(){ localStorage.setItem(LS_STATE, JSON.stringify(S)); if(profile) localStorage.setItem(LS_PROFILE, JSON.stringify(profile)); syncRemote(); }
@@ -16520,8 +16545,9 @@ function setScreen(html, opts){
 function tabbarHTML(){
   const tabs = [
     ["home","🏠","Learn"],
-    ["glossary","📖","Glossary"],
+    ["studio","🛠️","Studio"],
     ["brief","📰","Brief"],
+    ["glossary","📖","Glossary"],
     ["passport","🎒","Passport"]
   ];
   return `<nav class="tabbar"><div class="tabbar-inner">` + tabs.map(t =>
@@ -16531,7 +16557,7 @@ function tabbarHTML(){
 function bindTabs(){
   document.querySelectorAll(".tab").forEach(b => b.onclick = () => {
     currentTab = b.dataset.tab;
-    ({home:renderHome, glossary:renderGlossary, brief:renderBrief, passport:renderPassport})[currentTab]();
+    ({home:renderHome, glossary:renderGlossary, brief:renderBrief, passport:renderPassport, studio:renderStudio})[currentTab]();
   });
 }
 function topbarHTML(){
@@ -17542,12 +17568,18 @@ function renderArticle(i){
       <h3>Our take</h3>
       <p>${n.article.our_take}</p>
       ${n.source && n.source.url ? `<p style="font-size:13.5px;font-weight:600;margin-top:18px;">Source: <a href="${n.source.url}" target="_blank" rel="noopener" style="color:var(--blue);">${esc(n.source.name||"link")} ↗</a></p>` : ""}
-      <div style="height:14px"></div>
+      <div style="height:18px"></div>
+      <button class="btn btn-primary" id="brief-build" style="width:100%;">🛠️ Build from this →</button>
+      <div style="height:9px"></div>
       <button class="btn btn-ghost" id="back2">← Back to all briefs</button>
     </div>
   `, { noTabs: true });
   document.getElementById("back").onclick = renderBrief;
   document.getElementById("back2").onclick = renderBrief;
+  document.getElementById("brief-build").onclick = ()=>{
+    studioPrefill = `Build something for my business from this AI news: "${n.headline}". ${n.tldr}`;
+    studioView = "analyse"; renderStudio();
+  };
 }
 async function loadBrief(){
   if (!SB) return;
@@ -17558,6 +17590,245 @@ async function loadBrief(){
       if (currentTab === "brief") renderBrief();
     }
   }catch(e){}
+}
+
+/* =====================================================================
+   BUILD STUDIO
+   Paste a link or describe an AI build you saw. We reverse-engineer it and
+   rewrite the whole plan for your business, then save it to your Swipe File.
+   Backend: analyse-build Edge Function (Claude). Second Brain context lives
+   in profile.business_context. Saved cards live in S.swipeFile.
+   ===================================================================== */
+let studioView = "analyse";   // "analyse" | "swipe"
+let studioPrefill = "";        // seeded from the Brief "Build from this" CTA
+let studioCard = null;         // last analysed card, not yet saved
+let studioBusy = false;
+
+function swipeFile(){ if(!Array.isArray(S.swipeFile)) S.swipeFile = []; return S.swipeFile; }
+function bizCtx(){ return (profile && profile.business_context) || {}; }
+function bizCtxFilled(){ const c = bizCtx(); return !!(c.what_you_do || c.target_customer || c.build_goal); }
+function uid(){ return "b" + Date.now().toString(36) + Math.floor(Math.random()*1e4).toString(36); }
+const STATUS = { idea:["Idea","st-idea","💡"], building:["Building","st-building","🔧"], shipped:["Shipped","st-shipped","🚀"] };
+
+async function analyseBuild(input){
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) return { ok:false, error:"offline" };
+  try{
+    const r = await fetch(`${SUPABASE_URL}/functions/v1/analyse-build`, {
+      method:"POST",
+      headers:{ "content-type":"application/json", "authorization":"Bearer "+SUPABASE_ANON_KEY, "apikey":SUPABASE_ANON_KEY },
+      body: JSON.stringify({ input, business_context: bizCtx() })
+    });
+    return await r.json();
+  }catch(e){ return { ok:false, error:"network" }; }
+}
+
+function renderStudio(){
+  currentTab = "studio";
+  swipeFile();
+  const seg = (id,label)=>`<button class="seg ${studioView===id?"on":""}" data-sv="${id}">${label}</button>`;
+  setScreen(`
+    ${topbarHTML()}
+    <div class="section-title" style="margin-bottom:2px;">🛠️ Build Studio</div>
+    <p class="muted" style="font-weight:500;font-size:14px;margin-bottom:2px;">Saw an AI build you want for your business? Drop the link or describe it. We work out how it's made and rewrite the whole plan for you.</p>
+    <div class="seg-wrap">${seg("analyse","🔎 Analyse")}${seg("swipe","📑 Swipe File"+(swipeFile().length?` (${swipeFile().length})`:""))}</div>
+    <div id="studio-body"></div>
+  `);
+  document.querySelectorAll(".seg").forEach(b=> b.onclick = ()=>{ studioView=b.dataset.sv; renderStudio(); });
+  (studioView==="analyse" ? drawAnalyse : drawSwipe)();
+}
+
+function drawAnalyse(){
+  const body = document.getElementById("studio-body");
+  const seed = studioPrefill; studioPrefill = "";
+  const brainBanner = bizCtxFilled() ? "" : `
+    <button class="card rise" id="st-brain" style="display:flex;gap:11px;align-items:center;width:100%;text-align:left;border:2px dashed var(--blue);background:#f5f9ff;margin-bottom:14px;cursor:pointer;">
+      <div style="font-size:20px;">🧠</div>
+      <div><b style="color:var(--blue-dark);">Set up your Second Brain</b><div class="muted" style="font-size:12.5px;font-weight:500;margin-top:1px;">Tell us about your business once. Every build then gets shaped to you.</div></div>
+    </button>`;
+  body.innerHTML = `
+    ${brainBanner}
+    <textarea class="studio-in" id="st-input" placeholder="Paste a tweet, LinkedIn post, YouTube or Loom link, or any website. Or just describe the AI build you saw.">${seed?esc(seed):""}</textarea>
+    <div class="src-chips"><span class="src-chip">🔗 Tweet / LinkedIn</span><span class="src-chip">▶️ YouTube / Loom</span><span class="src-chip">🌐 Website</span><span class="src-chip">✍️ Your words</span></div>
+    <button class="btn btn-primary" id="st-go" style="width:100%;">${studioBusy?"Analysing…":"Reverse-engineer & adapt"}</button>
+    <div id="st-out" style="margin-top:18px;"></div>
+  `;
+  const brain = document.getElementById("st-brain"); if(brain) brain.onclick = ()=> renderBusiness("studio");
+  const go = document.getElementById("st-go");
+  if (studioCard) document.getElementById("st-out").innerHTML = buildCardHTML(studioCard, true), bindCardActions(studioCard, true);
+  go.onclick = async ()=>{
+    const input = document.getElementById("st-input").value.trim();
+    if (!input){ toast("Paste a link or describe what you saw"); return; }
+    if (studioBusy) return;
+    studioBusy = true; go.textContent = "Analysing…"; go.disabled = true;
+    const out = document.getElementById("st-out");
+    out.innerHTML = `<div class="card" style="text-align:center;padding:26px;"><div style="font-size:26px;">⚙️</div><p class="muted" style="font-weight:600;margin-top:8px;">Working out how it's built and rewriting it for your business…</p></div>`;
+    const res = await analyseBuild(input);
+    studioBusy = false; go.disabled = false; go.textContent = "Reverse-engineer & adapt";
+    if (res && res.ok && res.card){
+      studioCard = { id:uid(), created_at:new Date().toISOString(), status:"idea", adapted_for:res.card.adapted_for||"", ...res.card };
+      out.innerHTML = buildCardHTML(studioCard, true); bindCardActions(studioCard, true);
+    } else {
+      const msg = res && res.error==="offline" ? "The build backend is not connected yet. You can still save this as an idea to come back to."
+        : res && res.error ? esc(String(res.error)) : "Something went wrong. Try again.";
+      out.innerHTML = `<div class="card" style="border-color:#f0d2d2;background:#fdf6f6;">
+        <p style="font-weight:600;margin-bottom:10px;">${msg}</p>
+        <button class="btn btn-ghost" id="st-draft" style="width:100%;">Save as an idea anyway</button></div>`;
+      document.getElementById("st-draft").onclick = ()=>{
+        const draft = { id:uid(), created_at:new Date().toISOString(), status:"idea", title:input.slice(0,60), what_it_does:input, tools:[], steps:[], starter_prompt:"", adapted_for:"", source_url:(/^https?:/i.test(input)?input:"") };
+        swipeFile().unshift(draft); save(); toast("Saved to your Swipe File"); studioView="swipe"; renderStudio();
+      };
+    }
+  };
+}
+
+function buildCardHTML(c, unsaved){
+  const saved = swipeFile().some(x=>x.id===c.id);
+  const st = STATUS[c.status] || STATUS.idea;
+  return `<div class="card rise">
+    <div style="display:flex;align-items:flex-start;gap:8px;justify-content:space-between;">
+      <h4 style="font-size:17px;font-weight:800;color:var(--navy);margin:0;flex:1;">${esc(c.title||"Your build")}</h4>
+      <span class="st-chip ${st[1]}">${st[2]} ${st[0]}</span>
+    </div>
+    ${c.what_it_does?`<p style="font-size:15px;line-height:1.5;margin-top:8px;">${esc(c.what_it_does)}</p>`:""}
+    ${c.tools&&c.tools.length?`<div class="studio-sec"><h4>Tools you'll use</h4><div>${c.tools.map(t=>`<span class="stack-pill">${esc(t)}</span>`).join("")}</div></div>`:""}
+    ${c.steps&&c.steps.length?`<div class="studio-sec"><h4>Build plan</h4>${c.steps.map((s,i)=>`<div class="step-row"><div class="n">${i+1}</div><p>${esc(s)}</p></div>`).join("")}</div>`:""}
+    ${c.starter_prompt?`<div class="studio-sec"><h4>Starter prompt</h4><div class="prompt-box"><button class="copy-btn" data-copy="${esc(c.starter_prompt)}">Copy</button>${esc(c.starter_prompt)}</div></div>`:""}
+    ${c.adapted_for?`<p class="muted" style="font-size:12.5px;font-weight:600;font-style:italic;margin-top:10px;">🎯 ${esc(c.adapted_for)}</p>`:""}
+    <div style="display:flex;gap:9px;margin-top:14px;flex-wrap:wrap;">
+      ${unsaved&&!saved?`<button class="btn btn-primary" id="st-save" style="flex:1;min-width:130px;">📑 Save to Swipe File</button>`:""}
+      <button class="btn btn-ghost" id="st-build" style="flex:1;min-width:130px;">🚀 Build it</button>
+    </div>
+  </div>`;
+}
+
+function bindCardActions(c, unsaved){
+  document.querySelectorAll(".copy-btn").forEach(b=> b.onclick = ()=>{ navigator.clipboard && navigator.clipboard.writeText(b.dataset.copy); b.textContent="Copied"; setTimeout(()=>b.textContent="Copy",1200); });
+  const sv = document.getElementById("st-save");
+  if (sv) sv.onclick = ()=>{ swipeFile().unshift(c); save(); studioCard=null; toast("Saved to your Swipe File"); studioView="swipe"; renderStudio(); };
+  const bd = document.getElementById("st-build");
+  if (bd) bd.onclick = ()=> buildItHandoff(c);
+}
+
+function composeBuildPrompt(c){
+  const ctx = bizCtx();
+  const bc = [
+    ctx.what_you_do && `My business: ${ctx.what_you_do}`,
+    ctx.target_customer && `My customer: ${ctx.target_customer}`,
+    ctx.current_stack && `My tools: ${ctx.current_stack}`,
+  ].filter(Boolean).join("\n");
+  return `I want to build this for my business. Be my hands-on guide, one step at a time, and wait for me after each step.
+
+${bc?bc+"\n\n":""}WHAT I'M BUILDING: ${c.title||"an AI build"}
+${c.what_it_does?"\n"+c.what_it_does:""}
+${c.tools&&c.tools.length?"\nTools: "+c.tools.join(", "):""}
+${c.steps&&c.steps.length?"\nThe plan:\n"+c.steps.map((s,i)=>`${i+1}. ${s}`).join("\n"):""}
+${c.starter_prompt?"\nStarter prompt I was given:\n"+c.starter_prompt:""}
+
+Start by asking me what I have set up already, then walk me through step 1.`;
+}
+
+// "Build it" hands off to the user's own Claude with the full plan pre-loaded.
+// (Default, reversible: keeps LLM cost off LevelUp. An in-app guided wizard is
+// the alternative — deferred pending the product decision in the handoff.)
+function buildItHandoff(c){
+  const prompt = composeBuildPrompt(c);
+  setScreen(`
+    <div class="reader">
+      <button class="back-link" id="bk">← Back to Studio</button>
+      <h1 style="font-size:22px;">🚀 Build it: ${esc(c.title||"your build")}</h1>
+      <p class="lede">Take this straight into your own AI assistant. It has your whole plan and your business baked in, so you can start building in one paste.</p>
+      <div class="prompt-box" style="margin:6px 0 16px;"><button class="copy-btn" id="cp">Copy</button>${esc(prompt)}</div>
+      <a class="btn btn-primary" href="https://claude.ai/new" target="_blank" rel="noopener" style="width:100%;display:block;text-align:center;box-sizing:border-box;text-decoration:none;">Open Claude, then paste ↗</a>
+      <div style="height:9px"></div>
+      <a class="btn btn-ghost" href="https://chatgpt.com/" target="_blank" rel="noopener" style="width:100%;display:block;text-align:center;box-sizing:border-box;text-decoration:none;">Open ChatGPT instead ↗</a>
+      <p class="muted" style="font-size:12.5px;font-weight:500;margin-top:14px;">Tip: as you go, mark this build as Building, then Shipped in your Swipe File.</p>
+    </div>
+  `, { noTabs:true });
+  document.getElementById("bk").onclick = ()=> renderStudio();
+  document.getElementById("cp").onclick = (e)=>{ navigator.clipboard && navigator.clipboard.writeText(prompt); e.target.textContent="Copied"; setTimeout(()=>e.target.textContent="Copy",1200); };
+}
+
+function drawSwipe(){
+  const body = document.getElementById("studio-body");
+  const cards = swipeFile();
+  if (!cards.length){
+    body.innerHTML = `<div class="card" style="text-align:center;padding:30px 18px;">
+      <div style="font-size:34px;">📑</div>
+      <p style="font-weight:700;margin-top:8px;">Your Swipe File is empty</p>
+      <p class="muted" style="font-weight:500;font-size:13.5px;margin-top:4px;">Every build you save lands here, like a saved-reels folder for AI builds. Analyse something to start.</p>
+      <button class="btn btn-primary" id="sw-go" style="margin-top:14px;">🔎 Analyse a build</button></div>`;
+    document.getElementById("sw-go").onclick = ()=>{ studioView="analyse"; renderStudio(); };
+    return;
+  }
+  body.innerHTML = cards.map(c=>{
+    const st = STATUS[c.status]||STATUS.idea;
+    return `<button class="swipe-card" data-id="${c.id}">
+      <span class="em">${st[2]}</span>
+      <span style="flex:1;"><span class="st">${esc(c.title||"Untitled build")}</span><span class="ss">${(c.tools&&c.tools.length?c.tools.slice(0,3).join(" · "):"Tap to open")}</span></span>
+      <span class="st-chip ${st[1]}">${st[0]}</span>
+    </button>`;
+  }).join("");
+  document.querySelectorAll(".swipe-card").forEach(b=> b.onclick = ()=> renderSwipeDetail(b.dataset.id));
+}
+
+function renderSwipeDetail(id){
+  const c = swipeFile().find(x=>x.id===id); if(!c) return renderStudio();
+  setScreen(`
+    ${topbarHTML()}
+    <button class="back-link" id="bk" style="margin-bottom:6px;">← Swipe File</button>
+    <div id="sd-card"></div>
+    <div class="section-title" style="font-size:15px;margin:20px 0 8px;">Status</div>
+    <div style="display:flex;gap:8px;">
+      ${Object.keys(STATUS).map(k=>`<button class="btn ${c.status===k?"btn-primary":"btn-ghost"}" data-st="${k}" style="flex:1;font-size:13px;padding:9px 4px;">${STATUS[k][2]} ${STATUS[k][0]}</button>`).join("")}
+    </div>
+    ${c.source_url?`<p class="muted" style="font-size:12.5px;font-weight:600;margin-top:14px;">Source: <a href="${esc(c.source_url)}" target="_blank" rel="noopener" style="color:var(--blue);">${esc(c.source_url.slice(0,48))} ↗</a></p>`:""}
+    <div style="height:14px"></div>
+    <button class="btn btn-ghost" id="sd-del" style="width:100%;color:#c0392b;">Remove from Swipe File</button>
+    <div style="height:10px"></div>
+  `);
+  document.getElementById("sd-card").innerHTML = buildCardHTML(c, false); bindCardActions(c, false);
+  document.getElementById("bk").onclick = ()=>{ studioView="swipe"; renderStudio(); };
+  document.querySelectorAll("[data-st]").forEach(b=> b.onclick = ()=>{ c.status=b.dataset.st; save(); renderSwipeDetail(id); });
+  document.getElementById("sd-del").onclick = ()=>{ S.swipeFile = swipeFile().filter(x=>x.id!==id); save(); toast("Removed"); studioView="swipe"; renderStudio(); };
+}
+
+/* =====================================================================
+   SECOND BRAIN  (business context, stored in profile.business_context)
+   ===================================================================== */
+const BRAIN_FIELDS = [
+  ["what_you_do","What you do","Your company and what you sell, in a sentence or two"],
+  ["target_customer","Your customer","Who you serve"],
+  ["current_stack","Your tools","Tools and software you use day to day"],
+  ["main_challenge","Biggest challenge","The thing you most want to fix right now"],
+  ["build_goal","Your build goal","What you want to build during the residency"]
+];
+function renderBusiness(back){
+  const c = bizCtx();
+  setScreen(`
+    <div class="reader">
+      <button class="back-link" id="bk">← Back</button>
+      <h1 style="font-size:22px;">🧠 Your Second Brain</h1>
+      <p class="lede">Fill this in once. Every build in the Studio then gets rewritten for your business automatically.</p>
+      ${BRAIN_FIELDS.map(f=>`<div class="studio-sec" style="margin:14px 0;">
+        <h4 style="text-transform:none;letter-spacing:0;font-size:14px;color:var(--navy);">${f[1]}</h4>
+        <textarea class="studio-in" id="bf-${f[0]}" style="min-height:64px;" placeholder="${f[2]}">${c[f[0]]?esc(c[f[0]]):""}</textarea>
+      </div>`).join("")}
+      <label style="display:flex;align-items:center;gap:9px;font-weight:600;font-size:14px;margin:8px 2px 16px;cursor:pointer;">
+        <input type="checkbox" id="bf-codes" ${String(c.codes)==="true"?"checked":""} style="width:18px;height:18px;"> I write code (turn on a technical build lane)
+      </label>
+      <button class="btn btn-primary" id="bf-save" style="width:100%;">Save my Second Brain</button>
+      <div style="height:12px"></div>
+    </div>
+  `, { noTabs:true });
+  const home = ()=> back==="studio" ? (studioView="analyse", renderStudio()) : renderPassport();
+  document.getElementById("bk").onclick = home;
+  document.getElementById("bf-save").onclick = ()=>{
+    profile = profile || {};
+    const ctx = {};
+    BRAIN_FIELDS.forEach(f=> ctx[f[0]] = document.getElementById("bf-"+f[0]).value.trim());
+    ctx.codes = document.getElementById("bf-codes").checked ? "true" : "false";
+    profile.business_context = ctx; save(); toast("Saved. Your builds will now be shaped to you."); home();
+  };
 }
 
 /* =====================================================================
@@ -17636,6 +17907,12 @@ function renderPassport(){
       ${card("Minutes learned", s.minutes, "⏱️")}
     </div>
 
+    <button class="card rise" id="pp-brain" style="display:flex;gap:11px;align-items:center;width:100%;text-align:left;border:2px solid var(--border);cursor:pointer;margin-top:14px;">
+      <div style="font-size:22px;">🧠</div>
+      <div style="flex:1;"><b style="color:var(--navy);">My Business</b><div class="muted" style="font-size:12.5px;font-weight:500;margin-top:1px;">${bizCtxFilled()?"Your Second Brain. Tap to update.":"Set it up once. Every build gets shaped to you."}</div></div>
+      <span class="ts-chev">›</span>
+    </button>
+
     <div class="section-title" style="font-size:17px;margin:22px 0 4px;">What you can do now <span class="muted" style="font-weight:600;font-size:13px;">${capCount}/14</span></div>
     <div id="pp-caps">
       ${MODULES.map((m,mi)=>{ const on=capsUnlocked[mi]; return `<div class="card" style="display:flex;gap:11px;align-items:flex-start;margin-bottom:8px;${on?"":"opacity:.55;"}">
@@ -17667,6 +17944,7 @@ function renderPassport(){
     <div style="height:10px"></div>
   `);
   document.getElementById("pp-share").onclick = ()=> shareMoment(`I'm level ${s.lvl} on AIcademy with ${s.lessonsDone} stones cleared and a ${s.streak} day streak, learning AI by actually doing it.`);
+  document.getElementById("pp-brain").onclick = ()=> renderBusiness("passport");
   const ss=document.getElementById("set-sound"); if(ss) ss.onclick=()=>{ toggleMute(); renderPassport(); };
   const sn=document.getElementById("set-notif"); if(sn) sn.onclick=()=>{ if(typeof enablePush==="function" && pushSupported()) enablePush(); else toast("Open on your phone and add to home screen first"); };
   const sg=document.getElementById("set-goal"); if(sg) sg.onclick=()=> toast("Your goal follows your chosen rhythm. Change it by retaking onboarding.");
